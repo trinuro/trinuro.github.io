@@ -6,6 +6,9 @@
     <title>Personal Portfolio Website</title>
     <meta name="description" content="Froginacup's Personal Portfolio Page">
     <link rel="stylesheet" href="styles.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Yellowtail&display=swap" rel="stylesheet">
     <!--To import Open sans-->
     <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Open+Sans:400,700,800"/>
 
@@ -16,22 +19,28 @@
   </head>
   <body>
     <header id="navbar">
-      <h1 class="title">@froginacup</h1>
+      <h1 class="title username"><a href="#">froginacup</a></h1>
       <nav id="nav-list">
-        <a href="#welcome-section">About</a>
+        <a href="#">About</a>
         <a href="#projects">Projects</a>
         <a href="#contacts">Contacts</a>
-        <a href="#">Back to top</a>
       </nav>
     </header>
 
     <main>
       <section id="welcome-section">
         <div class="actual-about">
-          <img src="./Resources/Cropped Profile.jpg" alt="Froginacup Photo"/>
-          <h1><span class="emphasise">Hi, I am froginacup.</span></h1>
+          <!--
+          <img src="./Resources/Cropped Profile 2.jpg" alt="Froginacup Photo"/>
+          -->
+          <h1><span class="emphasise">Hi, I am <span class="username neon">froginacup</span>.</span></h1>
           <p>A computer science student from University of Malaya. He is passionate in cybersecurity, web programming and all things Computer Science. A blogger in his free time.</p>
           
+        </div>
+        <div class="custom-shape-divider-bottom-1709009140">
+          <svg data-name="Layer 1" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 120" preserveAspectRatio="none">
+              <path d="M321.39,56.44c58-10.79,114.16-30.13,172-41.86,82.39-16.72,168.19-17.73,250.45-.39C823.78,31,906.67,72,985.66,92.83c70.05,18.48,146.53,26.09,214.34,3V0H0V27.35A600.21,600.21,0,0,0,321.39,56.44Z" class="shape-fill"></path>
+          </svg>
         </div>
       </section>
 

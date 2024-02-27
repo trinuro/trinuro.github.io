@@ -1,3 +1,9 @@
+:root{
+  --color1: #0C2D57;
+  --color2: #FC6736;
+  --color3: #FFB0B0;
+}
+
 *{
   box-sizing: border-box;
 }
@@ -14,18 +20,29 @@ header{
   flex-direction: row;
   align-items: center;
   justify-content: space-between;
-  background-color: #FC6736;
+  background-color: var(--color2);
 
   padding-left: 1rem;
   padding-right: 0.5rem;
   
   position: sticky;
   top: 0;
+  z-index: 999;
 }
 
 header h1{
-  font-family: "Anton";
-  font-weight: 800;
+  font-size: 2.5rem;
+  margin: 0 0 1rem;
+}
+
+.title a{
+  text-decoration: none;
+  color: black;
+}
+
+.username{
+  font-family: 'YellowTail', cursive;
+  font-weight: 500;
 }
 
 #nav-list a{
@@ -53,28 +70,75 @@ main{
     /*Grid display*/
     display: grid;
     grid-template-columns: minmax(0,1fr) minmax(min-content, 1000px) minmax(0,1fr);
+    background: url("./Resources/Cropped\ Profile.jpg");
+    background-size: cover;
+    background-position: center; 
+    background-repeat: no-repeat; 
+    
 
-
-    background-color: #0C2D57;
+    background-color: var(--color1);
     padding: 1rem 2rem 0rem;
     margin: 0;
     height: calc(100vh);
     width: 100%;
+
+    position: relative;
 }
+
+
+#welcome-section::before{
+  content: "";
+  width: 100%;
+  height: 35%;
+  z-index: 1;
+  position: absolute;
+  top: 0;
+  left:0 ;
+
+  background: linear-gradient(
+    var(--color1) 60%, 
+    transparent
+    );
+
+  
+} 
+
 
 .actual-about{
+  z-index: 2;
   grid-column: 2/3;
+  position: relative;
 }
 
-#welcome-section img{
-  height: 30%;
-  max-height: 1000px;
+.actual-about h1{
+  margin-top: 0;
 }
 
 .emphasise{
   font-family: "Anton";
   font-size: 6rem;
-  color: #FFB0B0;
+  color: var(--color3);
+}
+
+.custom-shape-divider-bottom-1709009140 {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  overflow: hidden;
+  line-height: 0;
+  transform: rotate(180deg);
+}
+
+.custom-shape-divider-bottom-1709009140 svg {
+  position: relative;
+  display: block;
+  width: calc(131% + 1.3px);
+  height: 95px;
+}
+
+.custom-shape-divider-bottom-1709009140 .shape-fill {
+  fill: #FFB0B0;
 }
 
 /*Projects css section*/
@@ -173,6 +237,7 @@ main{
 }
 
 #contacts h2{
+  padding-top: 3rem;
   font-size: 5rem;
 }
 
@@ -203,6 +268,27 @@ footer{
   font-size: 1.1rem;
 }
 
+/*Miscellaneous classes*/
+@keyframes neon_flicker{
+  0%{
+     text-shadow: 0px 0px 10px;
+   }
+   50%{
+     text-shadow: 0px 0px 1px;
+     }
+   100%{
+     text-shadow: 0px 0px 10px;
+   } 
+ 
+ }
+
+.neon{
+  text-shadow: 0px 0px 10px;
+  -webkit-animation: neon_flicker 1s linear infinite ;
+  animation: neon_flicker 10s linear 0 infinite;
+}
+
+
 /*Small screen settings*/
 @media (max-width:912px){
   header{
@@ -211,10 +297,20 @@ footer{
     padding-bottom: 1rem;
   }
 
-  #welcome-section img{
-    max-width: 100%;
-    max-height: auto;
-    margin: 0 auto;
+  #welcome-section{
+    background-size: cover;
+    background-position: center top; /* Center the image */ 
+    background-repeat: no-repeat; /* Do not repeat the image */
+  }
+
+  #welcome-section::before{
+    background: linear-gradient(
+      var(--color1) 70%, 
+      transparent
+      );
+      /* background: black; */
+
+    border-radius: 0% 0% 30% 30%;
   }
 
   .emphasise{
@@ -226,4 +322,10 @@ footer{
     padding-left: 0;
     
   }
+
+  #contacts h2{
+    padding-top: 1rem;
+    font-size: 4rem;
+  }
+
 }
