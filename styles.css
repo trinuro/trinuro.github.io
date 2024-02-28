@@ -103,7 +103,6 @@ main{
   
 } 
 
-
 .actual-about{
   z-index: 2;
   grid-column: 2/3;
@@ -162,13 +161,18 @@ main{
   border: 1px solid #EFECEC;
 }
 
-#projects img{
+#showcase-one-project-section svg{
+  margin: 0;
+}
+
+.projects-container img{
   width: 100%;
   max-width: 300px;
 }
 
 /*CSS Grids for Projects container*/
 .projects-container{
+  margin-top: 3rem;
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
   gap: 1rem;
@@ -187,6 +191,58 @@ main{
   
 }
 
+/*This section is for project showcase (one at a time section)*/
+#showcase-one-project-section{
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+}
+
+#showcase-one-project-section::before, #showcase-one-project-section::after{
+  content: ' ';
+}
+
+.showcase-direction-container{
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
+
+.showcase-direction-container::before,
+.showcase-direction-container::after{
+  content:"";
+}
+
+#showcase-one-project-section button{
+  border: none;
+  max-height: fit-content;
+  font-size: 3rem;
+  /* background-color: transparent;
+*/}
+
+.project-showcase{
+  background-color: #EFECEC;
+  padding: 1rem 2rem 1rem;
+  max-width: 600px;
+  border-radius: 5%;
+  box-shadow: 5px 5px black;
+}
+
+.project-showcase-image{
+  width: 50vw;
+  height: auto;
+  max-width: 500px;
+  object-fit: contain;
+  border-radius: 5%;
+}
+
+#showcase-project-container a {
+  text-decoration: none;
+  color:#0C2D57;
+  font-size: 1.5rem;
+}
+
+/*Keep this section*/
 .project-selector{
   color: transparent;
   font-weight: bold;
@@ -212,6 +268,7 @@ main{
   background-color: #FC6736;
   padding: 0.8rem;
   border-radius: 5%;
+  margin-bottom: 1rem;
 }
 
 .move-forward{
@@ -222,6 +279,7 @@ main{
 .move-forward::before{
   content: " ";
 }
+/* Keep until here*/
 
 /*Contacts section*/
 #contacts{
@@ -230,10 +288,32 @@ main{
   padding: 2rem 0.5rem;
   text-align: center;
   height: 100vh;
+  position: relative;
 
   /*Grid display*/
     display: grid;
     grid-template-columns: minmax(0,1fr) minmax(min-content, 1000px) minmax(0,1fr);
+}
+
+.custom-shape-divider-top-1709086425 {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  overflow: hidden;
+  line-height: 0;
+  transform: rotate(180deg);
+}
+
+.custom-shape-divider-top-1709086425 svg {
+  position: relative;
+  display: block;
+  width: calc(100% + 1.3px);
+  height: 268px;
+}
+
+.custom-shape-divider-top-1709086425 .shape-fill {
+  fill: #FFB0B0;
 }
 
 #contacts h2{
@@ -323,6 +403,9 @@ footer{
     
   }
 
+  #showcase-project-container a {
+    font-size: 1rem;
+  }
   #contacts h2{
     padding-top: 1rem;
     font-size: 4rem;
