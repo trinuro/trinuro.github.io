@@ -15,12 +15,16 @@
     <!--To import FontAwesome Stylesheet (Gives access to Anton, Baskervville and Raleway-->
     <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.8.2/css/all.css">
 	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" integrity="sha512-DTOQO9RWCH3ppGqcWaEA1BIZOC6xxalwEsw9c2QQeAIftl+Vegovlnee1c9QX4TctnWMn13TZye+giMm8e2LwA==" crossorigin="anonymous" referrerpolicy="no-referrer" />
-    <!--Don't use cached version-->
-    <!--
-      <meta http-equiv='cache-control' content='no-cache'> 
-      <meta http-equiv='expires' content='0'> 
-      <meta http-equiv='pragma' content='no-cache'>
-    -->
+  <!--Change this to determine how long cache will cache the website
+  <meta http-equiv='expires' content='0'>
+  -->
+
+  <!--
+    Don't use cached version (Use this when you want to update the website immediately)
+    <meta http-equiv='cache-control' content='no-cache'> 
+    <meta http-equiv='expires' content='0'> 
+    <meta http-equiv='pragma' content='no-cache'>
+  -->
  
   </head>
   <body>
@@ -34,7 +38,7 @@
     </header>
 
     <main>
-      <section id="welcome-section">
+      <section id="welcome-section" loading="eager" fetchpriority="high">
         <div class="actual-about">
           <!--
           <img src="./Resources/Cropped Profile 2.jpg" alt="Froginacup Photo"/>
