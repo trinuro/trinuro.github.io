@@ -6,6 +6,9 @@
     <title>Personal Portfolio Website</title>
     <meta name="description" content="Froginacup's Personal Portfolio Page">
     <link rel="stylesheet" href="styles.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Yellowtail&display=swap" rel="stylesheet">
     <!--To import Open sans-->
     <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Open+Sans:400,700,800"/>
 
@@ -16,79 +19,70 @@
   </head>
   <body>
     <header id="navbar">
-      <h1 class="title">@froginacup</h1>
+      <h1 class="title username"><a href="#">froginacup</a></h1>
       <nav id="nav-list">
-        <a href="#welcome-section">About</a>
+        <a href="#">About</a>
         <a href="#projects">Projects</a>
         <a href="#contacts">Contacts</a>
-        <a href="#">Back to top</a>
       </nav>
     </header>
 
     <main>
       <section id="welcome-section">
         <div class="actual-about">
-          <img src="./Resources/Cropped Profile.jpg" alt="Froginacup Photo"/>
-          <h1><span class="emphasise">Hi, I am froginacup.</span></h1>
+          <!--
+          <img src="./Resources/Cropped Profile 2.jpg" alt="Froginacup Photo"/>
+          -->
+          <h1><span class="emphasise">Hi, I am <span class="username neon">froginacup</span>.</span></h1>
           <p>A computer science student from University of Malaya. He is passionate in cybersecurity, web programming and all things Computer Science. A blogger in his free time.</p>
           
+        </div>
+        <div class="custom-shape-divider-bottom-1709009140">
+          <svg data-name="Layer 1" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 120" preserveAspectRatio="none">
+              <path d="M321.39,56.44c58-10.79,114.16-30.13,172-41.86,82.39-16.72,168.19-17.73,250.45-.39C823.78,31,906.67,72,985.66,92.83c70.05,18.48,146.53,26.09,214.34,3V0H0V27.35A600.21,600.21,0,0,0,321.39,56.44Z" class="shape-fill"></path>
+          </svg>
         </div>
       </section>
 
       <section id="projects">
         <div></div>
         <div id="actual-projects-section">
-        <h2>These are some of my projects</h2><hr>
-        <div class="projects-container">
-          <div class="project">
-            <img class="project-image" src="./Resources/Workshop feedback form screenshot.jpeg" alt="Workshop Feedback Screenshot" >
-            <div class="project-title-container project-tile">
-              <a href="https://codepen.io/froginacup/pen/GRezrmx" target="_blank">
-                <span class="project-selector"><</span>Workshop Feedback Form<span class="project-selector">/></span>
-                </a>
-            </div>
-          </div>
-          <div class="project">
-            <img class="project-image" src="./Resources/Linus Torvalds Tribute Screenshot.jpeg" alt="Linus Torvalds Tribute Screenshot" >
-            <div class="project-title-container">
-              <a href="https://codepen.io/froginacup/pen/VwRgPpz" target="_blank">
-                <span class="project-selector"><</span>Linus Torvalds Tribute Page<span class="project-selector">/></span>
-                </a>
-            </div>
-          </div>
-          <div class="project">
-            <img class="project-image" src="./Resources/Documentation Graphics.png" alt="Techincal Documentation Page Screenshot" >
-            <div class="project-title-container">
-              <a href="https://codepen.io/froginacup/pen/bGZzgWQ" target="_blank">
-                <span class="project-selector"><</span>Technical Documentation Page<span class="project-selector">/></span>
-                </a>
-            </div>
-          </div>
+          <h2>These are some of my projects</h2><hr>
+          <section id="showcase-one-project-section">
 
-          <div class="project">
-            <img class="project-image" src="./Resources/Product Landing Page Screenshot.png" alt="Product Landing Page Screenshot" loading="lazy">
-            <div class="project-title-container">
-              <a href="https://codepen.io/froginacup/pen/eYXxgRN" target="_blank">
-                <span class="project-selector"><</span>Product Landing Page<span class="project-selector">/></span>
-                </a>
+            <div class="showcase-direction-container">
+              <div>
+                <svg id="showcase-go-left" width="70%" height="70%" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" stroke="#0C2D57" transform="rotate(180)"><g id="SVGRepo_bgCarrier" stroke-width="0"></g>
+                  <g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round"></g><g id="SVGRepo_iconCarrier"> <path d="M13 15L16 12M16 12L13 9M16 12H8M7.2 20H16.8C17.9201 20 18.4802 20 18.908 19.782C19.2843 19.5903 19.5903 19.2843 19.782 18.908C20 18.4802 20 17.9201 20 16.8V7.2C20 6.0799 20 5.51984 19.782 5.09202C19.5903 4.71569 19.2843 4.40973 18.908 4.21799C18.4802 4 17.9201 4 16.8 4H7.2C6.0799 4 5.51984 4 5.09202 4.21799C4.71569 4.40973 4.40973 4.71569 4.21799 5.09202C4 5.51984 4 6.07989 4 7.2V16.8C4 17.9201 4 18.4802 4.21799 18.908C4.40973 19.2843 4.71569 19.5903 5.09202 19.782C5.51984 20 6.07989 20 7.2 20Z" stroke="#0C2D57" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path> 
+                </g></svg>
+              </div>
+              
             </div>
-          </div>
 
-          <div class="project">
-            <img class="project-image" src="./Resources/HTB Academy Screenshot.png" alt="HTB Academy Screenshot" loading="lazy">
-            <div class="project-title-container">
-              <a href="https://drive.google.com/file/d/1L6v3ZO0oeKK-bVdl53adjor6bEPrG-Xc/view?usp=sharing" target="_blank">
-                <span class="project-selector"><</span>HacktheBox Academy<span class="project-selector">/></span>
-                </a>
+            <div id="showcase-project-container"></div>
+
+            <div class="showcase-direction-container">
+              <div><svg id="showcase-go-right" width="70%" height="70%" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" stroke="#0C2D57"><g id="SVGRepo_bgCarrier" stroke-width="0"></g><g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round"></g>
+                <g id="SVGRepo_iconCarrier"> <path d="M13 15L16 12M16 12L13 9M16 12H8M7.2 20H16.8C17.9201 20 18.4802 20 18.908 19.782C19.2843 19.5903 19.5903 19.2843 19.782 18.908C20 18.4802 20 17.9201 20 16.8V7.2C20 6.0799 20 5.51984 19.782 5.09202C19.5903 4.71569 19.2843 4.40973 18.908 4.21799C18.4802 4 17.9201 4 16.8 4H7.2C6.0799 4 5.51984 4 5.09202 4.21799C4.71569 4.40973 4.40973 4.71569 4.21799 5.09202C4 5.51984 4 6.07989 4 7.2V16.8C4 17.9201 4 18.4802 4.21799 18.908C4.40973 19.2843 4.71569 19.5903 5.09202 19.782C5.51984 20 6.07989 20 7.2 20Z" stroke="#0C2D57" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path> 
+              </g></svg> </div>
+                         
             </div>
-          </div>
-          </div>
+            
+          </section>
+          
+          <div class="projects-container"></div>
           <div></div>
-          <a href="https://github.com/trinuro" class="show-others-button" target="_blank">Show Others<span class="move-forward">></span></a>
+
+          <button type="button" id="show-others-button" class="show-others-button" target="_blank">Show All</button>
         </div>
       </section>
 
       <section id="contacts">
+        <div class="custom-shape-divider-top-1709086425">
+          <svg data-name="Layer 1" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 120" preserveAspectRatio="none">
+              <path d="M600,112.77C268.63,112.77,0,65.52,0,7.23V120H1200V7.23C1200,65.52,931.37,112.77,600,112.77Z" class="shape-fill"></path>
+          </svg>
+        </div>
         <div></div>
 
         <div class="actual-about">
@@ -122,5 +116,7 @@
       <p>This portfolio website is made by froginacup himself. Source code is available on his <a href="https://github.com/trinuro/trinuro.github.io/blob/main/index.html" target="_blank">Github</a></p>
       <p>This website is also the last project of <a id="profile-link" href="https://www.freecodecamp.org/froginacup" target="_blank">FreeCodeCamp</a>'s Responsive Web Design Certification</p>
     </footer>
+
+    <script src="script.js"></script>
   </body>
 </html>
