@@ -142,6 +142,9 @@ const showcaseAProject = (projectID) =>{
       showcaseGoRightButton.style.cursor = "pointer";
       showcaseGoRightButton.style.opacity=1;    
     }
+
+    //prefetch next image
+    prefetchAdjacentProjects(project);
 };
 
 showcaseAProject(projects.length-1);
