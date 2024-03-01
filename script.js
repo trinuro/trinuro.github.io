@@ -161,3 +161,20 @@ showcaseGoRightButton.addEventListener("click", ()=>{
   showcaseAProject(currentProject.id + 1);
 
 });
+
+// function to prefetch project images
+const prefetchAdjacentProjects = (project) =>{
+  // check if the next project id is in the projects bound
+  if(project.id+1 < projects.length){
+    const projectAfter = projects[project.id+1];
+    fetch(projectAfter.imageSrc)
+    .catch((error)=>console.log(error));
+  }
+
+  if(project.id-1 < projects.length){
+    const projectBefore = projects[project.id-1];
+    fetch(projectBefore.imageSrc)
+    .catch((error)=>console.log(error));
+  }
+
+}
