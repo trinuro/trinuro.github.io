@@ -70,7 +70,7 @@ main{
     /*Grid display*/
     display: grid;
     grid-template-columns: minmax(0,1fr) minmax(min-content, 1000px) minmax(0,1fr);
-    background: url("./Resources/Cropped\ Profile.jpg");
+    background: url("./Resources/webpImages/Cropped\ Profile.jpg.webp");
     background-size: cover;
     background-position: center; 
     background-repeat: no-repeat; 
