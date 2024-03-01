@@ -1,82 +1,84 @@
-const projects = [
-    {
-      id: 0,
-      projectName: "Workshop Feedback Form",
-      imageSrc: "./Resources/Workshop feedback form screenshot.jpeg",
-      altText: "Workshop Feedback Screenshot",
-      url: "https://codepen.io/froginacup/full/GRezrmx",
-    },
-    {
-      id: 1,
-      projectName: "Linus Torvalds Tribute Page",
-      imageSrc: "./Resources/Linus Torvalds Tribute Screenshot.jpeg",
-      altText: "Linus Torvalds Tribute Screenshot",
-      url: "https://codepen.io/froginacup/full/VwRgPpz",
-    },
-    {
-      id: 2,
-      projectName: "Technical Documentation Page",
-      imageSrc: "./Resources/Documentation Graphics.png",
-      altText: "Techincal Documentation Page Screenshot",
-      url: "https://codepen.io/froginacup/full/bGZzgWQ",
-    },
-    {
-      id: 3,
-      projectName: "Product Landing Page",
-      imageSrc: "./Resources/Product Landing Page Screenshot.png",
-      altText: "Product Landing Page Screenshot",
-      url: "https://codepen.io/froginacup/full/eYXxgRN",
-    },
-    {
-      id: 4,
-      projectName: "HacktheBox Academy",
-      imageSrc: "./Resources/HTB Academy Screenshot.png",
-      altText: "HTB Academy Screenshot",
-      url: "https://drive.google.com/file/d/1L6v3ZO0oeKK-bVdl53adjor6bEPrG-Xc/view?usp",
-    },
-    {
-      id: 5,
-      projectName: "First Version of Portfolio Website",
-      imageSrc: "./Resources/Portfolio Website Version 1.png",
-      altText: "Portfolio Website Version 1",
-      url: "https://trinuro.github.io/personal_portfolio_ver_1/",
-    },
-    {
-      id: 6,
-      projectName: "Palindrome Checker",
-      imageSrc: "./Resources/Palindrome Checker.png",
-      altText: "Palindrome Checker Screenshot",
-      url: "https://codepen.io/froginacup/full/vYMBORj",
-    },
-    {
-      id: 7,
-      projectName: "Roman Numeral Converter",
-      imageSrc: "./Resources/Roman Numeral Converter.png",
-      altText: "Roman Numeral Converter Screenshot",
-      url: "https://codepen.io/froginacup/full/VwNZLBX",
-    },
-    {
-      id: 8,
-      projectName: "US Phone Number Checker",
-      imageSrc: "./Resources/US Phone Number Checker.png",
-      altText: "US Phone Number Checker Screenshot",
-      url: "https://codepen.io/froginacup/full/KKYPpxw",
-    },
-    {
-      id: 9,
-      projectName: "Cash Register Project",
-      imageSrc: "./Resources/Cash Register Project Screenshot.png",
-      altText: "Cash Register Project Screenshot",
-      url: "https://codepen.io/froginacup/full/VwNZLGX",
-    },
-    {
-      id: 10,
-      projectName: "Pokemon Search App",
-      imageSrc: "./Resources/Pokemon Search App Screenshot.png",
-      altText: "Pokemon Search App Screenshot",
-      url: "https://codepen.io/froginacup/pen/zYXOGmN",
-    },
-    ]
+const projects = 
+[
+{
+  id: 0,
+  projectName: "Workshop Feedback Form",
+  imageSrc: "./Resources/webpImages/Workshop feedback form screenshot.jpeg.webp",
+  altText: "Workshop Feedback Screenshot",
+  url: "https://codepen.io/froginacup/full/GRezrmx",
+},
+{
+  id: 1,
+  projectName: "Linus Torvalds Tribute Page",
+  imageSrc: "./Resources/webpImages/Linus Torvalds Tribute Screenshot.jpeg.webp",
+  altText: "Linus Torvalds Tribute Screenshot",
+  url: "https://codepen.io/froginacup/full/VwRgPpz",
+},
+{
+  id: 2,
+  projectName: "Technical Documentation Page",
+  imageSrc: "./Resources/webpImages/Documentation Graphics.png.webp",
+  altText: "Techincal Documentation Page Screenshot",
+  url: "https://codepen.io/froginacup/full/bGZzgWQ",
+},
+{
+  id: 3,
+  projectName: "Product Landing Page",
+  imageSrc: "./Resources/webpImages/Product Landing Page Screenshot.png.webp",
+  altText: "Product Landing Page Screenshot",
+  url: "https://codepen.io/froginacup/full/eYXxgRN",
+},
+{
+  id: 4,
+  projectName: "HacktheBox Academy",
+  imageSrc: "./Resources/webpImages/HTB Academy Screenshot.png.webp",
+  altText: "HTB Academy Screenshot",
+  url: "https://drive.google.com/file/d/1L6v3ZO0oeKK-bVdl53adjor6bEPrG-Xc/view?usp",
+},
+{
+  id: 5,
+  projectName: "First Version of Portfolio Website",
+  imageSrc: "./Resources/webpImages/Portfolio Website Version 1.png.webp",
+  altText: "Portfolio Website Version 1.png",
+  url: "https://trinuro.github.io/personal_portfolio_ver_1/",
+},
+{
+  id: 6,
+  projectName: "Palindrome Checker",
+  imageSrc: "./Resources/webpImages/Palindrome Checker.png.webp",
+  altText: "Palindrome Checker Screenshot",
+  url: "https://codepen.io/froginacup/full/vYMBORj",
+},
+{
+  id: 7,
+  projectName: "Roman Numeral Converter",
+  imageSrc: "./Resources/webpImages/Roman Numeral Converter.png.webp",
+  altText: "Roman Numeral Converter Screenshot",
+  url: "https://codepen.io/froginacup/full/VwNZLBX",
+},
+{
+  id: 8,
+  projectName: "US Phone Number Checker",
+  imageSrc: "./Resources/webpImages/US Phone Number Checker.png.webp",
+  altText: "US Phone Number Checker Screenshot",
+  url: "https://codepen.io/froginacup/full/KKYPpxw",
+},
+{
+  id: 9,
+  projectName: "Cash Register Project",
+  imageSrc: "./Resources/webpImages/Cash Register Project Screenshot.png.webp",
+  altText: "Cash Register Project Screenshot",
+  url: "https://codepen.io/froginacup/full/VwNZLGX",
+},
+{
+  id: 10,
+  projectName: "Pokemon Search App",
+  imageSrc: "./Resources/webpImages/Pokemon Search App Screenshot.png.webp",
+  altText: "Pokemon Search App Screenshot",
+  url: "https://codepen.io/froginacup/full/zYXOGmN",
+},
+];
+
 
 const projectsContainer = document.querySelector(".projects-container");
 const showAllButton = document.getElementById("show-others-button");
@@ -115,6 +117,22 @@ showAllButton.addEventListener("click", ()=>{
 
 })
 
+// function to prefetch project images
+const prefetchAdjacentProjects = (project) =>{
+  // check if the next project id is in the projects bound
+  if(project.id+1 < projects.length){
+    const projectAfter = projects[project.id+1];
+    fetch(projectAfter.imageSrc)
+    .catch((error)=>console.log(error));
+  }
+
+  if(project.id-1 < projects.length){
+    const projectBefore = projects[project.id-1];
+    fetch(projectBefore.imageSrc)
+    .catch((error)=>console.log(error));
+  }
+
+}
 
 const showcaseAProject = (projectID) =>{
     currentProject = projects.find((project)=>project.id===projectID); // find current project
@@ -142,6 +160,9 @@ const showcaseAProject = (projectID) =>{
       showcaseGoRightButton.style.cursor = "pointer";
       showcaseGoRightButton.style.opacity=1;    
     }
+
+    //prefetch next image
+    prefetchAdjacentProjects(currentProject);
 };
 
 showcaseAProject(projects.length-1);
@@ -162,19 +183,3 @@ showcaseGoRightButton.addEventListener("click", ()=>{
 
 });
 
-// function to prefetch project images
-const prefetchAdjacentProjects = (project) =>{
-  // check if the next project id is in the projects bound
-  if(project.id+1 < projects.length){
-    const projectAfter = projects[project.id+1];
-    fetch(projectAfter.imageSrc)
-    .catch((error)=>console.log(error));
-  }
-
-  if(project.id-1 < projects.length){
-    const projectBefore = projects[project.id-1];
-    fetch(projectBefore.imageSrc)
-    .catch((error)=>console.log(error));
-  }
-
-}
