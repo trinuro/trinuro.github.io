@@ -1,14 +1,10 @@
 ---
-title: Note-Safe Trust Issues
-description: Insecure Deserialization
-slug: hello-world
-date: 2025-07-03 00:00:00+0000
-image: cover.jpg
-tags:
-    - insecure-deserialization
-    - dotnet 
-    - ctf-writeup
+title: "Notesafe"
+description: 
+date: 2025-07-02T23:48:26Z
+image: 
 ---
+
 
 Welcome to NoteSafe, the ultra-secure note-taking app that protected by "Bitcoin-style encryption"™. Store your deepest thoughts and sensitive files behind a digital vault crafted by developers who read just enough of the Bitcoin whitepaper to feel dangerous.
 
