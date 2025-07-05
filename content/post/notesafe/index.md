@@ -3,6 +3,12 @@ title: "Notesafe"
 description: 
 date: 2025-07-02T23:48:26Z
 image: 
+tags:
+  - ctf
+  - insecure-deserialisation
+  - cydes2025
+categories:
+  - CTF-Writeups
 ---
 
 
@@ -60,9 +66,11 @@ Can you bypass the crypto-hype, dig through the interface, and uncover what they
   }
 ```
 - The password is `admin123`
-2. Let's log in as admin:admin123 ![dashboard](Pasted image 20250627215718.png)
+2. Let's log in as admin:admin123 
+![dashboard](post/notesafe/Pasted%20image%2020250627215718.png)
 	- Alright we are in
-3.  The flag does not work ![does not work](Pasted image 20250627215948.png)
+3.  The flag does not work 
+![does not work](post/notesafe/Pasted%20image%2020250627215948.png)
 4. We can get directory listing like this:
 ```http
 GET /api/Files/list?folder=../../ HTTP/1.1
