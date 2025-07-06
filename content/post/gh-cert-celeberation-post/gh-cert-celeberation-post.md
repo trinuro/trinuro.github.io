@@ -2,7 +2,7 @@
 title: "Got my first GitHub Certification!"
 description: Post about the 3 GitHub certs I got in June 2025
 date: 2025-07-05T23:43:29Z
-image: 
+image:
 tags:
     - GitHub
 categories:
