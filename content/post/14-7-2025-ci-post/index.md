@@ -38,7 +38,7 @@ Desired Output:
 4. Inside the repository, you will see 3 important files:
 	1. `example_module.py`: Just a simple python module
 	2. `test_counting_sort.py` and `test_find_missing_number.py`: Tests cases for said module
-.5 Navigate to the the github repository> Actions tab and enable Actions. ![Workflows arent enabled by default](workflows-arent-enabled.png)
+.5 Navigate to the the github repository> Actions tab and enable Actions. ![Workflows arent enabled by default](p/github-actions-primer-workflows-for-continuous-integration/workflows-arent-enabled.png)
 
 ## Workflows
 1. A workflow uses the YAML syntax
@@ -107,7 +107,7 @@ jobs:
         run: echo "Hello $GITHUB_ACTOR, happy learning!" 
 ```
 Output: 
-![Initial Workflow Debug](debug-workflow.png)
+![Initial Workflow Debug](p/github-actions-primer-workflows-for-continuous-integration/debug-workflow.png)
 7. That is cool, but let's clone our repository in the container so that we can examine the code inside. For this, we will use a pre-made action: [actions/checkout](https://github.com/actions/checkout)
 ```yaml
 jobs:
@@ -121,7 +121,7 @@ jobs:
         uses: actions/checkout@v4
 ```
 - Learnt the fact that the container does not contain the repo the hard way lol 
-![Workflows failed!](failed-workflows-no-checkout.png)
+![Workflows failed!](p/github-actions-primer-workflows-for-continuous-integration/failed-workflows-no-checkout.png)
 8. Next, we will execute the Python test code
 ```yaml
 jobs:
@@ -153,15 +153,15 @@ jobs:
 	      python -m unittest
 ```
 Output:
-![CI Workflow Success](ci-success.png)
+![CI Workflow Success](p/github-actions-primer-workflows-for-continuous-integration/ci-success.png)
 ## Other Workflow Triggers
 1. There are two unique workflow triggers that we defined, workflow dispatch and repository dispatch. Let's see how to trigger them.
 2. To trigger `workflow_dispatch`, navigate to your GitHub Repo > Actions Tab > Click "Python Test" on the left sidebar. Click on "Run workflow" to trigger the workflow.
-	![[GitHub workflow_dispatch.png]]
+	![](p/github-actions-primer-workflows-for-continuous-integration/GitHub%20workflow_dispatch.png)
 3. To trigger `repository_dispatch`, you need to send a post request to a github endpoint. 
 	1. First, create a fine-tuned access token. Go to account settings> Developer Settings > PAT > Fine-grained tokens and press Generate New Token 
-		![](create-personal-token-1.png)
-		![](create-personal-token-2.png)
+		![](p/github-actions-primer-workflows-for-continuous-integration/create-personal-token-1.png)
+		![](p/github-actions-primer-workflows-for-continuous-integration/create-personal-token-2.png)
 	2.  The fine-grained token must have the following permission set:
 		- "Contents" repository permissions (read and write)
 	3. Send a HTTP request to the relevant endpoint. 
@@ -175,7 +175,7 @@ https://api.github.com/repos/<accName>/<repo-name>/dispatches \
 -d '{"event_type":"my_input","client_payload":{}'
 ```
 Output: 
-![](GH_Repo_Dispatch.png)
+![](p/github-actions-primer-workflows-for-continuous-integration/GH_Repo_Dispatch.png)
 - "Repository dispatch triggered"
 
 ## Conclusion
