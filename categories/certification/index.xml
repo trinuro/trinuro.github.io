@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?><rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>Certification on Froginacup's site</title><link>https://trinuro.github.io/categories/certification/</link><description>Recent content in Certification on Froginacup's site</description><generator>Hugo -- gohugo.io</generator><language>en-us</language><lastBuildDate>Sat, 05 Jul 2025 23:43:29 +0000</lastBuildDate><atom:link href="https://trinuro.github.io/categories/certification/index.xml" rel="self" type="application/rss+xml"/><item><title>Got my first GitHub Certification!</title><link>https://trinuro.github.io/p/got-my-first-github-certification/</link><pubDate>Sat, 05 Jul 2025 23:43:29 +0000</pubDate><guid>https://trinuro.github.io/p/got-my-first-github-certification/</guid><description>&lt;p>&lt;img src="https://trinuro.github.io/post/gh-cert-celeberation-post/GitHub_Certification_Pathway.png"
+loading="lazy"
+alt="GH Cert Pathway"
+>&lt;/p>
+&lt;p>Last month, I completed 3 certifications from GitHub, namely Foundations, Actions and Advanced Security. It was not in my plan, but since I received 2 free vouchers and a 60% off voucher, I figured, why not lol. Let me give you a quick run down of what I learnt and some tips for the exam.&lt;/p>
+&lt;h2 id="what-i-learnt-the-useful-ones-anyways">What I learnt (The useful ones anyways)
+&lt;/h2>&lt;ol>
+&lt;li>GitHub Foundations
+&lt;ol>
+&lt;li>Codespaces: Codespaces is a container allocated for a repository. You can edit your repository code, push commits, run and test the code etc. It is very useful if you want to test your code on the go. It uses the VS code interface.&lt;/li>
+&lt;li>Web Editor: It is basically codespaces but you can only run and edit files, no code execution. It does not incur charges from GitHub. I usually use this nowadays. Shortcut to use the editor: change &lt;code>https://github.com/trinuro/actions-learning-pathway&lt;/code> to &lt;code>https://github.dev/trinuro/actions-learning-pathway&lt;/code>&lt;/li>
+&lt;li>&lt;code>.devcontainer/devcontainer.json&lt;/code>: This file is used to configure the environment of codespaces. For example, install Golang in the container&lt;/li>
+&lt;/ol>
+&lt;/li>
+&lt;li>GitHub Actions
+&lt;ol>
+&lt;li>Workflows: Workflow is the file to define automatic operations in a repository. You must define the events that trigger the workflow (eg a push commit) and the jobs that it will execute if said event is triggered. Use this for CI/CD.&lt;/li>
+&lt;li>Custom GitHub Actions: You can define your own GitHub actions to be reused in multiple workflows. Just remember to define a &lt;code>actions.yml&lt;/code> in the root directory.&lt;/li>
+&lt;li>Reusable workflows: This is different from GitHub Actions in the sense that GH actions is used as a step in a job while reusable workflow is used as job&lt;/li>
+&lt;li>GitHub Secret: Use this to store secrets for your workflows. Don&amp;rsquo;t hardcode it.&lt;/li>
+&lt;/ol>
+&lt;/li>
+&lt;li>GitHub Advanced Security:
+&lt;ol>
+&lt;li>Code scanning: Identifies logical vulnerabilities in repository code, eg. SQL Injection&lt;/li>
+&lt;li>Secret scanning: Identifies exposed secrets in repository code, issues, pull requests etc, eg API tokens&lt;/li>
+&lt;li>Push protection: Identifies exposed secrets before it is committed&lt;/li>
+&lt;li>Dependabot: Identifies vulnerable dependencies in the repo&lt;/li>
+&lt;li>Dependabot Security Update: Automatically create pull request when vulnerable dependency is detected&lt;/li>
+&lt;/ol>
+&lt;/li>
+&lt;/ol>
+&lt;h2 id="tips-for-the-exam">Tips for the exam
+&lt;/h2>&lt;ol>
+&lt;li>Go through the exam syllabus. Make sure you can answer each point in the syllabus&lt;/li>
+&lt;li>Do labs!
+&lt;ol>
+&lt;li>Go through &lt;a class="link" href="https://resources.github.com/learn/pathways/" target="_blank" rel="noopener"
+>GitHub Learning Pathways&lt;/a> for initial exposure&lt;/li>
+&lt;li>Go through &lt;a class="link" href="https://learn.microsoft.com/en-us/training/github/" target="_blank" rel="noopener"
+>MS Learn on GitHub&lt;/a> for labs&lt;/li>
+&lt;/ol>
+&lt;/li>
+&lt;li>Try out the practice tests on &lt;a class="link" href="https://ghcertified.com/practice_tests/" target="_blank" rel="noopener"
+>GHCertified&lt;/a>. It is not one-to-one with the exam questions but I think it is good enough. It shows you which documentation to read which is good. Read them all.&lt;/li>
+&lt;/ol>
+&lt;h2 id="final-thoughts">Final Thoughts
+&lt;/h2>&lt;p>Out of the three, I learnt/struggled the most from the GitHub Actions certification. However, I would definitely encourage the reader to go through the GitHub Actions cert before attempting GitHub Advanced Security (GHAS) as GHAS builds on the knowledge on GitHub Actions.&lt;/p>
+&lt;p>Good luck and happy learning. Cert collector out.&lt;/p></description></item></channel></rss>
