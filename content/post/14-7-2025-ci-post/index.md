@@ -38,7 +38,7 @@ Desired Output:
 4. Inside the repository, you will see 3 important files:
 	1. `example_module.py`: Just a simple python module
 	2. `test_counting_sort.py` and `test_find_missing_number.py`: Tests cases for said module
-.5 Navigate to the the github repository> Actions tab and enable Actions. ![Workflows arent enabled by default](p/github-actions-primer-workflows-for-continuous-integration/workflows-arent-enabled.png)
+5. Navigate to the the github repository> Actions tab and enable Actions. ![Workflows arent enabled by default](p/github-actions-primer-workflows-for-continuous-integration/workflows-arent-enabled.png)
 
 ## Workflows
 1. A workflow uses the YAML syntax
