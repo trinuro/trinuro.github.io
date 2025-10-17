@@ -25,6 +25,11 @@ links:
       This certification thought me the various devsecops features available on GitHub. These include code scanning, secret scanning and dependabot (scans for vulnerable dependencies).
     website: https://www.credly.com/badges/3ae29346-873e-41a6-8f73-b2591859f055/print
     image: ./gh-ghas.png
+  - title: Huawei Certified ICT Associate (Datacom)
+    description: |
+      This certification was a refresher of most things I learnt in the CCNA. It was interesting to see how concepts are the same across vendors. Moreover, I learnt a lot about PPP, PPPOE and WLAN, which are not emphasized in CCNA.
+    website: https://drive.google.com/file/d/1n2W2kmDvC-w64R4-z18rHQss-1E6PI52/view
+    image: ./HCIA-Datacom.png
 menu:
     main: 
         weight: 4
