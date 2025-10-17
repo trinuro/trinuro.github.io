@@ -23,7 +23,7 @@ Whassup people. Chronic Cert Collector here! Long story short, I recently got th
 | No concept of "hybrid" ports. (At least at the CCNA level)                   | Hybrid ports are taught, basically switchports that can forward more than one vlans untagged. |
 | PPP and PPPOE theory and configuration not emphasised.                       | PPP and PPPOE theory and configuration are emphasised.                                        |
 | WLAN not very emphasised.                                                    | WLAN is very emphasised.                                                                      |
-| Python Automation is touched on.                                             | A bit of Python Automation.                                                                   |
+| Python Automation is not touched on.                                             | A bit of Python Automation.                                                                   |
 ## Conclusion
 Overall, I think this is an OK exam. However, would I have taken it if it wasn't sponsored by my university? No. I think CCNA is better as it emphasised (a bit) more on practical skills and requires deeper knowledge. 
 
