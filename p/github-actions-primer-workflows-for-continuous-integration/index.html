@@ -1,0 +1,193 @@
+<!doctype html><html lang=en-us dir=ltr><head><meta charset=utf-8><meta name=viewport content='width=device-width,initial-scale=1'><meta name=description content="In this blog post, I would like to share a little about workflows on GitHub. In a nutshell, workflows allow you automate stuffs on GitHub, like continuous integration, continuous deployment, make bots that automatically comment on issues, make bots that automatically create pull requests from issues etc. This post contains a hands-on lab to follow along. You can view the completed code in this repository\nSet Up Fork the repository Clone the repository release v1. 1 2 3 4 5 6 7 8 git clone git@github.com:trinuro-organization/gha-ci-example-fork.git # change this cd .\\gha-ci-example-fork\\ # change this git remote add upstream https://github.com/trinuro/gha-ci-example git fetch --tags upstream git push --tags git checkout v1 git switch -c myBranch A quick test to see whether it works: 1 git branch Desired Output:\n"><title>GitHub Actions Primer - Workflows for Continuous Integration</title><link rel=canonical href=https://trinuro.github.io/p/github-actions-primer-workflows-for-continuous-integration/><link rel=stylesheet href=/scss/style.min.833d6eed45de56f48306bf57268d5b8cdfc8a60e8e7bdc99810464fcd033f7c6.css><meta property='og:title' content="GitHub Actions Primer - Workflows for Continuous Integration"><meta property='og:description' content="In this blog post, I would like to share a little about workflows on GitHub. In a nutshell, workflows allow you automate stuffs on GitHub, like continuous integration, continuous deployment, make bots that automatically comment on issues, make bots that automatically create pull requests from issues etc. This post contains a hands-on lab to follow along. You can view the completed code in this repository\nSet Up Fork the repository Clone the repository release v1. 1 2 3 4 5 6 7 8 git clone git@github.com:trinuro-organization/gha-ci-example-fork.git # change this cd .\\gha-ci-example-fork\\ # change this git remote add upstream https://github.com/trinuro/gha-ci-example git fetch --tags upstream git push --tags git checkout v1 git switch -c myBranch A quick test to see whether it works: 1 git branch Desired Output:\n"><meta property='og:url' content='https://trinuro.github.io/p/github-actions-primer-workflows-for-continuous-integration/'><meta property='og:site_name' content="Froginacup's site"><meta property='og:type' content='article'><meta property='article:section' content='Post'><meta property='article:tag' content='GitHub'><meta property='article:tag' content='CI-CD'><meta property='article:published_time' content='2025-07-12T23:21:25+00:00'><meta property='article:modified_time' content='2025-07-12T23:21:25+00:00'><meta name=twitter:title content="GitHub Actions Primer - Workflows for Continuous Integration"><meta name=twitter:description content="In this blog post, I would like to share a little about workflows on GitHub. In a nutshell, workflows allow you automate stuffs on GitHub, like continuous integration, continuous deployment, make bots that automatically comment on issues, make bots that automatically create pull requests from issues etc. This post contains a hands-on lab to follow along. You can view the completed code in this repository\nSet Up Fork the repository Clone the repository release v1. 1 2 3 4 5 6 7 8 git clone git@github.com:trinuro-organization/gha-ci-example-fork.git # change this cd .\\gha-ci-example-fork\\ # change this git remote add upstream https://github.com/trinuro/gha-ci-example git fetch --tags upstream git push --tags git checkout v1 git switch -c myBranch A quick test to see whether it works: 1 git branch Desired Output:\n"><link rel="shortcut icon" href=/favicon.png></head><body class=article-page><script>(function(){const e="StackColorScheme";localStorage.getItem(e)||localStorage.setItem(e,"auto")})()</script><script>(function(){const t="StackColorScheme",e=localStorage.getItem(t),n=window.matchMedia("(prefers-color-scheme: dark)").matches===!0;e=="dark"||e==="auto"&&n?document.documentElement.dataset.scheme="dark":document.documentElement.dataset.scheme="light"})()</script><div class="container main-container flex on-phone--column extended"><aside class="sidebar left-sidebar sticky"><button class="hamburger hamburger--spin" type=button id=toggle-menu aria-label="Toggle Menu">
+<span class=hamburger-box><span class=hamburger-inner></span></span></button><header><figure class=site-avatar><a href=/><img src=/img/avatar_hu_aff73beef7294c1a.jpg width=300 height=299 class=site-logo loading=lazy alt=Avatar>
+</a><span class=emoji>💡</span></figure><div class=site-meta><h1 class=site-name><a href=/>Froginacup's site</a></h1><h2 class=site-description>A place where Froginacup writes his adventures</h2></div></header><ol class=menu-social><li><a href=https://github.com/trinuro target=_blank title=GitHub rel=me><svg class="icon icon-tabler icon-tabler-brand-github" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M9 19c-4.3 1.4-4.3-2.5-6-3m12 5v-3.5c0-1 .1-1.4-.5-2 2.8-.3 5.5-1.4 5.5-6a4.6 4.6.0 00-1.3-3.2 4.2 4.2.0 00-.1-3.2s-1.1-.3-3.5 1.3a12.3 12.3.0 00-6.2.0C6.5 2.8 5.4 3.1 5.4 3.1a4.2 4.2.0 00-.1 3.2A4.6 4.6.0 004 9.5c0 4.6 2.7 5.7 5.5 6-.6.6-.6 1.2-.5 2V21"/></svg></a></li></ol><ol class=menu id=main-menu><li><a href=/><svg class="icon icon-tabler icon-tabler-home" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z"/><polyline points="5 12 3 12 12 3 21 12 19 12"/><path d="M5 12v7a2 2 0 002 2h10a2 2 0 002-2v-7"/><path d="M9 21v-6a2 2 0 012-2h2a2 2 0 012 2v6"/></svg>
+<span>Home</span></a></li><li><a href=/archives/><svg class="icon icon-tabler icon-tabler-archive" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z"/><rect x="3" y="4" width="18" height="4" rx="2"/><path d="M5 8v10a2 2 0 002 2h10a2 2 0 002-2V8"/><line x1="10" y1="12" x2="14" y2="12"/></svg>
+<span>Archives</span></a></li><li><a href=/search/><svg class="icon icon-tabler icon-tabler-search" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z"/><circle cx="10" cy="10" r="7"/><line x1="21" y1="21" x2="15" y2="15"/></svg>
+<span>Search</span></a></li><li><a href=/projects-and-certificates/><svg class="icon icon-tabler icon-tabler-link" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z"/><path d="M10 14a3.5 3.5.0 005 0l4-4a3.5 3.5.0 00-5-5l-.5.5"/><path d="M14 10a3.5 3.5.0 00-5 0l-4 4a3.5 3.5.0 005 5l.5-.5"/></svg>
+<span>Projects and Certificates</span></a></li><li class=menu-bottom-section><ol class=menu><li id=dark-mode-toggle><svg class="icon icon-tabler icon-tabler-toggle-left" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z"/><circle cx="8" cy="12" r="2"/><rect x="2" y="6" width="20" height="12" rx="6"/></svg>
+<svg class="icon icon-tabler icon-tabler-toggle-right" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z"/><circle cx="16" cy="12" r="2"/><rect x="2" y="6" width="20" height="12" rx="6"/></svg>
+<span>Dark Mode</span></li></ol></li></ol></aside><aside class="sidebar right-sidebar sticky"><section class="widget archives"><div class=widget-icon><svg class="icon icon-tabler icon-tabler-hash" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z"/><line x1="5" y1="9" x2="19" y2="9"/><line x1="5" y1="15" x2="19" y2="15"/><line x1="11" y1="4" x2="7" y2="20"/><line x1="17" y1="4" x2="13" y2="20"/></svg></div><h2 class="widget-title section-title">Table of contents</h2><div class=widget--toc><nav id=TableOfContents><ol><li><a href=#set-up>Set Up</a></li><li><a href=#workflows>Workflows</a><ol><li><a href=#events-that-trigger-workflows>Events that trigger workflows</a></li><li><a href=#jobs>Jobs</a></li></ol></li><li><a href=#other-workflow-triggers>Other Workflow Triggers</a></li><li><a href=#conclusion>Conclusion</a></li></ol></nav></div></section></aside><main class="main full-width"><article class=main-article><header class=article-header><div class=article-details><header class=article-category><a href=/categories/personal-research/ style=background-color:#aa2f33;color:#fff>Personal Research</a></header><div class=article-title-wrapper><h2 class=article-title><a href=/p/github-actions-primer-workflows-for-continuous-integration/>GitHub Actions Primer - Workflows for Continuous Integration</a></h2></div><footer class=article-time><div><svg class="icon icon-tabler icon-tabler-calendar-time" width="56" height="56" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z"/><path d="M11.795 21H5a2 2 0 01-2-2V7a2 2 0 012-2h12a2 2 0 012 2v4"/><circle cx="18" cy="18" r="4"/><path d="M15 3v4"/><path d="M7 3v4"/><path d="M3 11h16"/><path d="M18 16.496V18l1 1"/></svg>
+<time class=article-time--published datetime=2025-07-12T23:21:25Z>Jul 12, 2025</time></div><div><svg class="icon icon-tabler icon-tabler-clock" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z"/><circle cx="12" cy="12" r="9"/><polyline points="12 7 12 12 15 15"/></svg>
+<time class=article-time--reading>5 minute read</time></div></footer></div></header><section class=article-content><p>In this blog post, I would like to share a little about workflows on GitHub. In a nutshell, workflows allow you automate stuffs on GitHub, like continuous integration, continuous deployment, make bots that automatically comment on issues, make bots that automatically create pull requests from issues etc. This post contains a hands-on lab to follow along.
+You can view the completed code in this <a class=link href=https://github.com/trinuro/gha-ci-example target=_blank rel=noopener>repository</a></p><h2 id=set-up>Set Up</h2><ol><li>Fork the repository</li><li>Clone the repository release v1.</li></ol><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt>1
+</span><span class=lnt>2
+</span><span class=lnt>3
+</span><span class=lnt>4
+</span><span class=lnt>5
+</span><span class=lnt>6
+</span><span class=lnt>7
+</span><span class=lnt>8
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-fallback data-lang=fallback><span class=line><span class=cl>git clone git@github.com:trinuro-organization/gha-ci-example-fork.git # change this
+</span></span><span class=line><span class=cl>cd .\gha-ci-example-fork\ # change this
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>git remote add upstream https://github.com/trinuro/gha-ci-example
+</span></span><span class=line><span class=cl>git fetch --tags upstream
+</span></span><span class=line><span class=cl>git push --tags
+</span></span><span class=line><span class=cl>git checkout v1
+</span></span><span class=line><span class=cl>git switch -c myBranch
+</span></span></code></pre></td></tr></table></div></div><ol start=3><li>A quick test to see whether it works:</li></ol><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt>1
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-fallback data-lang=fallback><span class=line><span class=cl>git branch
+</span></span></code></pre></td></tr></table></div></div><p>Desired Output:</p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt>1
+</span><span class=lnt>2
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-fallback data-lang=fallback><span class=line><span class=cl>  main
+</span></span><span class=line><span class=cl>* myBranch
+</span></span></code></pre></td></tr></table></div></div><ol start=4><li>Inside the repository, you will see 3 important files:<ol><li><code>example_module.py</code>: Just a simple python module</li><li><code>test_counting_sort.py</code> and <code>test_find_missing_number.py</code>: Tests cases for said module</li></ol></li><li>Navigate to the the github repository> Actions tab and enable Actions. <img src=/p/github-actions-primer-workflows-for-continuous-integration/workflows-arent-enabled.png loading=lazy alt="Workflows arent enabled by default"></li></ol><h2 id=workflows>Workflows</h2><ol><li>A workflow uses the YAML syntax</li><li>A workflow must have the following &ldquo;root&rdquo; keys</li></ol><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt>1
+</span><span class=lnt>2
+</span><span class=lnt>3
+</span><span class=lnt>4
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-yml data-lang=yml><span class=line><span class=cl><span class=nt>on</span><span class=p>:</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>	</span><span class=c># identifies the events that trigger this workflow</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=nt>jobs</span><span class=p>:</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>	</span><span class=c># identifies the jobs to run</span><span class=w>
+</span></span></span></code></pre></td></tr></table></div></div><h3 id=events-that-trigger-workflows>Events that trigger workflows</h3><ol><li>There are many <a class=link href=https://docs.github.com/en/actions/reference/events-that-trigger-workflows target=_blank rel=noopener>events</a> that can trigger workflows.</li><li>A few common ones:<ol><li><code>push</code>: When a commit is pushed to GitHub</li><li><code>pull_request</code>: When a pull request is created (Before it is merged)</li><li><code>workflow_dispatch</code>: Manual trigger (Gives you a button to trigger said workflow)</li><li><code>repository_dispatch</code>: Trigger due to events outside the repo (Very interesting, this one)</li></ol></li><li>To add an event trigger, add it under <code>on</code></li></ol><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt>1
+</span><span class=lnt>2
+</span><span class=lnt>3
+</span><span class=lnt>4
+</span><span class=lnt>5
+</span><span class=lnt>6
+</span><span class=lnt>7
+</span><span class=lnt>8
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-yaml data-lang=yaml><span class=line><span class=cl><span class=nt>on</span><span class=p>:</span><span class=w> </span><span class=l>push</span><span class=w> </span><span class=c># works for single event trigger</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=nt>on</span><span class=p>:</span><span class=w> </span><span class=p>[</span><span class=l>push, pull_request]</span><span class=w> </span><span class=c># multiple events</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=c># more granular event trigger</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=nt>on</span><span class=p>:</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>	</span><span class=nt>push</span><span class=p>:</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>		</span><span class=nt>branches</span><span class=p>:</span><span class=w> </span><span class=p>[</span><span class=l>main]</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>	</span><span class=nt>pull_request</span><span class=p>:</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>		</span><span class=nt>branches</span><span class=p>:</span><span class=w> </span><span class=p>[</span><span class=l>main]</span><span class=w>
+</span></span></span></code></pre></td></tr></table></div></div><ol start=4><li>In our example, let&rsquo;s say we want to define 4 event triggers.</li></ol><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt> 1
+</span><span class=lnt> 2
+</span><span class=lnt> 3
+</span><span class=lnt> 4
+</span><span class=lnt> 5
+</span><span class=lnt> 6
+</span><span class=lnt> 7
+</span><span class=lnt> 8
+</span><span class=lnt> 9
+</span><span class=lnt>10
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-yaml data-lang=yaml><span class=line><span class=cl><span class=nt>on</span><span class=p>:</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>  </span><span class=nt>push</span><span class=p>:</span><span class=w> 
+</span></span></span><span class=line><span class=cl><span class=w>    </span><span class=nt>branches</span><span class=p>:</span><span class=w> </span><span class=p>[</span><span class=s1>&#39;main&#39;</span><span class=p>]</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>  </span><span class=nt>pull_request</span><span class=p>:</span><span class=w> </span><span class=c># trigger when pr is created to main branch</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>    </span><span class=nt>branches</span><span class=p>:</span><span class=w> </span><span class=p>[</span><span class=s1>&#39;main&#39;</span><span class=p>]</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>  </span><span class=nt>workflow_dispatch</span><span class=p>:</span><span class=w> </span><span class=c># manual trigger</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>  </span><span class=nt>repository_dispatch</span><span class=p>:</span><span class=w> </span><span class=c># trigger via outside events</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>
+</span></span></span><span class=line><span class=cl><span class=nt>jobs</span><span class=p>:</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>	</span><span class=c># identifies the jobs to run</span><span class=w>
+</span></span></span></code></pre></td></tr></table></div></div><h3 id=jobs>Jobs</h3><ol><li>We can define multiple jobs that run during a workflow</li><li>Each job is run inside its own independent container.</li><li>Each job can has multiple steps (that run in the same container)</li><li>Compulsory options in a job are<ol><li><code>runs-on</code>: Runs on a certain kind of container. There are 3 options on GitHub:<ol><li>Ubuntu-latest</li><li>MacOS-latest</li><li>Windows-latest</li></ol></li><li><code>steps</code>: Define the steps in an action</li></ol></li><li>There are two &ldquo;kinds&rdquo; of steps. Different keyword is used for both of them.<ol><li>Steps that run GitHub Actions: <code>uses</code></li><li>Steps that run commands on the container: <code>run</code></li></ol></li><li>Let&rsquo;s define a job with one step: Greeting the user.</li></ol><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt>1
+</span><span class=lnt>2
+</span><span class=lnt>3
+</span><span class=lnt>4
+</span><span class=lnt>5
+</span><span class=lnt>6
+</span><span class=lnt>7
+</span><span class=lnt>8
+</span><span class=lnt>9
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-yaml data-lang=yaml><span class=line><span class=cl><span class=c># snip</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>
+</span></span></span><span class=line><span class=cl><span class=nt>jobs</span><span class=p>:</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>  </span><span class=nt>test</span><span class=p>:</span><span class=w> </span><span class=c># name of job (can be &#34;job1&#34; etc)</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>    </span><span class=nt>runs-on</span><span class=p>:</span><span class=w> </span><span class=l>ubuntu-latest</span><span class=w> </span><span class=c># use linux machine</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>    </span><span class=nt>steps</span><span class=p>:</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>      </span>- <span class=nt>name</span><span class=p>:</span><span class=w> </span><span class=s2>&#34;Hello World&#34;</span><span class=w> </span><span class=c># not compulsory but aids in debugging</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>        </span><span class=c># use run to execute commands in the container</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>        </span><span class=nt>run</span><span class=p>:</span><span class=w> </span><span class=l>echo &#34;Hello $GITHUB_ACTOR, happy learning!&#34; </span><span class=w>
+</span></span></span></code></pre></td></tr></table></div></div><p>Output:
+<img src=/p/github-actions-primer-workflows-for-continuous-integration/debug-workflow.png loading=lazy alt="Initial Workflow Debug">
+7. That is cool, but let&rsquo;s clone our repository in the container so that we can examine the code inside. For this, we will use a pre-made action: <a class=link href=https://github.com/actions/checkout target=_blank rel=noopener>actions/checkout</a></p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt>1
+</span><span class=lnt>2
+</span><span class=lnt>3
+</span><span class=lnt>4
+</span><span class=lnt>5
+</span><span class=lnt>6
+</span><span class=lnt>7
+</span><span class=lnt>8
+</span><span class=lnt>9
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-yaml data-lang=yaml><span class=line><span class=cl><span class=nt>jobs</span><span class=p>:</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>  </span><span class=nt>test</span><span class=p>:</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>    </span><span class=nt>runs-on</span><span class=p>:</span><span class=w> </span><span class=l>ubuntu-latest </span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>    </span><span class=nt>steps</span><span class=p>:</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>      </span>- <span class=nt>name</span><span class=p>:</span><span class=w> </span><span class=s2>&#34;Hello World&#34;</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>        </span><span class=nt>run</span><span class=p>:</span><span class=w> </span><span class=l>echo &#34;Hello $GITHUB_ACTOR, happy learning!&#34; </span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>      </span>- <span class=nt>name</span><span class=p>:</span><span class=w> </span><span class=s2>&#34;Import Repository&#34;</span><span class=w> 
+</span></span></span><span class=line><span class=cl><span class=w>        </span><span class=c># &#34;uses&#34; keyword allows us to use a github action</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>        </span><span class=nt>uses</span><span class=p>:</span><span class=w> </span><span class=l>actions/checkout@v4</span><span class=w>
+</span></span></span></code></pre></td></tr></table></div></div><ul><li>Learnt the fact that the container does not contain the repo the hard way lol
+<img src=/p/github-actions-primer-workflows-for-continuous-integration/failed-workflows-no-checkout.png loading=lazy alt="Workflows failed!"></li></ul><ol start=8><li>Next, we will execute the Python test code</li></ol><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt> 1
+</span><span class=lnt> 2
+</span><span class=lnt> 3
+</span><span class=lnt> 4
+</span><span class=lnt> 5
+</span><span class=lnt> 6
+</span><span class=lnt> 7
+</span><span class=lnt> 8
+</span><span class=lnt> 9
+</span><span class=lnt>10
+</span><span class=lnt>11
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-yaml data-lang=yaml><span class=line><span class=cl><span class=nt>jobs</span><span class=p>:</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>  </span><span class=nt>test</span><span class=p>:</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>    </span><span class=nt>runs-on</span><span class=p>:</span><span class=w> </span><span class=l>ubuntu-latest </span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>    </span><span class=nt>steps</span><span class=p>:</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>      </span>- <span class=nt>name</span><span class=p>:</span><span class=w> </span><span class=s2>&#34;Hello World&#34;</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>        </span><span class=nt>run</span><span class=p>:</span><span class=w> </span><span class=l>echo &#34;Hello $GITHUB_ACTOR, happy learning!&#34; </span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>      </span>- <span class=nt>name</span><span class=p>:</span><span class=w> </span><span class=s2>&#34;Import Repository&#34;</span><span class=w> 
+</span></span></span><span class=line><span class=cl><span class=w>        </span><span class=nt>uses</span><span class=p>:</span><span class=w> </span><span class=l>actions/checkout@v4</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>      </span>- <span class=nt>name</span><span class=p>:</span><span class=w> </span><span class=s2>&#34;Run Unit Test&#34;</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>        </span><span class=c># we can run multiline commands like this</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>        </span><span class=nt>run</span><span class=p>:</span><span class=w> </span><span class=l>python -m unittest       </span><span class=w>
+</span></span></span></code></pre></td></tr></table></div></div><ol start=9><li>Just for fun, this is how you run a multiline step</li></ol><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt> 1
+</span><span class=lnt> 2
+</span><span class=lnt> 3
+</span><span class=lnt> 4
+</span><span class=lnt> 5
+</span><span class=lnt> 6
+</span><span class=lnt> 7
+</span><span class=lnt> 8
+</span><span class=lnt> 9
+</span><span class=lnt>10
+</span><span class=lnt>11
+</span><span class=lnt>12
+</span><span class=lnt>13
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-yaml data-lang=yaml><span class=line><span class=cl><span class=nt>jobs</span><span class=p>:</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>  </span><span class=nt>test</span><span class=p>:</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>    </span><span class=nt>runs-on</span><span class=p>:</span><span class=w> </span><span class=l>ubuntu-latest </span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>    </span><span class=nt>steps</span><span class=p>:</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>      </span>- <span class=nt>name</span><span class=p>:</span><span class=w> </span><span class=s2>&#34;Hello World&#34;</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>        </span><span class=nt>run</span><span class=p>:</span><span class=w> </span><span class=l>echo &#34;Hello $GITHUB_ACTOR, happy learning!&#34; </span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>      </span>- <span class=nt>name</span><span class=p>:</span><span class=w> </span><span class=s2>&#34;Import Repository&#34;</span><span class=w> 
+</span></span></span><span class=line><span class=cl><span class=w>        </span><span class=nt>uses</span><span class=p>:</span><span class=w> </span><span class=l>actions/checkout@v4</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>      </span>- <span class=nt>name</span><span class=p>:</span><span class=w> </span><span class=s2>&#34;Run Unit Test&#34;</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>        </span><span class=c># we can run multiline commands like this</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>        </span><span class=nt>run</span><span class=p>:</span><span class=w> </span><span class=l>|</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>		  </span><span class=l>ls -la</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>	      </span><span class=l>python -m unittest</span><span class=w>
+</span></span></span></code></pre></td></tr></table></div></div><p>Output:
+<img src=/p/github-actions-primer-workflows-for-continuous-integration/ci-success.png loading=lazy alt="CI Workflow Success"></p><h2 id=other-workflow-triggers>Other Workflow Triggers</h2><ol><li>There are two unique workflow triggers that we defined, workflow dispatch and repository dispatch. Let&rsquo;s see how to trigger them.</li><li>To trigger <code>workflow_dispatch</code>, navigate to your GitHub Repo > Actions Tab > Click &ldquo;Python Test&rdquo; on the left sidebar. Click on &ldquo;Run workflow&rdquo; to trigger the workflow.
+<img src=/p/github-actions-primer-workflows-for-continuous-integration/GitHub%20workflow_dispatch.png loading=lazy></li><li>To trigger <code>repository_dispatch</code>, you need to send a post request to a github endpoint.<ol><li>First, create a fine-tuned access token. Go to account settings> Developer Settings > PAT > Fine-grained tokens and press Generate New Token
+<img src=/p/github-actions-primer-workflows-for-continuous-integration/create-personal-token-1.png loading=lazy>
+<img src=/p/github-actions-primer-workflows-for-continuous-integration/create-personal-token-2.png loading=lazy></li><li>The fine-grained token must have the following permission set:<ul><li>&ldquo;Contents&rdquo; repository permissions (read and write)</li></ul></li><li>Send a HTTP request to the relevant endpoint.</li></ol></li></ol><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt>1
+</span><span class=lnt>2
+</span><span class=lnt>3
+</span><span class=lnt>4
+</span><span class=lnt>5
+</span><span class=lnt>6
+</span><span class=lnt>7
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-sh data-lang=sh><span class=line><span class=cl>curl -L <span class=se>\
+</span></span></span><span class=line><span class=cl>-X POST <span class=se>\
+</span></span></span><span class=line><span class=cl>-H <span class=s2>&#34;Accept: application/vnd.github+json&#34;</span> <span class=se>\
+</span></span></span><span class=line><span class=cl>-H <span class=s2>&#34;Authorization: Bearer github_pat_..&lt;snip&gt;..&#34;</span> <span class=se>\
+</span></span></span><span class=line><span class=cl>-H <span class=s2>&#34;X-GitHub-Api-Version: 2022-11-28&#34;</span> <span class=se>\
+</span></span></span><span class=line><span class=cl>https://api.github.com/repos/&lt;accName&gt;/&lt;repo-name&gt;/dispatches <span class=se>\
+</span></span></span><span class=line><span class=cl>-d <span class=s1>&#39;{&#34;event_type&#34;:&#34;my_input&#34;,&#34;client_payload&#34;:{}&#39;</span>
+</span></span></code></pre></td></tr></table></div></div><p>Output:
+<img src=/p/github-actions-primer-workflows-for-continuous-integration/GH_Repo_Dispatch.png loading=lazy></p><ul><li>&ldquo;Repository dispatch triggered&rdquo;</li></ul><h2 id=conclusion>Conclusion</h2><ol><li>This is a very simple example of a continuous integration workflow using GitHub.</li><li>Automated workflows are quite powerful as it frees developers from mundane testing tasks and in terms of security, encourage a shift left in security.</li><li>Further reading:<ol><li>GitHub Workflow Syntax: <a class=link href=https://docs.github.com/en/actions/reference/workflow-syntax-for-github-actions target=_blank rel=noopener>https://docs.github.com/en/actions/reference/workflow-syntax-for-github-actions</a></li></ol></li></ol></section><footer class=article-footer><section class=article-tags><a href=/tags/github/>GitHub</a>
+<a href=/tags/ci-cd/>CI-CD</a></section><section class=article-copyright><svg class="icon icon-tabler icon-tabler-copyright" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z"/><circle cx="12" cy="12" r="9"/><path d="M14.5 9a3.5 4 0 100 6"/></svg>
+<span>Licensed under CC BY-NC-SA 4.0</span></section></footer></article><aside class=related-content--wrapper><h2 class=section-title>Related content</h2><div class=related-content><div class="flex article-list--tile"><article><a href=/p/electron-xss-to-rce/><div class=article-details><h2 class=article-title>Electron XSS to RCE</h2></div></a></article><article><a href=/p/xs-leaks-leveraging-cve-2024-11110/><div class=article-details><h2 class=article-title>XS Leaks Leveraging CVE 2024 11110</h2></div></a></article><article><a href=/p/becoming-a-super-soldier-common-/etc/sudoers-misconfigurations/><div class=article-details><h2 class=article-title>Becoming a Super Soldier (Common /etc/sudoers misconfigurations)</h2></div></a></article><article><a href=/p/common-apache-tomcat-misconfigurations-and-remediations/><div class=article-details><h2 class=article-title>Common Apache Tomcat Misconfigurations and Remediations</h2></div></a></article></div></div></aside><footer class=site-footer><section class=copyright>&copy;
+2025 -
+2026 Froginacup's site</section><section class=powerby>Built with <a href=https://gohugo.io/ target=_blank rel=noopener>Hugo</a><br>Theme <b><a href=https://github.com/CaiJimmy/hugo-theme-stack target=_blank rel=noopener data-version=3.33.0>Stack</a></b> designed by <a href=https://jimmycai.com target=_blank rel=noopener>Jimmy</a></section></footer><div class=pswp tabindex=-1 role=dialog aria-hidden=true><div class=pswp__bg></div><div class=pswp__scroll-wrap><div class=pswp__container><div class=pswp__item></div><div class=pswp__item></div><div class=pswp__item></div></div><div class="pswp__ui pswp__ui--hidden"><div class=pswp__top-bar><div class=pswp__counter></div><button class="pswp__button pswp__button--close" title="Close (Esc)"></button>
+<button class="pswp__button pswp__button--share" title=Share></button>
+<button class="pswp__button pswp__button--fs" title="Toggle fullscreen"></button>
+<button class="pswp__button pswp__button--zoom" title="Zoom in/out"></button><div class=pswp__preloader><div class=pswp__preloader__icn><div class=pswp__preloader__cut><div class=pswp__preloader__donut></div></div></div></div></div><div class="pswp__share-modal pswp__share-modal--hidden pswp__single-tap"><div class=pswp__share-tooltip></div></div><button class="pswp__button pswp__button--arrow--left" title="Previous (arrow left)">
+</button>
+<button class="pswp__button pswp__button--arrow--right" title="Next (arrow right)"></button><div class=pswp__caption><div class=pswp__caption__center></div></div></div></div></div><script src=https://cdn.jsdelivr.net/npm/photoswipe@4.1.3/dist/photoswipe.min.js integrity="sha256-ePwmChbbvXbsO02lbM3HoHbSHTHFAeChekF1xKJdleo=" crossorigin=anonymous defer></script><script src=https://cdn.jsdelivr.net/npm/photoswipe@4.1.3/dist/photoswipe-ui-default.min.js integrity="sha256-UKkzOn/w1mBxRmLLGrSeyB4e1xbrp4xylgAWb3M42pU=" crossorigin=anonymous defer></script><link rel=stylesheet href=https://cdn.jsdelivr.net/npm/photoswipe@4.1.3/dist/default-skin/default-skin.min.css crossorigin=anonymous><link rel=stylesheet href=https://cdn.jsdelivr.net/npm/photoswipe@4.1.3/dist/photoswipe.min.css crossorigin=anonymous></main></div><script src=https://cdn.jsdelivr.net/npm/node-vibrant@3.1.6/dist/vibrant.min.js integrity="sha256-awcR2jno4kI5X0zL8ex0vi2z+KMkF24hUW8WePSA9HM=" crossorigin=anonymous></script><script type=text/javascript src=/ts/main.c922af694cc257bf1ecc41c0dd7b0430f9114ec280ccf67cd2c6ad55f5316c4e.js defer></script><script>(function(){const e=document.createElement("link");e.href="https://fonts.googleapis.com/css2?family=Lato:wght@300;400;700&display=swap",e.type="text/css",e.rel="stylesheet",document.head.appendChild(e)})()</script></body></html>

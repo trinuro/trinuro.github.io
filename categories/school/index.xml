@@ -1,0 +1,1061 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?><rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>School on Froginacup's site</title><link>https://trinuro.github.io/categories/school/</link><description>Recent content in School on Froginacup's site</description><generator>Hugo -- gohugo.io</generator><language>en-us</language><lastBuildDate>Tue, 15 Jul 2025 23:59:30 +0000</lastBuildDate><atom:link href="https://trinuro.github.io/categories/school/index.xml" rel="self" type="application/rss+xml"/><item><title>Writeups on Sorting Algorithms</title><link>https://trinuro.github.io/p/writeups-on-sorting-algorithms/</link><pubDate>Tue, 15 Jul 2025 23:59:30 +0000</pubDate><guid>https://trinuro.github.io/p/writeups-on-sorting-algorithms/</guid><description>&lt;h2 id="merge-sort"&gt;Merge Sort
+&lt;/h2&gt;&lt;ol&gt;
+&lt;li&gt;This algorithm is interesting as it has a worst and average case of &lt;code&gt;O(nlogn)&lt;/code&gt;&lt;/li&gt;
+&lt;li&gt;However, it is not in-place (Requires extra memory)&lt;/li&gt;
+&lt;li&gt;It is stable too. (The relative position of two elements of the same value is the same before and after sorting.)&lt;/li&gt;
+&lt;/ol&gt;
+&lt;div class="highlight"&gt;&lt;div class="chroma"&gt;
+&lt;table class="lntable"&gt;&lt;tr&gt;&lt;td class="lntd"&gt;
+&lt;pre tabindex="0" class="chroma"&gt;&lt;code&gt;&lt;span class="lnt"&gt; 1
+&lt;/span&gt;&lt;span class="lnt"&gt; 2
+&lt;/span&gt;&lt;span class="lnt"&gt; 3
+&lt;/span&gt;&lt;span class="lnt"&gt; 4
+&lt;/span&gt;&lt;span class="lnt"&gt; 5
+&lt;/span&gt;&lt;span class="lnt"&gt; 6
+&lt;/span&gt;&lt;span class="lnt"&gt; 7
+&lt;/span&gt;&lt;span class="lnt"&gt; 8
+&lt;/span&gt;&lt;span class="lnt"&gt; 9
+&lt;/span&gt;&lt;span class="lnt"&gt;10
+&lt;/span&gt;&lt;span class="lnt"&gt;11
+&lt;/span&gt;&lt;span class="lnt"&gt;12
+&lt;/span&gt;&lt;span class="lnt"&gt;13
+&lt;/span&gt;&lt;span class="lnt"&gt;14
+&lt;/span&gt;&lt;span class="lnt"&gt;15
+&lt;/span&gt;&lt;span class="lnt"&gt;16
+&lt;/span&gt;&lt;span class="lnt"&gt;17
+&lt;/span&gt;&lt;span class="lnt"&gt;18
+&lt;/span&gt;&lt;span class="lnt"&gt;19
+&lt;/span&gt;&lt;span class="lnt"&gt;20
+&lt;/span&gt;&lt;span class="lnt"&gt;21
+&lt;/span&gt;&lt;span class="lnt"&gt;22
+&lt;/span&gt;&lt;span class="lnt"&gt;23
+&lt;/span&gt;&lt;span class="lnt"&gt;24
+&lt;/span&gt;&lt;span class="lnt"&gt;25
+&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;
+&lt;td class="lntd"&gt;
+&lt;pre tabindex="0" class="chroma"&gt;&lt;code class="language-fallback" data-lang="fallback"&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;MERGE-SORT(A,p,q)
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;m = floor((p+q)/2)
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;MERGE-SORT(A,p,m-1)
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;MERGE-SORT(A,m,q)
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;MERGE(A,p,q,m)
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;MERGE(A,p,q,m)
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;n1 = m-p
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;n2 = q-m+1
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;Create an array, L[1..n1]
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;Create an array, R[1..n2]
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;L[1..n1] = A[p..m-1]
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;R[1..n2] = A[m..q]
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;j = 0
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;k = 0
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;for i in p to q
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; if L[j] &amp;lt;= R[k]
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; A[i] = L[j]
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; j = j+1
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; else
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; A[i] = R[k]
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; k = k+1
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
+&lt;/div&gt;
+&lt;/div&gt;&lt;h2 id="quick-sort"&gt;Quick Sort
+&lt;/h2&gt;&lt;ol&gt;
+&lt;li&gt;Good all-purpose sorting algorithm&lt;/li&gt;
+&lt;li&gt;In-place (Sorting is done without extra memory)&lt;/li&gt;
+&lt;li&gt;Not stable&lt;/li&gt;
+&lt;li&gt;It has an average case of &lt;code&gt;O(nlogn)&lt;/code&gt; and a worst case of &lt;code&gt;O(n)&lt;/code&gt;&lt;/li&gt;
+&lt;li&gt;The algorithm&lt;/li&gt;
+&lt;/ol&gt;
+&lt;div class="highlight"&gt;&lt;div class="chroma"&gt;
+&lt;table class="lntable"&gt;&lt;tr&gt;&lt;td class="lntd"&gt;
+&lt;pre tabindex="0" class="chroma"&gt;&lt;code&gt;&lt;span class="lnt"&gt; 1
+&lt;/span&gt;&lt;span class="lnt"&gt; 2
+&lt;/span&gt;&lt;span class="lnt"&gt; 3
+&lt;/span&gt;&lt;span class="lnt"&gt; 4
+&lt;/span&gt;&lt;span class="lnt"&gt; 5
+&lt;/span&gt;&lt;span class="lnt"&gt; 6
+&lt;/span&gt;&lt;span class="lnt"&gt; 7
+&lt;/span&gt;&lt;span class="lnt"&gt; 8
+&lt;/span&gt;&lt;span class="lnt"&gt; 9
+&lt;/span&gt;&lt;span class="lnt"&gt;10
+&lt;/span&gt;&lt;span class="lnt"&gt;11
+&lt;/span&gt;&lt;span class="lnt"&gt;12
+&lt;/span&gt;&lt;span class="lnt"&gt;13
+&lt;/span&gt;&lt;span class="lnt"&gt;14
+&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;
+&lt;td class="lntd"&gt;
+&lt;pre tabindex="0" class="chroma"&gt;&lt;code class="language-fallback" data-lang="fallback"&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;QUICK-SORT(A,p,q)
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;m = PARTITION(A,p,q)
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;QUICK-SORT(A,p,m-1)
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;QUICK-SORT(A,m,q)
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;PARTITION(A,p,q)
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;u = A[q] // get the last element as pivot
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;k = 0
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;for i in p to q-1
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; if A[i] &amp;lt; u // elements smaller than pivot will be to the left of pivot
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; k = k+1
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; swap A[i] and A[k]
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;Swap A[i] and A[k+1] // pivot will be between elements smaller than it and elements larger than it
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;return k+1 // position of pivot
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
+&lt;/div&gt;
+&lt;/div&gt;&lt;ol start="6"&gt;
+&lt;li&gt;In order to reduce the possibility of the worst case from happening, we should randomly choose the pivot.&lt;/li&gt;
+&lt;/ol&gt;
+&lt;h2 id="counting-sort"&gt;Counting sort
+&lt;/h2&gt;&lt;ol&gt;
+&lt;li&gt;The algo&lt;/li&gt;
+&lt;/ol&gt;
+&lt;div class="highlight"&gt;&lt;div class="chroma"&gt;
+&lt;table class="lntable"&gt;&lt;tr&gt;&lt;td class="lntd"&gt;
+&lt;pre tabindex="0" class="chroma"&gt;&lt;code&gt;&lt;span class="lnt"&gt; 1
+&lt;/span&gt;&lt;span class="lnt"&gt; 2
+&lt;/span&gt;&lt;span class="lnt"&gt; 3
+&lt;/span&gt;&lt;span class="lnt"&gt; 4
+&lt;/span&gt;&lt;span class="lnt"&gt; 5
+&lt;/span&gt;&lt;span class="lnt"&gt; 6
+&lt;/span&gt;&lt;span class="lnt"&gt; 7
+&lt;/span&gt;&lt;span class="lnt"&gt; 8
+&lt;/span&gt;&lt;span class="lnt"&gt; 9
+&lt;/span&gt;&lt;span class="lnt"&gt;10
+&lt;/span&gt;&lt;span class="lnt"&gt;11
+&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;
+&lt;td class="lntd"&gt;
+&lt;pre tabindex="0" class="chroma"&gt;&lt;code class="language-fallback" data-lang="fallback"&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;counting-sort(A,B,k)
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;let C[1..k] be a new list
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;for i = 1 to k
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; C[i] = 0
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;for j = 1 to A.length
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; C[A[j]] = C[A[j]] + 1
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;for i = 1 to k
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; C[i] = C[i]+C[i-1]
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;for j = A.length downto 1
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; B[C[A[j]]] = A[j]
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; C[A[j]] = C[A[j]] -1
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
+&lt;/div&gt;
+&lt;/div&gt;&lt;ol start="2"&gt;
+&lt;li&gt;Time complexity is &lt;code&gt;O(n+k)&lt;/code&gt;&lt;/li&gt;
+&lt;li&gt;It is very efficient if the range of elements is small and known&lt;/li&gt;
+&lt;li&gt;Counting sort is stable.&lt;/li&gt;
+&lt;/ol&gt;
+&lt;h2 id="radix-sort"&gt;Radix Sort
+&lt;/h2&gt;&lt;ol&gt;
+&lt;li&gt;The algo&lt;/li&gt;
+&lt;/ol&gt;
+&lt;div class="highlight"&gt;&lt;div class="chroma"&gt;
+&lt;table class="lntable"&gt;&lt;tr&gt;&lt;td class="lntd"&gt;
+&lt;pre tabindex="0" class="chroma"&gt;&lt;code&gt;&lt;span class="lnt"&gt;1
+&lt;/span&gt;&lt;span class="lnt"&gt;2
+&lt;/span&gt;&lt;span class="lnt"&gt;3
+&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;
+&lt;td class="lntd"&gt;
+&lt;pre tabindex="0" class="chroma"&gt;&lt;code class="language-fallback" data-lang="fallback"&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;radix-sort(A,d)
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;for i = 1 to d
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; use a stable sort to sort array[A] on digit i
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
+&lt;/div&gt;
+&lt;/div&gt;&lt;ol start="2"&gt;
+&lt;li&gt;Time complexity is &lt;code&gt;O(n*k)&lt;/code&gt; where n is the number of elements and k is the number of radices.&lt;/li&gt;
+&lt;li&gt;It is very efficient to sort integers with similar number of integers&lt;/li&gt;
+&lt;/ol&gt;
+&lt;h2 id="bucket-sort"&gt;Bucket Sort
+&lt;/h2&gt;&lt;div class="highlight"&gt;&lt;div class="chroma"&gt;
+&lt;table class="lntable"&gt;&lt;tr&gt;&lt;td class="lntd"&gt;
+&lt;pre tabindex="0" class="chroma"&gt;&lt;code&gt;&lt;span class="lnt"&gt;1
+&lt;/span&gt;&lt;span class="lnt"&gt;2
+&lt;/span&gt;&lt;span class="lnt"&gt;3
+&lt;/span&gt;&lt;span class="lnt"&gt;4
+&lt;/span&gt;&lt;span class="lnt"&gt;5
+&lt;/span&gt;&lt;span class="lnt"&gt;6
+&lt;/span&gt;&lt;span class="lnt"&gt;7
+&lt;/span&gt;&lt;span class="lnt"&gt;8
+&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;
+&lt;td class="lntd"&gt;
+&lt;pre tabindex="0" class="chroma"&gt;&lt;code class="language-fallback" data-lang="fallback"&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;bucket-sort(A)
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;n = A.length
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;let B [0..n-1] be a new array
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;for i = 0 to n-1
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; make B[i] an empty list
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;for i = 1 to n
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; insert A[i] into list B[|_n*A[i]_|]
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;concatenate the lists B[0], B[1]...B[n-1] together in order
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
+&lt;/div&gt;
+&lt;/div&gt;&lt;p&gt;Time complexity is &lt;code&gt;theta(n)&lt;/code&gt;/&lt;code&gt;O(n+k)&lt;/code&gt; where n is the number of elements and k is the number of buckets.&lt;/p&gt;
+&lt;h2 id="shell-sort"&gt;Shell Sort
+&lt;/h2&gt;&lt;ol&gt;
+&lt;li&gt;Algorithm&lt;/li&gt;
+&lt;/ol&gt;
+&lt;div class="highlight"&gt;&lt;div class="chroma"&gt;
+&lt;table class="lntable"&gt;&lt;tr&gt;&lt;td class="lntd"&gt;
+&lt;pre tabindex="0" class="chroma"&gt;&lt;code&gt;&lt;span class="lnt"&gt;1
+&lt;/span&gt;&lt;span class="lnt"&gt;2
+&lt;/span&gt;&lt;span class="lnt"&gt;3
+&lt;/span&gt;&lt;span class="lnt"&gt;4
+&lt;/span&gt;&lt;span class="lnt"&gt;5
+&lt;/span&gt;&lt;span class="lnt"&gt;6
+&lt;/span&gt;&lt;span class="lnt"&gt;7
+&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;
+&lt;td class="lntd"&gt;
+&lt;pre tabindex="0" class="chroma"&gt;&lt;code class="language-fallback" data-lang="fallback"&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;gaps = [x,y,z...]
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;for each (G in gaps)
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; create sub-arrays with elements having gap as G
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; for each (S in sub-arrays)
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; insertion_sort(s)
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; merge all sub arrays
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
+&lt;/div&gt;
+&lt;/div&gt;&lt;ul&gt;
+&lt;li&gt;gaps usually divides by 2 every iteration&lt;/li&gt;
+&lt;/ul&gt;
+&lt;ol start="2"&gt;
+&lt;li&gt;Does not have a fixed time complexity.&lt;/li&gt;
+&lt;li&gt;Apparently, it is good for sorting with limited memory?&lt;/li&gt;
+&lt;/ol&gt;</description></item><item><title>Writeup on Hashing Algorithms</title><link>https://trinuro.github.io/p/writeup-on-hashing-algorithms/</link><pubDate>Tue, 15 Jul 2025 23:57:16 +0000</pubDate><guid>https://trinuro.github.io/p/writeup-on-hashing-algorithms/</guid><description>&lt;ol&gt;
+&lt;li&gt;Hash tables are interesting because they have an average time complexity of &lt;code&gt;O(1)&lt;/code&gt; for most operations. In order words, for most cases, we can retrieve and insert data in the constant time.&lt;/li&gt;
+&lt;li&gt;To insert data, we will convert the key into hash, then insert the key into the table.&lt;/li&gt;
+&lt;li&gt;Table[hash(key)] = key&lt;/li&gt;
+&lt;li&gt;Load factor is the ratio of the number of elements to number of slots in the table. The higher this ratio, the higher the probability of collision (Two elements have the same hash).&lt;/li&gt;
+&lt;li&gt;Hash table operations (insert, retrieval) time complexity:
+&lt;ol&gt;
+&lt;li&gt;Average case: &lt;code&gt;O(1)&lt;/code&gt;&lt;/li&gt;
+&lt;li&gt;Worst case: &lt;code&gt;O(n)&lt;/code&gt;&lt;/li&gt;
+&lt;li&gt;For hashing with chaining, &lt;code&gt;O(1+alpha)&lt;/code&gt;, where Alpha is the load factor&lt;/li&gt;
+&lt;/ol&gt;
+&lt;/li&gt;
+&lt;/ol&gt;
+&lt;h2 id="types-of-hashes"&gt;Types of Hashes
+&lt;/h2&gt;&lt;ol&gt;
+&lt;li&gt;Modular hashes: &lt;code&gt;H(k) = k mod q&lt;/code&gt;&lt;/li&gt;
+&lt;li&gt;Multiplication hashes: &lt;code&gt;H(k) = floor(q*(n*k mod 1))&lt;/code&gt;. Best way I can explain this is we multiply k by a fraction, n and gets the fraction (numbers after decimal point).. Then, we multiply it by a certain number and get a whole number.&lt;/li&gt;
+&lt;li&gt;Cryptographic hashes: RSA etc&lt;/li&gt;
+&lt;li&gt;Universal hashing: Create a set of hashes. Choose one to use randomly each time we need a hash.&lt;/li&gt;
+&lt;/ol&gt;
+&lt;h2 id="hash-collision-handling-methods"&gt;Hash collision Handling Methods
+&lt;/h2&gt;&lt;ol&gt;
+&lt;li&gt;Hash collisions refers to the situation where two data has the same hash.&lt;/li&gt;
+&lt;li&gt;There are two ways to handle this
+&lt;ol&gt;
+&lt;li&gt;Chaining: Each &amp;ldquo;slot&amp;rdquo; in the table is a linked list. Append the colliding elements to the linked list in table[hash]&lt;/li&gt;
+&lt;li&gt;Open addressing: Find another spot in the table to insert the second element&lt;/li&gt;
+&lt;/ol&gt;
+&lt;/li&gt;
+&lt;li&gt;We can see some pros and cons immediately:
+&lt;ol&gt;
+&lt;li&gt;Chaining:
+&lt;ol&gt;
+&lt;li&gt;Pros: Handles collisions very well. Works even when number of elements is more than number of slots. Also should be used when we do not know how many keys will be inserted into the hash table&lt;/li&gt;
+&lt;li&gt;Cons: More memory needed (Linked list needs to store the memory address of next node)&lt;/li&gt;
+&lt;/ol&gt;
+&lt;/li&gt;
+&lt;li&gt;Open addressing:
+&lt;ol&gt;
+&lt;li&gt;Pros: Only one element per slot. More memory efficient.&lt;/li&gt;
+&lt;/ol&gt;
+&lt;/li&gt;
+&lt;/ol&gt;
+&lt;/li&gt;
+&lt;/ol&gt;
+&lt;h3 id="probing"&gt;Probing
+&lt;/h3&gt;&lt;ol&gt;
+&lt;li&gt;In open addressing when collisions occur, we need to search for the next spot. This searching process is called probing.&lt;/li&gt;
+&lt;li&gt;There are 3 probing methods available:
+&lt;ol&gt;
+&lt;li&gt;Linear probe: Basically, add 1 to the original hash. For example, if the first hash is 7, next hash is 8, 9 etc&lt;/li&gt;
+&lt;li&gt;Quadratic probe: Add &lt;code&gt;c1*i+c2*i^2&lt;/code&gt; to the original hash. For example, if the first hash is 4, next hash is 5, 8, 13 etc. (4+i^2)&lt;/li&gt;
+&lt;li&gt;Double hashing: Formula is &lt;code&gt;H(k) = h1(k)+i*h2(k) % m&lt;/code&gt;. We need a second auxiliary hash to calculate the next probe sequence.&lt;/li&gt;
+&lt;/ol&gt;
+&lt;/li&gt;
+&lt;li&gt;Double hashing is better than linear and quadratic probe because it provides a unique probe sequence for each colliding key.
+&lt;ol&gt;
+&lt;li&gt;Just imagine, if 5 keys collide using linear/quadratic probing, the fifth key has to probe 5 times before reaching a place to put itself in&lt;/li&gt;
+&lt;/ol&gt;
+&lt;/li&gt;
+&lt;li&gt;However, there are two important criteria when using double hashing:
+&lt;ol&gt;
+&lt;li&gt;Result of second hash cannot be zero. You will be forever stuck!&lt;/li&gt;
+&lt;li&gt;Result of hash (&lt;code&gt;H(k)&lt;/code&gt;) must be co-prime to the number of slots in the table&lt;/li&gt;
+&lt;/ol&gt;
+&lt;/li&gt;
+&lt;/ol&gt;
+&lt;h3 id="resizing-hash-table"&gt;Resizing hash table
+&lt;/h3&gt;&lt;ol&gt;
+&lt;li&gt;You might be wondering, chaining seems so much better. You may be right, if not for resizing hash table.&lt;/li&gt;
+&lt;li&gt;Process of resizing hash table
+&lt;ol&gt;
+&lt;li&gt;Double (more or less) the size of the hash table&lt;/li&gt;
+&lt;li&gt;Recalculate the keys of each element in the table&lt;/li&gt;
+&lt;li&gt;Insert the elements in the table&lt;/li&gt;
+&lt;/ol&gt;
+&lt;/li&gt;
+&lt;li&gt;You should resize the table when load factor is too high to maintain optimal performance.&lt;/li&gt;
+&lt;/ol&gt;
+&lt;h3 id="personal-opinion"&gt;Personal Opinion
+&lt;/h3&gt;&lt;ol&gt;
+&lt;li&gt;The best hash table in my opinion is hash table with open addressing and double hashing. The hash used is universal hashing. Hash table resize occurs when load factor exceeds 0.7.&lt;/li&gt;
+&lt;li&gt;Universal hashing means that we do not use the same hash every time. We create a collection of hashes and choose 1 to use randomly every time.&lt;/li&gt;
+&lt;li&gt;Double hashing ensures two colliding keys have different probe sequence.&lt;/li&gt;
+&lt;/ol&gt;</description></item><item><title>Writeup on Dynamic Programming Algorithms</title><link>https://trinuro.github.io/p/writeup-on-dynamic-programming-algorithms/</link><pubDate>Tue, 15 Jul 2025 23:46:39 +0000</pubDate><guid>https://trinuro.github.io/p/writeup-on-dynamic-programming-algorithms/</guid><description>&lt;ol&gt;
+&lt;li&gt;Dynamic programming is programming paradigm that takes advantage of overlapping subprograms. It increases efficiency by answering the subproblems once and keeping the answers to overlapping subprograms.&lt;/li&gt;
+&lt;li&gt;There are two approaches of dynamic programming
+&lt;ol&gt;
+&lt;li&gt;Memoization: We store the answers of overlapping subprograms as we solve them.&lt;/li&gt;
+&lt;li&gt;Tabulation: We calculates the answers of the overlapping subprograms first.&lt;/li&gt;
+&lt;/ol&gt;
+&lt;/li&gt;
+&lt;li&gt;There are a few problems that can be solved with DP:
+&lt;ol&gt;
+&lt;li&gt;0-1 Knapsack Problem&lt;/li&gt;
+&lt;li&gt;Rod-cutting Problem&lt;/li&gt;
+&lt;li&gt;Fibonacci Series&lt;/li&gt;
+&lt;/ol&gt;
+&lt;/li&gt;
+&lt;/ol&gt;
+&lt;h2 id="fibonacci-series"&gt;Fibonacci Series
+&lt;/h2&gt;&lt;ol&gt;
+&lt;li&gt;This is a good problem to showcase the efficiency of dynamic programming&lt;/li&gt;
+&lt;li&gt;To solve this series naively, we use this&lt;/li&gt;
+&lt;/ol&gt;
+&lt;div class="highlight"&gt;&lt;div class="chroma"&gt;
+&lt;table class="lntable"&gt;&lt;tr&gt;&lt;td class="lntd"&gt;
+&lt;pre tabindex="0" class="chroma"&gt;&lt;code&gt;&lt;span class="lnt"&gt;1
+&lt;/span&gt;&lt;span class="lnt"&gt;2
+&lt;/span&gt;&lt;span class="lnt"&gt;3
+&lt;/span&gt;&lt;span class="lnt"&gt;4
+&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;
+&lt;td class="lntd"&gt;
+&lt;pre tabindex="0" class="chroma"&gt;&lt;code class="language-fallback" data-lang="fallback"&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;FIB(n)
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;if n&amp;lt;=1
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; return n
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;return FIB(n-1)+FIB(n-2)
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
+&lt;/div&gt;
+&lt;/div&gt;&lt;ol start="3"&gt;
+&lt;li&gt;Recursive tree of naive algorithm: ![[Pasted image 20250709205728.png]]
+&lt;ol&gt;
+&lt;li&gt;As you can see many calculations are repeated. This is the so called &amp;ldquo;overlapping subproblem&amp;rdquo;&lt;/li&gt;
+&lt;li&gt;For example, &lt;code&gt;FIB(2)&lt;/code&gt; is repeated 3 times&lt;/li&gt;
+&lt;/ol&gt;
+&lt;/li&gt;
+&lt;li&gt;We can improve efficiency by storing the results of &lt;code&gt;FIB(X)&lt;/code&gt; ![[Pasted image 20250709205942.png]]&lt;/li&gt;
+&lt;li&gt;This method is called the memoization method in dynamic programming&lt;/li&gt;
+&lt;/ol&gt;
+&lt;div class="highlight"&gt;&lt;div class="chroma"&gt;
+&lt;table class="lntable"&gt;&lt;tr&gt;&lt;td class="lntd"&gt;
+&lt;pre tabindex="0" class="chroma"&gt;&lt;code&gt;&lt;span class="lnt"&gt; 1
+&lt;/span&gt;&lt;span class="lnt"&gt; 2
+&lt;/span&gt;&lt;span class="lnt"&gt; 3
+&lt;/span&gt;&lt;span class="lnt"&gt; 4
+&lt;/span&gt;&lt;span class="lnt"&gt; 5
+&lt;/span&gt;&lt;span class="lnt"&gt; 6
+&lt;/span&gt;&lt;span class="lnt"&gt; 7
+&lt;/span&gt;&lt;span class="lnt"&gt; 8
+&lt;/span&gt;&lt;span class="lnt"&gt; 9
+&lt;/span&gt;&lt;span class="lnt"&gt;10
+&lt;/span&gt;&lt;span class="lnt"&gt;11
+&lt;/span&gt;&lt;span class="lnt"&gt;12
+&lt;/span&gt;&lt;span class="lnt"&gt;13
+&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;
+&lt;td class="lntd"&gt;
+&lt;pre tabindex="0" class="chroma"&gt;&lt;code class="language-fallback" data-lang="fallback"&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;FIB-MEMO(n)
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;Create an array S[0..n]
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;for i in 1 to n
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; S[i] = -1
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;return FIB-AUX(n,S)
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;FIB-AUX(n,S)
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;if S[n] != -1:
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; return S[n] // if S[n] is memorized
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;if n&amp;lt;=1
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; return n
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;S[n] = FIB-AUX(n-1,S) + FIB-AUX(n-2,S) // memorize the output of FIB(n)
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;return S[n]
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
+&lt;/div&gt;
+&lt;/div&gt;&lt;ol start="6"&gt;
+&lt;li&gt;The tabulation approach is slightly different. In this approach, we will precompute all the answers to subproblems&lt;/li&gt;
+&lt;/ol&gt;
+&lt;div class="highlight"&gt;&lt;div class="chroma"&gt;
+&lt;table class="lntable"&gt;&lt;tr&gt;&lt;td class="lntd"&gt;
+&lt;pre tabindex="0" class="chroma"&gt;&lt;code&gt;&lt;span class="lnt"&gt;1
+&lt;/span&gt;&lt;span class="lnt"&gt;2
+&lt;/span&gt;&lt;span class="lnt"&gt;3
+&lt;/span&gt;&lt;span class="lnt"&gt;4
+&lt;/span&gt;&lt;span class="lnt"&gt;5
+&lt;/span&gt;&lt;span class="lnt"&gt;6
+&lt;/span&gt;&lt;span class="lnt"&gt;7
+&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;
+&lt;td class="lntd"&gt;
+&lt;pre tabindex="0" class="chroma"&gt;&lt;code class="language-fallback" data-lang="fallback"&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;FIB(n)
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;Create an array A[0..n]
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;A[0] = 0
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;A[1] = 1
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;for i in 2 to n
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; A[i] = A[i-1] + A[i-2]
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;return A[n]
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
+&lt;/div&gt;
+&lt;/div&gt;&lt;p&gt;Visualization&lt;/p&gt;
+&lt;table&gt;
+&lt;thead&gt;
+&lt;tr&gt;
+&lt;th&gt;i&lt;/th&gt;
+&lt;th&gt;0&lt;/th&gt;
+&lt;th&gt;1&lt;/th&gt;
+&lt;th&gt;2&lt;/th&gt;
+&lt;th&gt;3&lt;/th&gt;
+&lt;th&gt;4&lt;/th&gt;
+&lt;th&gt;5&lt;/th&gt;
+&lt;th&gt;6&lt;/th&gt;
+&lt;th&gt;&amp;hellip;&lt;/th&gt;
+&lt;th&gt;n&lt;/th&gt;
+&lt;/tr&gt;
+&lt;/thead&gt;
+&lt;tbody&gt;
+&lt;tr&gt;
+&lt;td&gt;FIB(i)&lt;/td&gt;
+&lt;td&gt;0&lt;/td&gt;
+&lt;td&gt;1&lt;/td&gt;
+&lt;td&gt;1&lt;/td&gt;
+&lt;td&gt;2&lt;/td&gt;
+&lt;td&gt;3&lt;/td&gt;
+&lt;td&gt;5&lt;/td&gt;
+&lt;td&gt;8&lt;/td&gt;
+&lt;td&gt;….&lt;/td&gt;
+&lt;td&gt;&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;7. The naive approach to Fibonacci numbers has a time complexity of &lt;code&gt;O(2^n)&lt;/code&gt; while the dynamic programming approach to Fibonacci numbers has a time complexity of &lt;code&gt;O(n)&lt;/code&gt;&lt;/td&gt;
+&lt;td&gt;&lt;/td&gt;
+&lt;td&gt;&lt;/td&gt;
+&lt;td&gt;&lt;/td&gt;
+&lt;td&gt;&lt;/td&gt;
+&lt;td&gt;&lt;/td&gt;
+&lt;td&gt;&lt;/td&gt;
+&lt;td&gt;&lt;/td&gt;
+&lt;td&gt;&lt;/td&gt;
+&lt;td&gt;&lt;/td&gt;
+&lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;/table&gt;
+&lt;h2 id="rod-cutting-problem"&gt;Rod-Cutting Problem
+&lt;/h2&gt;&lt;ol&gt;
+&lt;li&gt;In this problem, we want to maximise the profit from a given length of rod. This is because the length of the rod is not proportional to the profit of the rod.&lt;/li&gt;
+&lt;li&gt;Example: Say we have a Profit array of &lt;code&gt;P = [3,5,1,9]&lt;/code&gt;, where the profit of 1 unit length of rod is &lt;code&gt;P[1] = 3&lt;/code&gt; and so on. The length of the rod right now is 4 units. What is the best way to chop and sell this rod?&lt;/li&gt;
+&lt;li&gt;The trick to solve this is to recursively find the maximum profit for rod length 1,2,3 and 4.&lt;/li&gt;
+&lt;/ol&gt;
+&lt;div class="highlight"&gt;&lt;div class="chroma"&gt;
+&lt;table class="lntable"&gt;&lt;tr&gt;&lt;td class="lntd"&gt;
+&lt;pre tabindex="0" class="chroma"&gt;&lt;code&gt;&lt;span class="lnt"&gt;1
+&lt;/span&gt;&lt;span class="lnt"&gt;2
+&lt;/span&gt;&lt;span class="lnt"&gt;3
+&lt;/span&gt;&lt;span class="lnt"&gt;4
+&lt;/span&gt;&lt;span class="lnt"&gt;5
+&lt;/span&gt;&lt;span class="lnt"&gt;6
+&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;
+&lt;td class="lntd"&gt;
+&lt;pre tabindex="0" class="chroma"&gt;&lt;code class="language-fallback" data-lang="fallback"&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;M[4] = MAX(
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; P[4]+M[0], // no cut
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; P[3]+M[1], // 3 unit + best cut for 1 unit
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; P[2]+M[2], // 2 unit + best cut for 2 unit
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; P[1]+M[3] // 1 unit + best cut for 3 unit
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; )
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
+&lt;/div&gt;
+&lt;/div&gt;&lt;p&gt;To find the best cut of length 3,&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;div class="chroma"&gt;
+&lt;table class="lntable"&gt;&lt;tr&gt;&lt;td class="lntd"&gt;
+&lt;pre tabindex="0" class="chroma"&gt;&lt;code&gt;&lt;span class="lnt"&gt;1
+&lt;/span&gt;&lt;span class="lnt"&gt;2
+&lt;/span&gt;&lt;span class="lnt"&gt;3
+&lt;/span&gt;&lt;span class="lnt"&gt;4
+&lt;/span&gt;&lt;span class="lnt"&gt;5
+&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;
+&lt;td class="lntd"&gt;
+&lt;pre tabindex="0" class="chroma"&gt;&lt;code class="language-fallback" data-lang="fallback"&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;M[3] = MAX(
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; P[3]+M[0], // no cut
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; P[2]+M[1], // 3 unit + best cut for 1 unit
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; P[1]+M[2], // 2 unit + best cut for 2 unit
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; )
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
+&lt;/div&gt;
+&lt;/div&gt;&lt;p&gt;And so on.
+4. The tabulation algorithm (n is the length of rod while P is the profit for each length of rod)&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;div class="chroma"&gt;
+&lt;table class="lntable"&gt;&lt;tr&gt;&lt;td class="lntd"&gt;
+&lt;pre tabindex="0" class="chroma"&gt;&lt;code&gt;&lt;span class="lnt"&gt;1
+&lt;/span&gt;&lt;span class="lnt"&gt;2
+&lt;/span&gt;&lt;span class="lnt"&gt;3
+&lt;/span&gt;&lt;span class="lnt"&gt;4
+&lt;/span&gt;&lt;span class="lnt"&gt;5
+&lt;/span&gt;&lt;span class="lnt"&gt;6
+&lt;/span&gt;&lt;span class="lnt"&gt;7
+&lt;/span&gt;&lt;span class="lnt"&gt;8
+&lt;/span&gt;&lt;span class="lnt"&gt;9
+&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;
+&lt;td class="lntd"&gt;
+&lt;pre tabindex="0" class="chroma"&gt;&lt;code class="language-fallback" data-lang="fallback"&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;ROD(n,P)
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;Create an array M[0..n]
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;M[0] = 0
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;for i in 1 to n
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; q = - INF
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; for j in 1 to i
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; q = MAX(q, P[j]+ M[i-j])
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; M[i] = q
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;return M[n]
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
+&lt;/div&gt;
+&lt;/div&gt;&lt;ol start="5"&gt;
+&lt;li&gt;The memoization algorithm&lt;/li&gt;
+&lt;/ol&gt;
+&lt;div class="highlight"&gt;&lt;div class="chroma"&gt;
+&lt;table class="lntable"&gt;&lt;tr&gt;&lt;td class="lntd"&gt;
+&lt;pre tabindex="0" class="chroma"&gt;&lt;code&gt;&lt;span class="lnt"&gt; 1
+&lt;/span&gt;&lt;span class="lnt"&gt; 2
+&lt;/span&gt;&lt;span class="lnt"&gt; 3
+&lt;/span&gt;&lt;span class="lnt"&gt; 4
+&lt;/span&gt;&lt;span class="lnt"&gt; 5
+&lt;/span&gt;&lt;span class="lnt"&gt; 6
+&lt;/span&gt;&lt;span class="lnt"&gt; 7
+&lt;/span&gt;&lt;span class="lnt"&gt; 8
+&lt;/span&gt;&lt;span class="lnt"&gt; 9
+&lt;/span&gt;&lt;span class="lnt"&gt;10
+&lt;/span&gt;&lt;span class="lnt"&gt;11
+&lt;/span&gt;&lt;span class="lnt"&gt;12
+&lt;/span&gt;&lt;span class="lnt"&gt;13
+&lt;/span&gt;&lt;span class="lnt"&gt;14
+&lt;/span&gt;&lt;span class="lnt"&gt;15
+&lt;/span&gt;&lt;span class="lnt"&gt;16
+&lt;/span&gt;&lt;span class="lnt"&gt;17
+&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;
+&lt;td class="lntd"&gt;
+&lt;pre tabindex="0" class="chroma"&gt;&lt;code class="language-fallback" data-lang="fallback"&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;ROD(n,P)
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;Create an array M[0..n]
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;for i in 0 to n
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; M[i] = -INF
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;ROD-AUX(n,P,M)
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;ROD-AUX(i,P,M)
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;if M[i] != -INF
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; return M[i]
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;if i == 0
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; M[i] = 0
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; return M[i]
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;q = -INF
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;for j in 1 to i
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; q = MAX(q, P[j]+ROD-AUX(i-j,P,M))
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;M[i] = q
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;return M[i]
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
+&lt;/div&gt;
+&lt;/div&gt;&lt;h2 id="0-1-knapsack-problem"&gt;0-1 Knapsack Problem
+&lt;/h2&gt;&lt;ol&gt;
+&lt;li&gt;In this problem, we have n indivisible objects. We can only choose m objects out of n into our knapsack. We can only carry a max weight, w. Each object has a certain profit, &lt;code&gt;P[i]&lt;/code&gt;. How do we pick these objects such that our profit is maximized?&lt;/li&gt;
+&lt;li&gt;The naive approach is to test all possibilities.
+&lt;ol&gt;
+&lt;li&gt;An object can be either in or outside the knapsack. (0 or 1)&lt;/li&gt;
+&lt;li&gt;Thus, there is 2^n ways to choose objects.&lt;/li&gt;
+&lt;li&gt;Find the profit of all the permutations. Reject the permutation that cause the knapsack to become overweight.&lt;/li&gt;
+&lt;/ol&gt;
+&lt;/li&gt;
+&lt;li&gt;The dynamic programming approach will stop the search at the maximum weight and avoid recalculating what is the highest profit at a certain weight value. (Kinda bad explanation, lul)&lt;/li&gt;
+&lt;li&gt;The DP algorithm (Tabulation approach)&lt;/li&gt;
+&lt;/ol&gt;
+&lt;div class="highlight"&gt;&lt;div class="chroma"&gt;
+&lt;table class="lntable"&gt;&lt;tr&gt;&lt;td class="lntd"&gt;
+&lt;pre tabindex="0" class="chroma"&gt;&lt;code&gt;&lt;span class="lnt"&gt; 1
+&lt;/span&gt;&lt;span class="lnt"&gt; 2
+&lt;/span&gt;&lt;span class="lnt"&gt; 3
+&lt;/span&gt;&lt;span class="lnt"&gt; 4
+&lt;/span&gt;&lt;span class="lnt"&gt; 5
+&lt;/span&gt;&lt;span class="lnt"&gt; 6
+&lt;/span&gt;&lt;span class="lnt"&gt; 7
+&lt;/span&gt;&lt;span class="lnt"&gt; 8
+&lt;/span&gt;&lt;span class="lnt"&gt; 9
+&lt;/span&gt;&lt;span class="lnt"&gt;10
+&lt;/span&gt;&lt;span class="lnt"&gt;11
+&lt;/span&gt;&lt;span class="lnt"&gt;12
+&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;
+&lt;td class="lntd"&gt;
+&lt;pre tabindex="0" class="chroma"&gt;&lt;code class="language-fallback" data-lang="fallback"&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;KNAPSACK(P,W,max)
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;n = W.length
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;Create a 2d array, M[0..n][0..max]
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;for i in 0 to max
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; M[0][i] = 0 // nothing has a profit of zero
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;for i in 1 to n
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; for j in 0 to max
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; if j &amp;gt;= W[i]
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; M[i][j] = MIN(M[i-1][j], M[i-1][j-W[i]]+P[i]) // ok, basically check if the previous set of objects or previous set of objects and the profit of current object is higher
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; else
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; M[i][j] = M[i-1][j]
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;return M[n][max]
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
+&lt;/div&gt;
+&lt;/div&gt;&lt;ol start="5"&gt;
+&lt;li&gt;Example
+P = {1,2,5,6}&lt;br&gt;
+W = {2,3,4,5}&lt;br&gt;
+Max weight = 8&lt;/li&gt;
+&lt;/ol&gt;
+&lt;table&gt;
+&lt;thead&gt;
+&lt;tr&gt;
+&lt;th style="text-align: right"&gt;&lt;strong&gt;P&lt;/strong&gt;&lt;/th&gt;
+&lt;th style="text-align: right"&gt;&lt;strong&gt;W&lt;/strong&gt;&lt;/th&gt;
+&lt;th style="text-align: right"&gt;&lt;strong&gt;i&lt;/strong&gt;&lt;/th&gt;
+&lt;th style="text-align: right"&gt;&lt;strong&gt;0&lt;/strong&gt;&lt;/th&gt;
+&lt;th style="text-align: right"&gt;&lt;strong&gt;1&lt;/strong&gt;&lt;/th&gt;
+&lt;th style="text-align: right"&gt;&lt;strong&gt;2&lt;/strong&gt;&lt;/th&gt;
+&lt;th style="text-align: right"&gt;&lt;strong&gt;3&lt;/strong&gt;&lt;/th&gt;
+&lt;th style="text-align: right"&gt;&lt;strong&gt;4&lt;/strong&gt;&lt;/th&gt;
+&lt;th style="text-align: right"&gt;&lt;strong&gt;5&lt;/strong&gt;&lt;/th&gt;
+&lt;th style="text-align: right"&gt;&lt;strong&gt;6&lt;/strong&gt;&lt;/th&gt;
+&lt;th style="text-align: right"&gt;&lt;strong&gt;7&lt;/strong&gt;&lt;/th&gt;
+&lt;th style="text-align: right"&gt;8&lt;/th&gt;
+&lt;/tr&gt;
+&lt;/thead&gt;
+&lt;tbody&gt;
+&lt;tr&gt;
+&lt;td style="text-align: right"&gt;0&lt;/td&gt;
+&lt;td style="text-align: right"&gt;0&lt;/td&gt;
+&lt;td style="text-align: right"&gt;i = 0&lt;/td&gt;
+&lt;td style="text-align: right"&gt;0&lt;/td&gt;
+&lt;td style="text-align: right"&gt;0&lt;/td&gt;
+&lt;td style="text-align: right"&gt;0&lt;/td&gt;
+&lt;td style="text-align: right"&gt;0&lt;/td&gt;
+&lt;td style="text-align: right"&gt;0&lt;/td&gt;
+&lt;td style="text-align: right"&gt;0&lt;/td&gt;
+&lt;td style="text-align: right"&gt;0&lt;/td&gt;
+&lt;td style="text-align: right"&gt;0&lt;/td&gt;
+&lt;td style="text-align: right"&gt;0&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td style="text-align: right"&gt;1&lt;/td&gt;
+&lt;td style="text-align: right"&gt;2&lt;/td&gt;
+&lt;td style="text-align: right"&gt;i = 1&lt;/td&gt;
+&lt;td style="text-align: right"&gt;0&lt;/td&gt;
+&lt;td style="text-align: right"&gt;0&lt;/td&gt;
+&lt;td style="text-align: right"&gt;1&lt;/td&gt;
+&lt;td style="text-align: right"&gt;1&lt;/td&gt;
+&lt;td style="text-align: right"&gt;1&lt;/td&gt;
+&lt;td style="text-align: right"&gt;1&lt;/td&gt;
+&lt;td style="text-align: right"&gt;1&lt;/td&gt;
+&lt;td style="text-align: right"&gt;1&lt;/td&gt;
+&lt;td style="text-align: right"&gt;1&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td style="text-align: right"&gt;2&lt;/td&gt;
+&lt;td style="text-align: right"&gt;3&lt;/td&gt;
+&lt;td style="text-align: right"&gt;i = 2&lt;/td&gt;
+&lt;td style="text-align: right"&gt;0&lt;/td&gt;
+&lt;td style="text-align: right"&gt;0&lt;/td&gt;
+&lt;td style="text-align: right"&gt;1&lt;/td&gt;
+&lt;td style="text-align: right"&gt;==2==&lt;/td&gt;
+&lt;td style="text-align: right"&gt;2&lt;/td&gt;
+&lt;td style="text-align: right"&gt;3&lt;/td&gt;
+&lt;td style="text-align: right"&gt;3&lt;/td&gt;
+&lt;td style="text-align: right"&gt;3&lt;/td&gt;
+&lt;td style="text-align: right"&gt;3&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td style="text-align: right"&gt;5&lt;/td&gt;
+&lt;td style="text-align: right"&gt;4&lt;/td&gt;
+&lt;td style="text-align: right"&gt;i = 3&lt;/td&gt;
+&lt;td style="text-align: right"&gt;0&lt;/td&gt;
+&lt;td style="text-align: right"&gt;0&lt;/td&gt;
+&lt;td style="text-align: right"&gt;1&lt;/td&gt;
+&lt;td style="text-align: right"&gt;==2==&lt;/td&gt;
+&lt;td style="text-align: right"&gt;5&lt;/td&gt;
+&lt;td style="text-align: right"&gt;5&lt;/td&gt;
+&lt;td style="text-align: right"&gt;6&lt;/td&gt;
+&lt;td style="text-align: right"&gt;7&lt;/td&gt;
+&lt;td style="text-align: right"&gt;7&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td style="text-align: right"&gt;6&lt;/td&gt;
+&lt;td style="text-align: right"&gt;5&lt;/td&gt;
+&lt;td style="text-align: right"&gt;i = 4&lt;/td&gt;
+&lt;td style="text-align: right"&gt;0&lt;/td&gt;
+&lt;td style="text-align: right"&gt;0&lt;/td&gt;
+&lt;td style="text-align: right"&gt;1&lt;/td&gt;
+&lt;td style="text-align: right"&gt;==2==&lt;/td&gt;
+&lt;td style="text-align: right"&gt;5&lt;/td&gt;
+&lt;td style="text-align: right"&gt;6&lt;/td&gt;
+&lt;td style="text-align: right"&gt;6&lt;/td&gt;
+&lt;td style="text-align: right"&gt;7&lt;/td&gt;
+&lt;td style="text-align: right"&gt;==8==&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td style="text-align: right"&gt;Max-profit = 8&lt;/td&gt;
+&lt;td&gt;&lt;/td&gt;
+&lt;td&gt;&lt;/td&gt;
+&lt;td&gt;&lt;/td&gt;
+&lt;td&gt;&lt;/td&gt;
+&lt;td&gt;&lt;/td&gt;
+&lt;td&gt;&lt;/td&gt;
+&lt;td&gt;&lt;/td&gt;
+&lt;td&gt;&lt;/td&gt;
+&lt;td&gt;&lt;/td&gt;
+&lt;td&gt;&lt;/td&gt;
+&lt;td&gt;&lt;/td&gt;
+&lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;/table&gt;
+&lt;p&gt;To backtrack which object is in the set,
+Notice that &lt;code&gt;M[3][8]&lt;/code&gt; is 7 != 8. Thus, Item 4 must be in this set.
+Subtract &lt;code&gt;P[4]&lt;/code&gt; from 8. We get &lt;code&gt;8-6=2&lt;/code&gt;.
+Follow the column with value in 2
+Notice that &lt;code&gt;M[1][3]&lt;/code&gt; is 1 != 2. Thus, Item 2 must be in this set.&lt;/p&gt;
+&lt;p&gt;Set of item with maximum profit = {2,4}&lt;/p&gt;</description></item><item><title>Writeup on Graph Algorithms</title><link>https://trinuro.github.io/p/writeup-on-graph-algorithms/</link><pubDate>Tue, 15 Jul 2025 23:37:48 +0000</pubDate><guid>https://trinuro.github.io/p/writeup-on-graph-algorithms/</guid><description>&lt;ol&gt;
+&lt;li&gt;In graph theory, there are four major types of problems:
+&lt;ol&gt;
+&lt;li&gt;Searching: We want to find a node, n in the tree&lt;/li&gt;
+&lt;li&gt;Minimum spanning tree: We want to find a way to connect all nodes in the cheapest way possible.&lt;/li&gt;
+&lt;li&gt;Single source shortest path: We want to find the shortest path from a source node, u to every other node, v in the graph.&lt;/li&gt;
+&lt;li&gt;All pairs shortest path: We want to find the shortest path from all nodes to every other nodes in the graph&lt;/li&gt;
+&lt;/ol&gt;
+&lt;/li&gt;
+&lt;/ol&gt;
+&lt;h2 id="searching-algorithms"&gt;Searching algorithms
+&lt;/h2&gt;&lt;ol&gt;
+&lt;li&gt;There are two important search algorithms:
+&lt;ol&gt;
+&lt;li&gt;Depth-first search (DFS)&lt;/li&gt;
+&lt;li&gt;Breadth-first search (BFS)&lt;/li&gt;
+&lt;/ol&gt;
+&lt;/li&gt;
+&lt;li&gt;General differences:
+&lt;ol&gt;
+&lt;li&gt;DFS uses stack while BFS uses queue&lt;/li&gt;
+&lt;li&gt;DFS results in a &amp;ldquo;taller&amp;rdquo; tree while BFS results in a tree with more branches&lt;/li&gt;
+&lt;/ol&gt;
+&lt;/li&gt;
+&lt;li&gt;DFS Pseudocode&lt;/li&gt;
+&lt;/ol&gt;
+&lt;div class="highlight"&gt;&lt;div class="chroma"&gt;
+&lt;table class="lntable"&gt;&lt;tr&gt;&lt;td class="lntd"&gt;
+&lt;pre tabindex="0" class="chroma"&gt;&lt;code&gt;&lt;span class="lnt"&gt; 1
+&lt;/span&gt;&lt;span class="lnt"&gt; 2
+&lt;/span&gt;&lt;span class="lnt"&gt; 3
+&lt;/span&gt;&lt;span class="lnt"&gt; 4
+&lt;/span&gt;&lt;span class="lnt"&gt; 5
+&lt;/span&gt;&lt;span class="lnt"&gt; 6
+&lt;/span&gt;&lt;span class="lnt"&gt; 7
+&lt;/span&gt;&lt;span class="lnt"&gt; 8
+&lt;/span&gt;&lt;span class="lnt"&gt; 9
+&lt;/span&gt;&lt;span class="lnt"&gt;10
+&lt;/span&gt;&lt;span class="lnt"&gt;11
+&lt;/span&gt;&lt;span class="lnt"&gt;12
+&lt;/span&gt;&lt;span class="lnt"&gt;13
+&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;
+&lt;td class="lntd"&gt;
+&lt;pre tabindex="0" class="chroma"&gt;&lt;code class="language-fallback" data-lang="fallback"&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;DFS(G,s)
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;V = {}
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;DFS-AUX(G,s,V)
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;DFS-AUX(G,u,V)
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;if u is in V
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; return
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;process(u) // print it, add it to a sum etc
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;V = V U {u}
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;for each vertex v that is neighbour of u
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; if v is not in V
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; DFS-AUX(G,v,V)
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
+&lt;/div&gt;
+&lt;/div&gt;&lt;ol start="4"&gt;
+&lt;li&gt;BFS Pseudocode&lt;/li&gt;
+&lt;/ol&gt;
+&lt;div class="highlight"&gt;&lt;div class="chroma"&gt;
+&lt;table class="lntable"&gt;&lt;tr&gt;&lt;td class="lntd"&gt;
+&lt;pre tabindex="0" class="chroma"&gt;&lt;code&gt;&lt;span class="lnt"&gt; 1
+&lt;/span&gt;&lt;span class="lnt"&gt; 2
+&lt;/span&gt;&lt;span class="lnt"&gt; 3
+&lt;/span&gt;&lt;span class="lnt"&gt; 4
+&lt;/span&gt;&lt;span class="lnt"&gt; 5
+&lt;/span&gt;&lt;span class="lnt"&gt; 6
+&lt;/span&gt;&lt;span class="lnt"&gt; 7
+&lt;/span&gt;&lt;span class="lnt"&gt; 8
+&lt;/span&gt;&lt;span class="lnt"&gt; 9
+&lt;/span&gt;&lt;span class="lnt"&gt;10
+&lt;/span&gt;&lt;span class="lnt"&gt;11
+&lt;/span&gt;&lt;span class="lnt"&gt;12
+&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;
+&lt;td class="lntd"&gt;
+&lt;pre tabindex="0" class="chroma"&gt;&lt;code class="language-fallback" data-lang="fallback"&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;BFS(G,s)
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;V = {s}
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;Create queue Q
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;ENQUEUE(Q,s)
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;while Q is not empty
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; u = DEQUEUE(Q)
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; process(u) // print it, add it to a sum etc
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; for each vertex v that is a neighbour of u
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; if v is not in V
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; V = V U {v}
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; ENQUEUE(Q,v)
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
+&lt;/div&gt;
+&lt;/div&gt;&lt;h2 id="minimum-spanning-tree"&gt;Minimum spanning tree
+&lt;/h2&gt;&lt;ol&gt;
+&lt;li&gt;Minimum spanning tree: Connected and acyclic graph in which the total weight of edges is the smallest&lt;/li&gt;
+&lt;li&gt;Two ways to create MST:
+&lt;ol&gt;
+&lt;li&gt;Prim&amp;rsquo;s algorithm
+&lt;ol&gt;
+&lt;li&gt;Choose vertex&lt;/li&gt;
+&lt;li&gt;Maintain one MST during building process&lt;/li&gt;
+&lt;/ol&gt;
+&lt;/li&gt;
+&lt;li&gt;Kruskal&amp;rsquo;s algorithm
+&lt;ol&gt;
+&lt;li&gt;Choose edge&lt;/li&gt;
+&lt;li&gt;Maintain one or more MST during building process&lt;/li&gt;
+&lt;/ol&gt;
+&lt;/li&gt;
+&lt;/ol&gt;
+&lt;/li&gt;
+&lt;li&gt;Prim&amp;rsquo;s Algorithm Pseudocode&lt;/li&gt;
+&lt;/ol&gt;
+&lt;div class="highlight"&gt;&lt;div class="chroma"&gt;
+&lt;table class="lntable"&gt;&lt;tr&gt;&lt;td class="lntd"&gt;
+&lt;pre tabindex="0" class="chroma"&gt;&lt;code&gt;&lt;span class="lnt"&gt; 1
+&lt;/span&gt;&lt;span class="lnt"&gt; 2
+&lt;/span&gt;&lt;span class="lnt"&gt; 3
+&lt;/span&gt;&lt;span class="lnt"&gt; 4
+&lt;/span&gt;&lt;span class="lnt"&gt; 5
+&lt;/span&gt;&lt;span class="lnt"&gt; 6
+&lt;/span&gt;&lt;span class="lnt"&gt; 7
+&lt;/span&gt;&lt;span class="lnt"&gt; 8
+&lt;/span&gt;&lt;span class="lnt"&gt; 9
+&lt;/span&gt;&lt;span class="lnt"&gt;10
+&lt;/span&gt;&lt;span class="lnt"&gt;11
+&lt;/span&gt;&lt;span class="lnt"&gt;12
+&lt;/span&gt;&lt;span class="lnt"&gt;13
+&lt;/span&gt;&lt;span class="lnt"&gt;14
+&lt;/span&gt;&lt;span class="lnt"&gt;15
+&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;
+&lt;td class="lntd"&gt;
+&lt;pre tabindex="0" class="chroma"&gt;&lt;code class="language-fallback" data-lang="fallback"&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;PRIM(G,s)
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;// initialise key and previous node
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;for each vertex v in G.V:
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; v.key = INF
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; v.previous = NIL
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;s.key=0
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;V = G.V
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;while V is not empty:
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; u = EXTRACT-MIN(V) // get node with lowest weight
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; for each vertex v that is neighbour of u
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; // adjust the key of all nodes
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; if v is in V and v.key &amp;gt; w(u,v):
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; v.key = w(u,v)
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; v.previous = u
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
+&lt;/div&gt;
+&lt;/div&gt;&lt;ol start="4"&gt;
+&lt;li&gt;Kruskal&amp;rsquo;s Algorithm Pseudocode&lt;/li&gt;
+&lt;/ol&gt;
+&lt;div class="highlight"&gt;&lt;div class="chroma"&gt;
+&lt;table class="lntable"&gt;&lt;tr&gt;&lt;td class="lntd"&gt;
+&lt;pre tabindex="0" class="chroma"&gt;&lt;code&gt;&lt;span class="lnt"&gt; 1
+&lt;/span&gt;&lt;span class="lnt"&gt; 2
+&lt;/span&gt;&lt;span class="lnt"&gt; 3
+&lt;/span&gt;&lt;span class="lnt"&gt; 4
+&lt;/span&gt;&lt;span class="lnt"&gt; 5
+&lt;/span&gt;&lt;span class="lnt"&gt; 6
+&lt;/span&gt;&lt;span class="lnt"&gt; 7
+&lt;/span&gt;&lt;span class="lnt"&gt; 8
+&lt;/span&gt;&lt;span class="lnt"&gt; 9
+&lt;/span&gt;&lt;span class="lnt"&gt;10
+&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;
+&lt;td class="lntd"&gt;
+&lt;pre tabindex="0" class="chroma"&gt;&lt;code class="language-fallback" data-lang="fallback"&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;KRUSKAL(G)
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;for each vertex v in G.V:
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; MAKE-SET(v) // each vertex is its own tree
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;Sort G.E in ascending order of weight // get edge with lowest weight each time
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;S = {}
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;for each edge (u,v) in G.E:
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; if GET-SET(u) != GET-SET(v): // prevents merge of nodes from same tree
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; UNION(u,v) // merge two trees
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; S = S U {(u,v)} // add edge to output
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;return S
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
+&lt;/div&gt;
+&lt;/div&gt;&lt;ol start="5"&gt;
+&lt;li&gt;Both Prim and Kruskal have time complexity of &lt;code&gt;O(ElogV)&lt;/code&gt;&lt;/li&gt;
+&lt;/ol&gt;
+&lt;h2 id="single-source-shortest-path"&gt;Single source shortest Path
+&lt;/h2&gt;&lt;ol&gt;
+&lt;li&gt;Objective is to find shortest path from current node, s to all other nodes&lt;/li&gt;
+&lt;li&gt;Two algorithms are available:
+&lt;ol&gt;
+&lt;li&gt;Dijkstra&amp;rsquo;s
+&lt;ol&gt;
+&lt;li&gt;Cannot handle negative weights&lt;/li&gt;
+&lt;li&gt;Better time complexity for positive weights than Bellman-Ford&lt;/li&gt;
+&lt;/ol&gt;
+&lt;/li&gt;
+&lt;li&gt;Bellman-Ford
+&lt;ol&gt;
+&lt;li&gt;Can handle negative weights&lt;/li&gt;
+&lt;/ol&gt;
+&lt;/li&gt;
+&lt;/ol&gt;
+&lt;/li&gt;
+&lt;li&gt;Both do not work if there exists a negative cycle&lt;/li&gt;
+&lt;li&gt;Dijkstra&amp;rsquo;s algorithm pseudocode&lt;/li&gt;
+&lt;/ol&gt;
+&lt;div class="highlight"&gt;&lt;div class="chroma"&gt;
+&lt;table class="lntable"&gt;&lt;tr&gt;&lt;td class="lntd"&gt;
+&lt;pre tabindex="0" class="chroma"&gt;&lt;code&gt;&lt;span class="lnt"&gt;1
+&lt;/span&gt;&lt;span class="lnt"&gt;2
+&lt;/span&gt;&lt;span class="lnt"&gt;3
+&lt;/span&gt;&lt;span class="lnt"&gt;4
+&lt;/span&gt;&lt;span class="lnt"&gt;5
+&lt;/span&gt;&lt;span class="lnt"&gt;6
+&lt;/span&gt;&lt;span class="lnt"&gt;7
+&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;
+&lt;td class="lntd"&gt;
+&lt;pre tabindex="0" class="chroma"&gt;&lt;code class="language-fallback" data-lang="fallback"&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;DIJKSTRA(G,s,w)
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;INITIALISE-SINGLE-SOURCE(G,s)
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;V = G.V
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;while V is not empty:
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; u = EXTRACT-MIN(V) // Get the vertex with smallest weight every time
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; for each vertex v that is neighbour of u:
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; RELAX(u,v,w)
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
+&lt;/div&gt;
+&lt;/div&gt;&lt;ol start="5"&gt;
+&lt;li&gt;Bellman-Ford algorithm Pseudocode&lt;/li&gt;
+&lt;/ol&gt;
+&lt;div class="highlight"&gt;&lt;div class="chroma"&gt;
+&lt;table class="lntable"&gt;&lt;tr&gt;&lt;td class="lntd"&gt;
+&lt;pre tabindex="0" class="chroma"&gt;&lt;code&gt;&lt;span class="lnt"&gt; 1
+&lt;/span&gt;&lt;span class="lnt"&gt; 2
+&lt;/span&gt;&lt;span class="lnt"&gt; 3
+&lt;/span&gt;&lt;span class="lnt"&gt; 4
+&lt;/span&gt;&lt;span class="lnt"&gt; 5
+&lt;/span&gt;&lt;span class="lnt"&gt; 6
+&lt;/span&gt;&lt;span class="lnt"&gt; 7
+&lt;/span&gt;&lt;span class="lnt"&gt; 8
+&lt;/span&gt;&lt;span class="lnt"&gt; 9
+&lt;/span&gt;&lt;span class="lnt"&gt;10
+&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;
+&lt;td class="lntd"&gt;
+&lt;pre tabindex="0" class="chroma"&gt;&lt;code class="language-fallback" data-lang="fallback"&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;BELLMAN-FORD(G,s,w)
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;INTIALISE-SINGLE-SOURCE(G,s)
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;n = |G.V|
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;for i in 1 to n-1
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; for each edge(u,v) in G.E
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; RELAX(u,v,w)
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;for each edge(u,v) in G.E
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; if v.key &amp;gt; u.key+w(u,v)
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; return FALSE // If negative cycle exist, the result is wrong
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;return TRUE
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
+&lt;/div&gt;
+&lt;/div&gt;&lt;ol start="6"&gt;
+&lt;li&gt;Helper algorithms&lt;/li&gt;
+&lt;/ol&gt;
+&lt;div class="highlight"&gt;&lt;div class="chroma"&gt;
+&lt;table class="lntable"&gt;&lt;tr&gt;&lt;td class="lntd"&gt;
+&lt;pre tabindex="0" class="chroma"&gt;&lt;code&gt;&lt;span class="lnt"&gt; 1
+&lt;/span&gt;&lt;span class="lnt"&gt; 2
+&lt;/span&gt;&lt;span class="lnt"&gt; 3
+&lt;/span&gt;&lt;span class="lnt"&gt; 4
+&lt;/span&gt;&lt;span class="lnt"&gt; 5
+&lt;/span&gt;&lt;span class="lnt"&gt; 6
+&lt;/span&gt;&lt;span class="lnt"&gt; 7
+&lt;/span&gt;&lt;span class="lnt"&gt; 8
+&lt;/span&gt;&lt;span class="lnt"&gt; 9
+&lt;/span&gt;&lt;span class="lnt"&gt;10
+&lt;/span&gt;&lt;span class="lnt"&gt;11
+&lt;/span&gt;&lt;span class="lnt"&gt;12
+&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;
+&lt;td class="lntd"&gt;
+&lt;pre tabindex="0" class="chroma"&gt;&lt;code class="language-fallback" data-lang="fallback"&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;// Initialize all vertex to have nodes with impossible distance and no parent node, except source node
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;INTIIALISE-SINGLE-SOURCE(G,s)
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;for each vertex u in G.V
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; u.key = INF
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; u.previous = NIL
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;s.key = 0
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;// Adjust the key of each node IF there is a better path to the node
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;RELAX(u,v,w)
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;if v.key &amp;gt; u.key+w(u,v)
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; v.key = u.key+w(u,v)
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; v.previous = u
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
+&lt;/div&gt;
+&lt;/div&gt;&lt;ol start="7"&gt;
+&lt;li&gt;Time complexity of Dijkstra
+&lt;ol&gt;
+&lt;li&gt;Without max-heap: &lt;code&gt;O(V^2)&lt;/code&gt;&lt;/li&gt;
+&lt;li&gt;With max-heap: &lt;code&gt;O(ElogV)&lt;/code&gt;&lt;/li&gt;
+&lt;/ol&gt;
+&lt;/li&gt;
+&lt;li&gt;Time complexity of Bellman-Ford is &lt;code&gt;O(VE)&lt;/code&gt;&lt;/li&gt;
+&lt;/ol&gt;
+&lt;h2 id="all-pairs-shortest-path"&gt;All Pairs Shortest Path
+&lt;/h2&gt;&lt;ol&gt;
+&lt;li&gt;Objective is for each pair of vertex, u and v, of the graph, find the shortest path between these two nodes&lt;/li&gt;
+&lt;li&gt;Two algorithms:
+&lt;ol&gt;
+&lt;li&gt;Johnson&amp;rsquo;s:
+&lt;ol&gt;
+&lt;li&gt;Complex as heck, but better time complexity&lt;/li&gt;
+&lt;/ol&gt;
+&lt;/li&gt;
+&lt;li&gt;Floyd-Warshall
+&lt;ol&gt;
+&lt;li&gt;Simple, uses matrices&lt;/li&gt;
+&lt;/ol&gt;
+&lt;/li&gt;
+&lt;/ol&gt;
+&lt;/li&gt;
+&lt;li&gt;Johnson&amp;rsquo;s algorithm high level overview
+&lt;ol&gt;
+&lt;li&gt;Add a new vertex to the graph and add edge to each existing vertex on the graph&lt;/li&gt;
+&lt;li&gt;Apply Bellman-Ford algorithm and normalize the graph to remove all negative-weighted edges&lt;/li&gt;
+&lt;li&gt;Remove the extra vertex in step 1 and apply Dijkstra&amp;rsquo;s on all original vertices.&lt;/li&gt;
+&lt;/ol&gt;
+&lt;/li&gt;
+&lt;li&gt;Floyd-Warshall algorithm pseudocode&lt;/li&gt;
+&lt;/ol&gt;
+&lt;div class="highlight"&gt;&lt;div class="chroma"&gt;
+&lt;table class="lntable"&gt;&lt;tr&gt;&lt;td class="lntd"&gt;
+&lt;pre tabindex="0" class="chroma"&gt;&lt;code&gt;&lt;span class="lnt"&gt; 1
+&lt;/span&gt;&lt;span class="lnt"&gt; 2
+&lt;/span&gt;&lt;span class="lnt"&gt; 3
+&lt;/span&gt;&lt;span class="lnt"&gt; 4
+&lt;/span&gt;&lt;span class="lnt"&gt; 5
+&lt;/span&gt;&lt;span class="lnt"&gt; 6
+&lt;/span&gt;&lt;span class="lnt"&gt; 7
+&lt;/span&gt;&lt;span class="lnt"&gt; 8
+&lt;/span&gt;&lt;span class="lnt"&gt; 9
+&lt;/span&gt;&lt;span class="lnt"&gt;10
+&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;
+&lt;td class="lntd"&gt;
+&lt;pre tabindex="0" class="chroma"&gt;&lt;code class="language-fallback" data-lang="fallback"&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;FLOYD-WARSHALL(G,w)
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;n = |G.V|
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;Create a matrix nxn, D(0)
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;D = G
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;for i in 1 to n
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; for j in 1 to n
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; for k in 1 to n
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; Create a new nxn matrix, D(i)
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; D(i)[j][k] = MIN(D(i-1)[j][k], D(i-1)[j][i]+D(i-1)[i][k])
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;return D(n)
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
+&lt;/div&gt;
+&lt;/div&gt;&lt;ol start="5"&gt;
+&lt;li&gt;Floyd-Warshall time complexity is &lt;code&gt;O(V^3)&lt;/code&gt;&lt;/li&gt;
+&lt;li&gt;Johnson&amp;rsquo;s algorithm time complexity is &lt;code&gt;O(V^2 log V + VE)&lt;/code&gt;&lt;/li&gt;
+&lt;/ol&gt;</description></item></channel></rss>

