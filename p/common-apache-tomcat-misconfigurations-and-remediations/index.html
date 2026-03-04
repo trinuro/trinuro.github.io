@@ -1,0 +1,752 @@
+<!doctype html><html lang=en-us dir=ltr><head><meta charset=utf-8><meta name=viewport content='width=device-width,initial-scale=1'><meta name=description content="A simple blog post about Apache Tomcat. Still very much used in the industry and I want to learn more about it."><title>Common Apache Tomcat Misconfigurations and Remediations</title><link rel=canonical href=https://trinuro.github.io/p/common-apache-tomcat-misconfigurations-and-remediations/><link rel=stylesheet href=/scss/style.min.833d6eed45de56f48306bf57268d5b8cdfc8a60e8e7bdc99810464fcd033f7c6.css><meta property='og:title' content="Common Apache Tomcat Misconfigurations and Remediations"><meta property='og:description' content="A simple blog post about Apache Tomcat. Still very much used in the industry and I want to learn more about it."><meta property='og:url' content='https://trinuro.github.io/p/common-apache-tomcat-misconfigurations-and-remediations/'><meta property='og:site_name' content="Froginacup's site"><meta property='og:type' content='article'><meta property='article:section' content='Post'><meta property='article:tag' content='Web'><meta property='article:published_time' content='2025-11-09T07:47:48-05:00'><meta property='article:modified_time' content='2025-11-09T07:47:48-05:00'><meta name=twitter:title content="Common Apache Tomcat Misconfigurations and Remediations"><meta name=twitter:description content="A simple blog post about Apache Tomcat. Still very much used in the industry and I want to learn more about it."><link rel="shortcut icon" href=/favicon.png></head><body class=article-page><script>(function(){const e="StackColorScheme";localStorage.getItem(e)||localStorage.setItem(e,"auto")})()</script><script>(function(){const t="StackColorScheme",e=localStorage.getItem(t),n=window.matchMedia("(prefers-color-scheme: dark)").matches===!0;e=="dark"||e==="auto"&&n?document.documentElement.dataset.scheme="dark":document.documentElement.dataset.scheme="light"})()</script><div class="container main-container flex on-phone--column extended"><aside class="sidebar left-sidebar sticky"><button class="hamburger hamburger--spin" type=button id=toggle-menu aria-label="Toggle Menu">
+<span class=hamburger-box><span class=hamburger-inner></span></span></button><header><figure class=site-avatar><a href=/><img src=/img/avatar_hu_aff73beef7294c1a.jpg width=300 height=299 class=site-logo loading=lazy alt=Avatar>
+</a><span class=emoji>💡</span></figure><div class=site-meta><h1 class=site-name><a href=/>Froginacup's site</a></h1><h2 class=site-description>A place where Froginacup writes his adventures</h2></div></header><ol class=menu-social><li><a href=https://github.com/trinuro target=_blank title=GitHub rel=me><svg class="icon icon-tabler icon-tabler-brand-github" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M9 19c-4.3 1.4-4.3-2.5-6-3m12 5v-3.5c0-1 .1-1.4-.5-2 2.8-.3 5.5-1.4 5.5-6a4.6 4.6.0 00-1.3-3.2 4.2 4.2.0 00-.1-3.2s-1.1-.3-3.5 1.3a12.3 12.3.0 00-6.2.0C6.5 2.8 5.4 3.1 5.4 3.1a4.2 4.2.0 00-.1 3.2A4.6 4.6.0 004 9.5c0 4.6 2.7 5.7 5.5 6-.6.6-.6 1.2-.5 2V21"/></svg></a></li></ol><ol class=menu id=main-menu><li><a href=/><svg class="icon icon-tabler icon-tabler-home" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z"/><polyline points="5 12 3 12 12 3 21 12 19 12"/><path d="M5 12v7a2 2 0 002 2h10a2 2 0 002-2v-7"/><path d="M9 21v-6a2 2 0 012-2h2a2 2 0 012 2v6"/></svg>
+<span>Home</span></a></li><li><a href=/archives/><svg class="icon icon-tabler icon-tabler-archive" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z"/><rect x="3" y="4" width="18" height="4" rx="2"/><path d="M5 8v10a2 2 0 002 2h10a2 2 0 002-2V8"/><line x1="10" y1="12" x2="14" y2="12"/></svg>
+<span>Archives</span></a></li><li><a href=/search/><svg class="icon icon-tabler icon-tabler-search" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z"/><circle cx="10" cy="10" r="7"/><line x1="21" y1="21" x2="15" y2="15"/></svg>
+<span>Search</span></a></li><li><a href=/projects-and-certificates/><svg class="icon icon-tabler icon-tabler-link" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z"/><path d="M10 14a3.5 3.5.0 005 0l4-4a3.5 3.5.0 00-5-5l-.5.5"/><path d="M14 10a3.5 3.5.0 00-5 0l-4 4a3.5 3.5.0 005 5l.5-.5"/></svg>
+<span>Projects and Certificates</span></a></li><li class=menu-bottom-section><ol class=menu><li id=dark-mode-toggle><svg class="icon icon-tabler icon-tabler-toggle-left" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z"/><circle cx="8" cy="12" r="2"/><rect x="2" y="6" width="20" height="12" rx="6"/></svg>
+<svg class="icon icon-tabler icon-tabler-toggle-right" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z"/><circle cx="16" cy="12" r="2"/><rect x="2" y="6" width="20" height="12" rx="6"/></svg>
+<span>Dark Mode</span></li></ol></li></ol></aside><aside class="sidebar right-sidebar sticky"><section class="widget archives"><div class=widget-icon><svg class="icon icon-tabler icon-tabler-hash" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z"/><line x1="5" y1="9" x2="19" y2="9"/><line x1="5" y1="15" x2="19" y2="15"/><line x1="11" y1="4" x2="7" y2="20"/><line x1="17" y1="4" x2="13" y2="20"/></svg></div><h2 class="widget-title section-title">Table of contents</h2><div class=widget--toc><nav id=TableOfContents><ol><li><a href=#directory-listing>Directory Listing</a></li><li><a href=#default-error-page>Default Error Page</a></li><li><a href=#broken-authorization>Broken Authorization</a></li><li><a href=#http-enabled>HTTP Enabled</a></li><li><a href=#missing-content-security-policy-csp-header>Missing Content Security Policy (CSP) Header</a><ol><li><a href=#how-to-configure-the-most-restrictive-csp>How to configure (the most restrictive) CSP</a></li></ol></li></ol></nav></div></section></aside><main class="main full-width"><article class=main-article><header class=article-header><div class=article-details><header class=article-category><a href=/categories/personal-research/ style=background-color:#aa2f33;color:#fff>Personal Research</a></header><div class=article-title-wrapper><h2 class=article-title><a href=/p/common-apache-tomcat-misconfigurations-and-remediations/>Common Apache Tomcat Misconfigurations and Remediations</a></h2><h3 class=article-subtitle>A simple blog post about Apache Tomcat. Still very much used in the industry and I want to learn more about it.</h3></div><footer class=article-time><div><svg class="icon icon-tabler icon-tabler-calendar-time" width="56" height="56" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z"/><path d="M11.795 21H5a2 2 0 01-2-2V7a2 2 0 012-2h12a2 2 0 012 2v4"/><circle cx="18" cy="18" r="4"/><path d="M15 3v4"/><path d="M7 3v4"/><path d="M3 11h16"/><path d="M18 16.496V18l1 1"/></svg>
+<time class=article-time--published datetime=2025-11-09T07:47:48-05:00>Nov 09, 2025</time></div><div><svg class="icon icon-tabler icon-tabler-clock" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z"/><circle cx="12" cy="12" r="9"/><polyline points="12 7 12 12 15 15"/></svg>
+<time class=article-time--reading>9 minute read</time></div></footer></div></header><section class=article-content><h2 id=directory-listing>Directory Listing</h2><ol><li>To enable directory listing, go to <code>&lt;root>/conf/web.xml</code> or <code>&lt;root>/webapps/&lt;webapp>/WEB-INF/web.xml</code></li></ol><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt> 1
+</span><span class=lnt> 2
+</span><span class=lnt> 3
+</span><span class=lnt> 4
+</span><span class=lnt> 5
+</span><span class=lnt> 6
+</span><span class=lnt> 7
+</span><span class=lnt> 8
+</span><span class=lnt> 9
+</span><span class=lnt>10
+</span><span class=lnt>11
+</span><span class=lnt>12
+</span><span class=lnt>13
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-xml data-lang=xml><span class=line><span class=cl><span class=nt>&lt;servlet&gt;</span>
+</span></span><span class=line><span class=cl>	<span class=nt>&lt;servlet-name&gt;</span>default<span class=nt>&lt;/servlet-name&gt;</span>
+</span></span><span class=line><span class=cl>	<span class=nt>&lt;servlet-class&gt;</span>org.apache.catalina.servlets.DefaultServlet<span class=nt>&lt;/servlet-class&gt;</span>
+</span></span><span class=line><span class=cl>	<span class=nt>&lt;init-param&gt;</span>
+</span></span><span class=line><span class=cl>		<span class=nt>&lt;param-name&gt;</span>debug<span class=nt>&lt;/param-name&gt;</span>
+</span></span><span class=line><span class=cl>		<span class=nt>&lt;param-value&gt;</span>0<span class=nt>&lt;/param-value&gt;</span>
+</span></span><span class=line><span class=cl>	<span class=nt>&lt;/init-param&gt;</span>
+</span></span><span class=line><span class=cl>	<span class=nt>&lt;init-param&gt;</span>
+</span></span><span class=line><span class=cl>		<span class=nt>&lt;param-name&gt;</span>listings<span class=nt>&lt;/param-name&gt;</span>
+</span></span><span class=line><span class=cl>		<span class=nt>&lt;param-value&gt;</span>true<span class=nt>&lt;/param-value&gt;</span> <span class=c>&lt;!--Change this to true--&gt;</span>
+</span></span><span class=line><span class=cl>	<span class=nt>&lt;/init-param&gt;</span>
+</span></span><span class=line><span class=cl>	<span class=nt>&lt;load-on-startup&gt;</span>1<span class=nt>&lt;/load-on-startup&gt;</span>
+</span></span><span class=line><span class=cl><span class=nt>&lt;/servlet&gt;</span>
+</span></span></code></pre></td></tr></table></div></div><ol start=2><li>To verify this vulnerability, navigate to any directory without index.html.
+<img src=/p/common-apache-tomcat-misconfigurations-and-remediations/Apache_Tomcat_Dir_Listing.png width=2390 height=450 srcset="/p/common-apache-tomcat-misconfigurations-and-remediations/Apache_Tomcat_Dir_Listing_hu_7dc9e582d8dffc6b.png 480w, /p/common-apache-tomcat-misconfigurations-and-remediations/Apache_Tomcat_Dir_Listing_hu_36d3b177c7ff298.png 1024w" loading=lazy alt=Apache_Tomcat_Dir_Listing.png class=gallery-image data-flex-grow=531 data-flex-basis=1274px>
+Not Vulnerable
+<img src=/p/common-apache-tomcat-misconfigurations-and-remediations/Apache_Tomcat_No_Dir_Listing.png width=2387 height=502 srcset="/p/common-apache-tomcat-misconfigurations-and-remediations/Apache_Tomcat_No_Dir_Listing_hu_4b54bfc8780213fb.png 480w, /p/common-apache-tomcat-misconfigurations-and-remediations/Apache_Tomcat_No_Dir_Listing_hu_143812e2f40669ba.png 1024w" loading=lazy alt=Apache_Tomcat_No_Dir_Listing.png class=gallery-image data-flex-grow=475 data-flex-basis=1141px></li><li>To remediate,</li></ol><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt> 1
+</span><span class=lnt> 2
+</span><span class=lnt> 3
+</span><span class=lnt> 4
+</span><span class=lnt> 5
+</span><span class=lnt> 6
+</span><span class=lnt> 7
+</span><span class=lnt> 8
+</span><span class=lnt> 9
+</span><span class=lnt>10
+</span><span class=lnt>11
+</span><span class=lnt>12
+</span><span class=lnt>13
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-xml data-lang=xml><span class=line><span class=cl><span class=nt>&lt;servlet&gt;</span>
+</span></span><span class=line><span class=cl>	<span class=nt>&lt;servlet-name&gt;</span>default<span class=nt>&lt;/servlet-name&gt;</span>
+</span></span><span class=line><span class=cl>	<span class=nt>&lt;servlet-class&gt;</span>org.apache.catalina.servlets.DefaultServlet<span class=nt>&lt;/servlet-class&gt;</span>
+</span></span><span class=line><span class=cl>	<span class=nt>&lt;init-param&gt;</span>
+</span></span><span class=line><span class=cl>		<span class=nt>&lt;param-name&gt;</span>debug<span class=nt>&lt;/param-name&gt;</span>
+</span></span><span class=line><span class=cl>		<span class=nt>&lt;param-value&gt;</span>0<span class=nt>&lt;/param-value&gt;</span>
+</span></span><span class=line><span class=cl>	<span class=nt>&lt;/init-param&gt;</span>
+</span></span><span class=line><span class=cl>	<span class=nt>&lt;init-param&gt;</span>
+</span></span><span class=line><span class=cl>		<span class=nt>&lt;param-name&gt;</span>listings<span class=nt>&lt;/param-name&gt;</span>
+</span></span><span class=line><span class=cl>		<span class=nt>&lt;param-value&gt;</span>false<span class=nt>&lt;/param-value&gt;</span> <span class=c>&lt;!--Ensure this is false--&gt;</span>
+</span></span><span class=line><span class=cl>	<span class=nt>&lt;/init-param&gt;</span>
+</span></span><span class=line><span class=cl>	<span class=nt>&lt;load-on-startup&gt;</span>1<span class=nt>&lt;/load-on-startup&gt;</span>
+</span></span><span class=line><span class=cl><span class=nt>&lt;/servlet&gt;</span>
+</span></span></code></pre></td></tr></table></div></div><h2 id=default-error-page>Default Error Page</h2><ol><li>By default, Tomcat serves an error page</li><li>To verify, go to a non existent path
+<img src=/p/common-apache-tomcat-misconfigurations-and-remediations/Tomcat_Default_Error_Page.png width=2381 height=557 srcset="/p/common-apache-tomcat-misconfigurations-and-remediations/Tomcat_Default_Error_Page_hu_f36a21007b2fffeb.png 480w, /p/common-apache-tomcat-misconfigurations-and-remediations/Tomcat_Default_Error_Page_hu_1b388db67e846659.png 1024w" loading=lazy alt=Tomcat_Default_Error_Page.png class=gallery-image data-flex-grow=427 data-flex-basis=1025px></li><li>To remediate, use the <code>&lt;error-page></code> tag.
+Given this directory structure</li></ol><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt> 1
+</span><span class=lnt> 2
+</span><span class=lnt> 3
+</span><span class=lnt> 4
+</span><span class=lnt> 5
+</span><span class=lnt> 6
+</span><span class=lnt> 7
+</span><span class=lnt> 8
+</span><span class=lnt> 9
+</span><span class=lnt>10
+</span><span class=lnt>11
+</span><span class=lnt>12
+</span><span class=lnt>13
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-fallback data-lang=fallback><span class=line><span class=cl>.
+</span></span><span class=line><span class=cl>├── error
+</span></span><span class=line><span class=cl>│   └── error.html
+</span></span><span class=line><span class=cl>├── hello.html
+</span></span><span class=line><span class=cl>└── WEB-INF
+</span></span><span class=line><span class=cl>    ├── classes
+</span></span><span class=line><span class=cl>    │   ├── CertServlet.class
+</span></span><span class=line><span class=cl>    │   ├── CertServlet.java
+</span></span><span class=line><span class=cl>    │   ├── HelloServlet.class
+</span></span><span class=line><span class=cl>    │   ├── HelloServlet.java
+</span></span><span class=line><span class=cl>    │   ├── SupermanServlet.class
+</span></span><span class=line><span class=cl>    │   └── SupermanServlet.java
+</span></span><span class=line><span class=cl>    └── web.xml
+</span></span></code></pre></td></tr></table></div></div><p>We can specify a custom error page like this</p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt> 1
+</span><span class=lnt> 2
+</span><span class=lnt> 3
+</span><span class=lnt> 4
+</span><span class=lnt> 5
+</span><span class=lnt> 6
+</span><span class=lnt> 7
+</span><span class=lnt> 8
+</span><span class=lnt> 9
+</span><span class=lnt>10
+</span><span class=lnt>11
+</span><span class=lnt>12
+</span><span class=lnt>13
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-xml data-lang=xml><span class=line><span class=cl><span class=cp>&lt;?xml version=&#34;1.0&#34; encoding=&#34;ISO-8859-1&#34;?&gt;</span>
+</span></span><span class=line><span class=cl><span class=nt>&lt;web-app</span> <span class=na>version=</span><span class=s>&#34;3.0&#34;</span>
+</span></span><span class=line><span class=cl>  <span class=na>xmlns=</span><span class=s>&#34;http://java.sun.com/xml/ns/javaee&#34;</span>
+</span></span><span class=line><span class=cl>  <span class=na>xmlns:xsi=</span><span class=s>&#34;http://www.w3.org/2001/XMLSchema-instance&#34;</span>
+</span></span><span class=line><span class=cl>  <span class=na>xsi:schemaLocation=</span><span class=s>&#34;http://java.sun.com/xml/ns/javaee http://java.sun.com/xml/ns/javaee/web-app_3_0.xsd&#34;</span><span class=nt>&gt;</span>
+</span></span><span class=line><span class=cl>	<span class=nt>&lt;error-page&gt;</span>
+</span></span><span class=line><span class=cl>		<span class=nt>&lt;exception-type&gt;</span>java.lang.Throwable<span class=nt>&lt;/exception-type&gt;</span>
+</span></span><span class=line><span class=cl>		<span class=nt>&lt;location&gt;</span>/error/error.html<span class=nt>&lt;/location&gt;</span>
+</span></span><span class=line><span class=cl>	<span class=nt>&lt;/error-page&gt;</span>
+</span></span><span class=line><span class=cl>	<span class=nt>&lt;error-page&gt;</span> <span class=c>&lt;!--Catch all--&gt;</span>
+</span></span><span class=line><span class=cl>	  <span class=nt>&lt;location&gt;</span>/error/error.html<span class=nt>&lt;/location&gt;</span>
+</span></span><span class=line><span class=cl>	<span class=nt>&lt;/error-page&gt;</span>
+</span></span><span class=line><span class=cl><span class=nt>&lt;/web-app&gt;</span>
+</span></span></code></pre></td></tr></table></div></div><p>To verify,</p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt> 1
+</span><span class=lnt> 2
+</span><span class=lnt> 3
+</span><span class=lnt> 4
+</span><span class=lnt> 5
+</span><span class=lnt> 6
+</span><span class=lnt> 7
+</span><span class=lnt> 8
+</span><span class=lnt> 9
+</span><span class=lnt>10
+</span><span class=lnt>11
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-fallback data-lang=fallback><span class=line><span class=cl>curl http://localhost:8080/hello-world/WEB-INF/abc/ 
+</span></span><span class=line><span class=cl>&lt;!DOCTYPE html&gt;
+</span></span><span class=line><span class=cl>&lt;html&gt;
+</span></span><span class=line><span class=cl>    &lt;head&gt;
+</span></span><span class=line><span class=cl>        &lt;title&gt;Error&lt;/title&gt;
+</span></span><span class=line><span class=cl>    &lt;/head&gt;
+</span></span><span class=line><span class=cl>    &lt;body&gt;
+</span></span><span class=line><span class=cl>        &lt;h1&gt;🚨ERROR🚨&lt;/h1&gt;
+</span></span><span class=line><span class=cl>        &lt;p&gt;Roses are red, Violets are blue, This is an error page, Goodbye to you too.&lt;/p&gt;
+</span></span><span class=line><span class=cl>    &lt;/body&gt;
+</span></span><span class=line><span class=cl>&lt;/html&gt; 
+</span></span></code></pre></td></tr></table></div></div><h2 id=broken-authorization>Broken Authorization</h2><ol><li>Example vulnerable configuration</li></ol><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt> 1
+</span><span class=lnt> 2
+</span><span class=lnt> 3
+</span><span class=lnt> 4
+</span><span class=lnt> 5
+</span><span class=lnt> 6
+</span><span class=lnt> 7
+</span><span class=lnt> 8
+</span><span class=lnt> 9
+</span><span class=lnt>10
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-xml data-lang=xml><span class=line><span class=cl><span class=nt>&lt;security-constraint&gt;</span>
+</span></span><span class=line><span class=cl>  <span class=nt>&lt;web-resource-collection&gt;</span>
+</span></span><span class=line><span class=cl>    <span class=nt>&lt;web-resource-name&gt;</span>secret<span class=nt>&lt;/web-resource-name&gt;</span>
+</span></span><span class=line><span class=cl>    <span class=nt>&lt;url-pattern&gt;</span>/secret/*<span class=nt>&lt;/url-pattern&gt;</span>
+</span></span><span class=line><span class=cl>    <span class=nt>&lt;http-method&gt;</span>GET<span class=nt>&lt;/http-method&gt;</span>
+</span></span><span class=line><span class=cl>  <span class=nt>&lt;/web-resource-collection&gt;</span>
+</span></span><span class=line><span class=cl>  <span class=nt>&lt;auth-constraint&gt;</span>
+</span></span><span class=line><span class=cl>    <span class=nt>&lt;role-name&gt;</span>admin<span class=nt>&lt;/role-name&gt;</span>
+</span></span><span class=line><span class=cl>  <span class=nt>&lt;/auth-constraint&gt;</span>
+</span></span><span class=line><span class=cl><span class=nt>&lt;/security-constraint&gt;</span>
+</span></span></code></pre></td></tr></table></div></div><ul><li>This configuration ensures that all GET request will be authenticated and only admin users is authorized to access.</li></ul><ol start=2><li>To bypass, we can use any other http methods</li></ol><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt>1
+</span><span class=lnt>2
+</span><span class=lnt>3
+</span><span class=lnt>4
+</span><span class=lnt>5
+</span><span class=lnt>6
+</span><span class=lnt>7
+</span><span class=lnt>8
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-fallback data-lang=fallback><span class=line><span class=cl>curl http://localhost:8080/hello-world/secret/secret.html -X POST
+</span></span><span class=line><span class=cl>&lt;!DOCTYPE html&gt;
+</span></span><span class=line><span class=cl>&lt;html&gt;
+</span></span><span class=line><span class=cl>    &lt;head&gt;&lt;title&gt;Secret Page&lt;/title&gt;&lt;/head&gt;
+</span></span><span class=line><span class=cl>    &lt;body&gt;
+</span></span><span class=line><span class=cl>        &lt;h1&gt;My Secret is I have no secrets&lt;/h1&gt;
+</span></span><span class=line><span class=cl>    &lt;/body&gt;
+</span></span><span class=line><span class=cl>&lt;/html&gt;  
+</span></span></code></pre></td></tr></table></div></div><ul><li>Apparently, older versions of Tomcat allows access with junk HTTP methods too.</li></ul><ol start=3><li>To remediate, remove the <code>&lt;http-method></code> tag</li></ol><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt>1
+</span><span class=lnt>2
+</span><span class=lnt>3
+</span><span class=lnt>4
+</span><span class=lnt>5
+</span><span class=lnt>6
+</span><span class=lnt>7
+</span><span class=lnt>8
+</span><span class=lnt>9
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-xml data-lang=xml><span class=line><span class=cl><span class=nt>&lt;security-constraint&gt;</span>
+</span></span><span class=line><span class=cl>  <span class=nt>&lt;web-resource-collection&gt;</span>
+</span></span><span class=line><span class=cl>    <span class=nt>&lt;web-resource-name&gt;</span>secret<span class=nt>&lt;/web-resource-name&gt;</span>
+</span></span><span class=line><span class=cl>    <span class=nt>&lt;url-pattern&gt;</span>/secret/*<span class=nt>&lt;/url-pattern&gt;</span>
+</span></span><span class=line><span class=cl>  <span class=nt>&lt;/web-resource-collection&gt;</span>
+</span></span><span class=line><span class=cl>  <span class=nt>&lt;auth-constraint&gt;</span>
+</span></span><span class=line><span class=cl>    <span class=nt>&lt;role-name&gt;</span>admin<span class=nt>&lt;/role-name&gt;</span>
+</span></span><span class=line><span class=cl>  <span class=nt>&lt;/auth-constraint&gt;</span>
+</span></span><span class=line><span class=cl><span class=nt>&lt;/security-constraint&gt;</span>
+</span></span></code></pre></td></tr></table></div></div><ul><li>It will now apply to all methods.</li></ul><h2 id=http-enabled>HTTP Enabled</h2><ol><li>Obviously, it is because no SSL certificate is configured</li><li>We can verify it is vulnerable if the scheme is HTTP and not HTTPS.</li><li>To remediate,
+First, create a certificate</li></ol><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt>1
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-gdscript3 data-lang=gdscript3><span class=line><span class=cl><span class=n>keytool</span> <span class=o>-</span><span class=n>genkey</span> <span class=o>-</span><span class=n>alias</span> <span class=n>tomcat</span> <span class=o>-</span><span class=n>keyalg</span> <span class=n>RSA</span> <span class=o>-</span><span class=n>keystore</span> <span class=n>mycertificate</span><span class=o>.</span><span class=n>cert</span>
+</span></span></code></pre></td></tr></table></div></div><p>Let&rsquo;s say Password: <code>admin1234</code> (Poor password haha)
+Output:</p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt> 1
+</span><span class=lnt> 2
+</span><span class=lnt> 3
+</span><span class=lnt> 4
+</span><span class=lnt> 5
+</span><span class=lnt> 6
+</span><span class=lnt> 7
+</span><span class=lnt> 8
+</span><span class=lnt> 9
+</span><span class=lnt>10
+</span><span class=lnt>11
+</span><span class=lnt>12
+</span><span class=lnt>13
+</span><span class=lnt>14
+</span><span class=lnt>15
+</span><span class=lnt>16
+</span><span class=lnt>17
+</span><span class=lnt>18
+</span><span class=lnt>19
+</span><span class=lnt>20
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-fallback data-lang=fallback><span class=line><span class=cl>Enter keystore password:  
+</span></span><span class=line><span class=cl>Re-enter new password: 
+</span></span><span class=line><span class=cl>Enter the distinguished name. Provide a single dot (.) to leave a sub-component empty or press ENTER to use the default value in braces.
+</span></span><span class=line><span class=cl>What is your first and last name?
+</span></span><span class=line><span class=cl>  [Unknown]:  superheroes.com
+</span></span><span class=line><span class=cl>What is the name of your organizational unit?
+</span></span><span class=line><span class=cl>  [Unknown]:  
+</span></span><span class=line><span class=cl>What is the name of your organization?
+</span></span><span class=line><span class=cl>  [Unknown]:  
+</span></span><span class=line><span class=cl>What is the name of your City or Locality?
+</span></span><span class=line><span class=cl>  [Unknown]:  
+</span></span><span class=line><span class=cl>What is the name of your State or Province?
+</span></span><span class=line><span class=cl>  [Unknown]:  
+</span></span><span class=line><span class=cl>What is the two-letter country code for this unit?
+</span></span><span class=line><span class=cl>  [Unknown]:  
+</span></span><span class=line><span class=cl>Is CN=superheroes.com, OU=Unknown, O=Unknown, L=Unknown, ST=Unknown, C=Unknown correct?
+</span></span><span class=line><span class=cl>  [no]:  yes
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>Generating 3,072 bit RSA key pair and self-signed certificate (SHA384withRSA) with a validity of 90 days
+</span></span><span class=line><span class=cl>        for: CN=superheroes.com, OU=Unknown, O=Unknown, L=Unknown, ST=Unknown, C=Unknown
+</span></span></code></pre></td></tr></table></div></div><p>In <code>&lt;root>/conf/web.xml</code>,</p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt> 1
+</span><span class=lnt> 2
+</span><span class=lnt> 3
+</span><span class=lnt> 4
+</span><span class=lnt> 5
+</span><span class=lnt> 6
+</span><span class=lnt> 7
+</span><span class=lnt> 8
+</span><span class=lnt> 9
+</span><span class=lnt>10
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-xml data-lang=xml><span class=line><span class=cl><span class=nt>&lt;Connector</span> <span class=na>port=</span><span class=s>&#34;8443&#34;</span> <span class=na>protocol=</span><span class=s>&#34;org.apache.coyote.http11.Http11NioProtocol&#34;</span>
+</span></span><span class=line><span class=cl>		   <span class=na>maxThreads=</span><span class=s>&#34;150&#34;</span> <span class=na>SSLEnabled=</span><span class=s>&#34;true&#34;</span>
+</span></span><span class=line><span class=cl>		   <span class=na>maxParameterCount=</span><span class=s>&#34;1000&#34;</span>
+</span></span><span class=line><span class=cl><span class=nt>&gt;</span>
+</span></span><span class=line><span class=cl>	<span class=nt>&lt;UpgradeProtocol</span> <span class=na>className=</span><span class=s>&#34;org.apache.coyote.http2.Http2Protocol&#34;</span> <span class=nt>/&gt;</span>
+</span></span><span class=line><span class=cl>	<span class=nt>&lt;SSLHostConfig&gt;</span>
+</span></span><span class=line><span class=cl>		<span class=nt>&lt;Certificate</span> <span class=na>certificateKeystoreFile=</span><span class=s>&#34;/home/kali/mycertificate.cert&#34;</span>
+</span></span><span class=line><span class=cl>					 <span class=na>certificateKeystorePassword=</span><span class=s>&#34;admin1234&#34;</span> <span class=na>type=</span><span class=s>&#34;RSA&#34;</span> <span class=nt>/&gt;</span>
+</span></span><span class=line><span class=cl>	<span class=nt>&lt;/SSLHostConfig&gt;</span>
+</span></span><span class=line><span class=cl><span class=nt>&lt;/Connector&gt;</span>
+</span></span></code></pre></td></tr></table></div></div><ul><li>This will just open a HTTPS port on port 8443.</li></ul><ol start=4><li>We can verify with a Nmap port scan</li></ol><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt>1
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-sh data-lang=sh><span class=line><span class=cl>sudo nmap localhost -p <span class=m>8443</span> --script<span class=o>=</span>ssl-cert 
+</span></span></code></pre></td></tr></table></div></div><p>Output:</p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt> 1
+</span><span class=lnt> 2
+</span><span class=lnt> 3
+</span><span class=lnt> 4
+</span><span class=lnt> 5
+</span><span class=lnt> 6
+</span><span class=lnt> 7
+</span><span class=lnt> 8
+</span><span class=lnt> 9
+</span><span class=lnt>10
+</span><span class=lnt>11
+</span><span class=lnt>12
+</span><span class=lnt>13
+</span><span class=lnt>14
+</span><span class=lnt>15
+</span><span class=lnt>16
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-fallback data-lang=fallback><span class=line><span class=cl>Host is up (0.000079s latency).
+</span></span><span class=line><span class=cl>Other addresses for localhost (not scanned): ::1
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>PORT     STATE SERVICE
+</span></span><span class=line><span class=cl>8443/tcp open  https-alt
+</span></span><span class=line><span class=cl>| ssl-cert: Subject: commonName=superman/organizationName=Unknown/stateOrProvinceName=Unknown/countryName=Unknown
+</span></span><span class=line><span class=cl>| Issuer: commonName=superman/organizationName=Unknown/stateOrProvinceName=Unknown/countryName=Unknown
+</span></span><span class=line><span class=cl>| Public Key type: rsa
+</span></span><span class=line><span class=cl>| Public Key bits: 3072
+</span></span><span class=line><span class=cl>| Signature Algorithm: sha384WithRSAEncryption
+</span></span><span class=line><span class=cl>| Not valid before: 2025-11-08T08:27:53
+</span></span><span class=line><span class=cl>| Not valid after:  2026-02-06T08:27:53
+</span></span><span class=line><span class=cl>| MD5:   eb11:2281:1c16:8b54:5ca6:0347:36ea:27c0
+</span></span><span class=line><span class=cl>|_SHA-1: 7045:713e:da36:eadc:2c39:2703:424c:ebb0:3323:46d2
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>Nmap done: 1 IP address (1 host up) scanned in 0.18 seconds
+</span></span></code></pre></td></tr></table></div></div><ul><li>Of course, it is self-signed, so it is probably a LOW or INFO finding depending on whether it is internal-facing.</li></ul><h2 id=missing-content-security-policy-csp-header>Missing Content Security Policy (CSP) Header</h2><ol><li>To verify,</li></ol><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt>1
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-sh data-lang=sh><span class=line><span class=cl>curl http://localhost:8081 -I   
+</span></span></code></pre></td></tr></table></div></div><p>Output:</p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt>1
+</span><span class=lnt>2
+</span><span class=lnt>3
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-http data-lang=http><span class=line><span class=cl><span class=kr>HTTP</span><span class=o>/</span><span class=m>1.1</span> <span class=m>200</span> 
+</span></span><span class=line><span class=cl><span class=n>Content-Type</span><span class=o>:</span> <span class=l>text/html;charset=UTF-8</span>
+</span></span><span class=line><span class=cl><span class=n>Date</span><span class=o>:</span> <span class=l>Sat, 08 Nov 2025 08:52:41 GMT</span>
+</span></span></code></pre></td></tr></table></div></div><ul><li>Missing Content Security Policy Header</li></ul><ol start=2><li>Remediation: Look below</li></ol><h3 id=how-to-configure-the-most-restrictive-csp>How to configure (the most restrictive) CSP</h3><ol><li>Dependencies:<ol><li><a class=link href=https://commons.apache.org/codec/download_codec.cgi target=_blank rel=noopener>https://commons.apache.org/codec/download_codec.cgi</a></li></ol></li></ol><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt>1
+</span><span class=lnt>2
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-gdscript3 data-lang=gdscript3><span class=line><span class=cl><span class=c1># Download the JAR file and place it in the /lib of your tomcat instance </span>
+</span></span><span class=line><span class=cl><span class=n>cp</span> <span class=n>commons</span><span class=o>-</span><span class=n>codec</span><span class=o>.</span><span class=n>jar</span> <span class=s1>&#39;/home/kali/learning_materials/tomcat and jsp/apache-tomcat-10.1.48/lib&#39;</span>
+</span></span></code></pre></td></tr></table></div></div><ol start=3><li>First, we need to compile this</li></ol><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt>  1
+</span><span class=lnt>  2
+</span><span class=lnt>  3
+</span><span class=lnt>  4
+</span><span class=lnt>  5
+</span><span class=lnt>  6
+</span><span class=lnt>  7
+</span><span class=lnt>  8
+</span><span class=lnt>  9
+</span><span class=lnt> 10
+</span><span class=lnt> 11
+</span><span class=lnt> 12
+</span><span class=lnt> 13
+</span><span class=lnt> 14
+</span><span class=lnt> 15
+</span><span class=lnt> 16
+</span><span class=lnt> 17
+</span><span class=lnt> 18
+</span><span class=lnt> 19
+</span><span class=lnt> 20
+</span><span class=lnt> 21
+</span><span class=lnt> 22
+</span><span class=lnt> 23
+</span><span class=lnt> 24
+</span><span class=lnt> 25
+</span><span class=lnt> 26
+</span><span class=lnt> 27
+</span><span class=lnt> 28
+</span><span class=lnt> 29
+</span><span class=lnt> 30
+</span><span class=lnt> 31
+</span><span class=lnt> 32
+</span><span class=lnt> 33
+</span><span class=lnt> 34
+</span><span class=lnt> 35
+</span><span class=lnt> 36
+</span><span class=lnt> 37
+</span><span class=lnt> 38
+</span><span class=lnt> 39
+</span><span class=lnt> 40
+</span><span class=lnt> 41
+</span><span class=lnt> 42
+</span><span class=lnt> 43
+</span><span class=lnt> 44
+</span><span class=lnt> 45
+</span><span class=lnt> 46
+</span><span class=lnt> 47
+</span><span class=lnt> 48
+</span><span class=lnt> 49
+</span><span class=lnt> 50
+</span><span class=lnt> 51
+</span><span class=lnt> 52
+</span><span class=lnt> 53
+</span><span class=lnt> 54
+</span><span class=lnt> 55
+</span><span class=lnt> 56
+</span><span class=lnt> 57
+</span><span class=lnt> 58
+</span><span class=lnt> 59
+</span><span class=lnt> 60
+</span><span class=lnt> 61
+</span><span class=lnt> 62
+</span><span class=lnt> 63
+</span><span class=lnt> 64
+</span><span class=lnt> 65
+</span><span class=lnt> 66
+</span><span class=lnt> 67
+</span><span class=lnt> 68
+</span><span class=lnt> 69
+</span><span class=lnt> 70
+</span><span class=lnt> 71
+</span><span class=lnt> 72
+</span><span class=lnt> 73
+</span><span class=lnt> 74
+</span><span class=lnt> 75
+</span><span class=lnt> 76
+</span><span class=lnt> 77
+</span><span class=lnt> 78
+</span><span class=lnt> 79
+</span><span class=lnt> 80
+</span><span class=lnt> 81
+</span><span class=lnt> 82
+</span><span class=lnt> 83
+</span><span class=lnt> 84
+</span><span class=lnt> 85
+</span><span class=lnt> 86
+</span><span class=lnt> 87
+</span><span class=lnt> 88
+</span><span class=lnt> 89
+</span><span class=lnt> 90
+</span><span class=lnt> 91
+</span><span class=lnt> 92
+</span><span class=lnt> 93
+</span><span class=lnt> 94
+</span><span class=lnt> 95
+</span><span class=lnt> 96
+</span><span class=lnt> 97
+</span><span class=lnt> 98
+</span><span class=lnt> 99
+</span><span class=lnt>100
+</span><span class=lnt>101
+</span><span class=lnt>102
+</span><span class=lnt>103
+</span><span class=lnt>104
+</span><span class=lnt>105
+</span><span class=lnt>106
+</span><span class=lnt>107
+</span><span class=lnt>108
+</span><span class=lnt>109
+</span><span class=lnt>110
+</span><span class=lnt>111
+</span><span class=lnt>112
+</span><span class=lnt>113
+</span><span class=lnt>114
+</span><span class=lnt>115
+</span><span class=lnt>116
+</span><span class=lnt>117
+</span><span class=lnt>118
+</span><span class=lnt>119
+</span><span class=lnt>120
+</span><span class=lnt>121
+</span><span class=lnt>122
+</span><span class=lnt>123
+</span><span class=lnt>124
+</span><span class=lnt>125
+</span><span class=lnt>126
+</span><span class=lnt>127
+</span><span class=lnt>128
+</span><span class=lnt>129
+</span><span class=lnt>130
+</span><span class=lnt>131
+</span><span class=lnt>132
+</span><span class=lnt>133
+</span><span class=lnt>134
+</span><span class=lnt>135
+</span><span class=lnt>136
+</span><span class=lnt>137
+</span><span class=lnt>138
+</span><span class=lnt>139
+</span><span class=lnt>140
+</span><span class=lnt>141
+</span><span class=lnt>142
+</span><span class=lnt>143
+</span><span class=lnt>144
+</span><span class=lnt>145
+</span><span class=lnt>146
+</span><span class=lnt>147
+</span><span class=lnt>148
+</span><span class=lnt>149
+</span><span class=lnt>150
+</span><span class=lnt>151
+</span><span class=lnt>152
+</span><span class=lnt>153
+</span><span class=lnt>154
+</span><span class=lnt>155
+</span><span class=lnt>156
+</span><span class=lnt>157
+</span><span class=lnt>158
+</span><span class=lnt>159
+</span><span class=lnt>160
+</span><span class=lnt>161
+</span><span class=lnt>162
+</span><span class=lnt>163
+</span><span class=lnt>164
+</span><span class=lnt>165
+</span><span class=lnt>166
+</span><span class=lnt>167
+</span><span class=lnt>168
+</span><span class=lnt>169
+</span><span class=lnt>170
+</span><span class=lnt>171
+</span><span class=lnt>172
+</span><span class=lnt>173
+</span><span class=lnt>174
+</span><span class=lnt>175
+</span><span class=lnt>176
+</span><span class=lnt>177
+</span><span class=lnt>178
+</span><span class=lnt>179
+</span><span class=lnt>180
+</span><span class=lnt>181
+</span><span class=lnt>182
+</span><span class=lnt>183
+</span><span class=lnt>184
+</span><span class=lnt>185
+</span><span class=lnt>186
+</span><span class=lnt>187
+</span><span class=lnt>188
+</span><span class=lnt>189
+</span><span class=lnt>190
+</span><span class=lnt>191
+</span><span class=lnt>192
+</span><span class=lnt>193
+</span><span class=lnt>194
+</span><span class=lnt>195
+</span><span class=lnt>196
+</span><span class=lnt>197
+</span><span class=lnt>198
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-java data-lang=java><span class=line><span class=cl><span class=c1>// webapps/&lt;web-app-name&gt;/WEB-INF/classes/CSPPoliciesApplier.java</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=kn>import</span><span class=w> </span><span class=nn>java.io.IOException</span><span class=p>;</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=kn>import</span><span class=w> </span><span class=nn>java.security.MessageDigest</span><span class=p>;</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=kn>import</span><span class=w> </span><span class=nn>java.security.NoSuchAlgorithmException</span><span class=p>;</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=kn>import</span><span class=w> </span><span class=nn>java.security.SecureRandom</span><span class=p>;</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=kn>import</span><span class=w> </span><span class=nn>java.util.ArrayList</span><span class=p>;</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=kn>import</span><span class=w> </span><span class=nn>java.util.List</span><span class=p>;</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>
+</span></span></span><span class=line><span class=cl><span class=cm>/* for Tomcat 9 and below
+</span></span></span><span class=line><span class=cl><span class=cm>import javax.servlet.Filter;
+</span></span></span><span class=line><span class=cl><span class=cm>import javax.servlet.FilterChain;
+</span></span></span><span class=line><span class=cl><span class=cm>import javax.servlet.FilterConfig;
+</span></span></span><span class=line><span class=cl><span class=cm>import javax.servlet.ServletException;
+</span></span></span><span class=line><span class=cl><span class=cm>import javax.servlet.ServletRequest;
+</span></span></span><span class=line><span class=cl><span class=cm>import javax.servlet.ServletResponse;
+</span></span></span><span class=line><span class=cl><span class=cm>import javax.servlet.annotation.WebFilter;
+</span></span></span><span class=line><span class=cl><span class=cm>import javax.servlet.http.HttpServletRequest;
+</span></span></span><span class=line><span class=cl><span class=cm>import javax.servlet.http.HttpServletResponse;
+</span></span></span><span class=line><span class=cl><span class=cm>*/</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=kn>import</span><span class=w> </span><span class=nn>jakarta.servlet.Filter</span><span class=p>;</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=kn>import</span><span class=w> </span><span class=nn>jakarta.servlet.FilterChain</span><span class=p>;</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=kn>import</span><span class=w> </span><span class=nn>jakarta.servlet.FilterConfig</span><span class=p>;</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=kn>import</span><span class=w> </span><span class=nn>jakarta.servlet.ServletException</span><span class=p>;</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=kn>import</span><span class=w> </span><span class=nn>jakarta.servlet.ServletRequest</span><span class=p>;</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=kn>import</span><span class=w> </span><span class=nn>jakarta.servlet.ServletResponse</span><span class=p>;</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=kn>import</span><span class=w> </span><span class=nn>jakarta.servlet.annotation.WebFilter</span><span class=p>;</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=kn>import</span><span class=w> </span><span class=nn>jakarta.servlet.http.HttpServletRequest</span><span class=p>;</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=kn>import</span><span class=w> </span><span class=nn>jakarta.servlet.http.HttpServletResponse</span><span class=p>;</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>
+</span></span></span><span class=line><span class=cl><span class=kn>import</span><span class=w> </span><span class=nn>org.apache.commons.codec.binary.Hex</span><span class=p>;</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>
+</span></span></span><span class=line><span class=cl><span class=cm>/**
+</span></span></span><span class=line><span class=cl><span class=cm> * Sample filter implementation to define a set of Content Security Policies.&lt;br/&gt;
+</span></span></span><span class=line><span class=cl><span class=cm> * This implementation has a dependency on Commons Codec API.&lt;br/&gt;
+</span></span></span><span class=line><span class=cl><span class=cm> * This filter set CSP policies using all HTTP headers defined into W3C specification.&lt;br/&gt;
+</span></span></span><span class=line><span class=cl><span class=cm> * &lt;br/&gt;
+</span></span></span><span class=line><span class=cl><span class=cm> * This implementation is oriented to be easily understandable and easily adapted.&lt;br/&gt;
+</span></span></span><span class=line><span class=cl><span class=cm> */</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=nd>@WebFilter</span><span class=p>(</span><span class=s>&#34;/*&#34;</span><span class=p>)</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=kd>public</span><span class=w> </span><span class=kd>class</span> <span class=nc>CSPPoliciesApplier</span><span class=w> </span><span class=kd>implements</span><span class=w> </span><span class=n>Filter</span><span class=w> </span><span class=p>{</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>    </span><span class=cm>/** Configuration member to specify if web app use web fonts */</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>    </span><span class=kd>public</span><span class=w> </span><span class=kd>static</span><span class=w> </span><span class=kd>final</span><span class=w> </span><span class=kt>boolean</span><span class=w> </span><span class=n>APP_USE_WEBFONTS</span><span class=w> </span><span class=o>=</span><span class=w> </span><span class=kc>false</span><span class=p>;</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>    </span><span class=cm>/** Configuration member to specify if web app use videos or audios */</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>    </span><span class=kd>public</span><span class=w> </span><span class=kd>static</span><span class=w> </span><span class=kd>final</span><span class=w> </span><span class=kt>boolean</span><span class=w> </span><span class=n>APP_USE_AUDIOS_OR_VIDEOS</span><span class=w> </span><span class=o>=</span><span class=w> </span><span class=kc>false</span><span class=p>;</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>    </span><span class=cm>/**
+</span></span></span><span class=line><span class=cl><span class=cm>     * Configuration member to specify if filter must add CSP directive used by Mozilla (Firefox)
+</span></span></span><span class=line><span class=cl><span class=cm>     */</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>    </span><span class=kd>public</span><span class=w> </span><span class=kd>static</span><span class=w> </span><span class=kd>final</span><span class=w> </span><span class=kt>boolean</span><span class=w> </span><span class=n>INCLUDE_MOZILLA_CSP_DIRECTIVES</span><span class=w> </span><span class=o>=</span><span class=w> </span><span class=kc>false</span><span class=p>;</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>    </span><span class=cm>/** Filter configuration */</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>    </span><span class=nd>@SuppressWarnings</span><span class=p>(</span><span class=s>&#34;unused&#34;</span><span class=p>)</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>    </span><span class=kd>private</span><span class=w> </span><span class=n>FilterConfig</span><span class=w> </span><span class=n>filterConfig</span><span class=w> </span><span class=o>=</span><span class=w> </span><span class=kc>null</span><span class=p>;</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>    </span><span class=cm>/** List CSP HTTP Headers */</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>    </span><span class=kd>private</span><span class=w> </span><span class=n>List</span><span class=o>&lt;</span><span class=n>String</span><span class=o>&gt;</span><span class=w> </span><span class=n>cspHeaders</span><span class=w> </span><span class=o>=</span><span class=w> </span><span class=k>new</span><span class=w> </span><span class=n>ArrayList</span><span class=o>&lt;</span><span class=n>String</span><span class=o>&gt;</span><span class=p>();</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>    </span><span class=cm>/** Collection of CSP polcies that will be applied */</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>    </span><span class=kd>private</span><span class=w> </span><span class=n>String</span><span class=w> </span><span class=n>policies</span><span class=w> </span><span class=o>=</span><span class=w> </span><span class=kc>null</span><span class=p>;</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>    </span><span class=cm>/** Used for Script Nonce */</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>    </span><span class=kd>private</span><span class=w> </span><span class=n>SecureRandom</span><span class=w> </span><span class=n>prng</span><span class=w> </span><span class=o>=</span><span class=w> </span><span class=kc>null</span><span class=p>;</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>    </span><span class=cm>/**
+</span></span></span><span class=line><span class=cl><span class=cm>     * Used to prepare (one time for all) set of CSP policies that will be applied on each HTTP
+</span></span></span><span class=line><span class=cl><span class=cm>     * response.
+</span></span></span><span class=line><span class=cl><span class=cm>     *
+</span></span></span><span class=line><span class=cl><span class=cm>     * @see javax.servlet.Filter#init(javax.servlet.FilterConfig)
+</span></span></span><span class=line><span class=cl><span class=cm>     */</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>    </span><span class=nd>@Override</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>    </span><span class=kd>public</span><span class=w> </span><span class=kt>void</span><span class=w> </span><span class=nf>init</span><span class=p>(</span><span class=n>FilterConfig</span><span class=w> </span><span class=n>fConfig</span><span class=p>)</span><span class=w> </span><span class=kd>throws</span><span class=w> </span><span class=n>ServletException</span><span class=w> </span><span class=p>{</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=c1>// Get filter configuration</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>        </span><span class=k>this</span><span class=p>.</span><span class=na>filterConfig</span><span class=w> </span><span class=o>=</span><span class=w> </span><span class=n>fConfig</span><span class=p>;</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>
+</span></span></span><span class=line><span class=cl><span class=c1>// Init secure random</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>        </span><span class=k>try</span><span class=w> </span><span class=p>{</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>            </span><span class=k>this</span><span class=p>.</span><span class=na>prng</span><span class=w> </span><span class=o>=</span><span class=w> </span><span class=n>SecureRandom</span><span class=p>.</span><span class=na>getInstance</span><span class=p>(</span><span class=s>&#34;SHA1PRNG&#34;</span><span class=p>);</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>        </span><span class=p>}</span><span class=w> </span><span class=k>catch</span><span class=w> </span><span class=p>(</span><span class=n>NoSuchAlgorithmException</span><span class=w> </span><span class=n>e</span><span class=p>)</span><span class=w> </span><span class=p>{</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>            </span><span class=k>throw</span><span class=w> </span><span class=k>new</span><span class=w> </span><span class=n>ServletException</span><span class=p>(</span><span class=n>e</span><span class=p>);</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>        </span><span class=p>}</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>
+</span></span></span><span class=line><span class=cl><span class=c1>// Define list of CSP HTTP Headers</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>        </span><span class=k>this</span><span class=p>.</span><span class=na>cspHeaders</span><span class=p>.</span><span class=na>add</span><span class=p>(</span><span class=s>&#34;Content-Security-Policy&#34;</span><span class=p>);</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>        </span><span class=c1>// this.cspHeaders.add(&#34;X-Content-Security-Policy&#34;);</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>        </span><span class=c1>// this.cspHeaders.add(&#34;X-WebKit-CSP&#34;);</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>
+</span></span></span><span class=line><span class=cl><span class=c1>// Define CSP policies</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=c1>// Loading policies for Frame and Sandboxing will be dynamically defined : We need to know if context use Frame</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>        </span><span class=n>List</span><span class=o>&lt;</span><span class=n>String</span><span class=o>&gt;</span><span class=w> </span><span class=n>cspPolicies</span><span class=w> </span><span class=o>=</span><span class=w> </span><span class=k>new</span><span class=w> </span><span class=n>ArrayList</span><span class=o>&lt;</span><span class=n>String</span><span class=o>&gt;</span><span class=p>();</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>        </span><span class=n>String</span><span class=w> </span><span class=n>originLocationRef</span><span class=w> </span><span class=o>=</span><span class=w> </span><span class=s>&#34;&#39;self&#39;&#34;</span><span class=p>;</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>        </span><span class=c1>// --Disable default source in order to avoid browser fallback loading using &#39;default-src&#39;</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>        </span><span class=c1>// locations</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>        </span><span class=n>cspPolicies</span><span class=p>.</span><span class=na>add</span><span class=p>(</span><span class=s>&#34;default-src &#39;none&#39;&#34;</span><span class=p>);</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>        </span><span class=c1>// --Define loading policies for Scripts</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>        </span><span class=c1>// cspPolicies.add(&#34;script-src &#34; + originLocationRef + &#34; &#39;unsafe-inline&#39; &#39;unsafe-eval&#39;&#34;); &lt;- bad policy!</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>        </span><span class=n>cspPolicies</span><span class=p>.</span><span class=na>add</span><span class=p>(</span><span class=s>&#34;script-src &#34;</span><span class=w> </span><span class=o>+</span><span class=w> </span><span class=n>originLocationRef</span><span class=p>);</span><span class=w> </span><span class=c1>// not the best but will do</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>        </span><span class=k>if</span><span class=w> </span><span class=p>(</span><span class=n>INCLUDE_MOZILLA_CSP_DIRECTIVES</span><span class=p>)</span><span class=w> </span><span class=p>{</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>            </span><span class=n>cspPolicies</span><span class=p>.</span><span class=na>add</span><span class=p>(</span><span class=s>&#34;options inline-script eval-script&#34;</span><span class=p>);</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>            </span><span class=n>cspPolicies</span><span class=p>.</span><span class=na>add</span><span class=p>(</span><span class=s>&#34;xhr-src &#39;self&#39;&#34;</span><span class=p>);</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>        </span><span class=p>}</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>        </span><span class=c1>// --Define loading policies for Plugins</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>        </span><span class=n>cspPolicies</span><span class=p>.</span><span class=na>add</span><span class=p>(</span><span class=s>&#34;object-src &#34;</span><span class=w> </span><span class=o>+</span><span class=w> </span><span class=n>originLocationRef</span><span class=p>);</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>        </span><span class=c1>// --Define loading policies for Styles (CSS)</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>        </span><span class=n>cspPolicies</span><span class=p>.</span><span class=na>add</span><span class=p>(</span><span class=s>&#34;style-src &#34;</span><span class=w> </span><span class=o>+</span><span class=w> </span><span class=s>&#34;&#39;unsafe-inline&#39;&#34;</span><span class=p>);</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>        </span><span class=c1>// --Define loading policies for Images</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>        </span><span class=n>cspPolicies</span><span class=p>.</span><span class=na>add</span><span class=p>(</span><span class=s>&#34;img-src &#34;</span><span class=w> </span><span class=o>+</span><span class=w> </span><span class=n>originLocationRef</span><span class=p>);</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>        </span><span class=c1>// --Define loading policies for Form</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>        </span><span class=n>cspPolicies</span><span class=p>.</span><span class=na>add</span><span class=p>(</span><span class=s>&#34;form-action &#34;</span><span class=w> </span><span class=o>+</span><span class=w> </span><span class=n>originLocationRef</span><span class=p>);</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>        </span><span class=c1>// --Define loading policies for Audios/Videos</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>        </span><span class=k>if</span><span class=w> </span><span class=p>(</span><span class=n>APP_USE_AUDIOS_OR_VIDEOS</span><span class=p>)</span><span class=w> </span><span class=p>{</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>            </span><span class=n>cspPolicies</span><span class=p>.</span><span class=na>add</span><span class=p>(</span><span class=s>&#34;media-src &#34;</span><span class=w> </span><span class=o>+</span><span class=w> </span><span class=n>originLocationRef</span><span class=p>);</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>        </span><span class=p>}</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>        </span><span class=c1>// --Define loading policies for Fonts</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>        </span><span class=k>if</span><span class=w> </span><span class=p>(</span><span class=n>APP_USE_WEBFONTS</span><span class=p>)</span><span class=w> </span><span class=p>{</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>            </span><span class=n>cspPolicies</span><span class=p>.</span><span class=na>add</span><span class=p>(</span><span class=s>&#34;font-src &#34;</span><span class=w> </span><span class=o>+</span><span class=w> </span><span class=n>originLocationRef</span><span class=p>);</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>        </span><span class=p>}</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>        </span><span class=c1>// --Define loading policies for Connection</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>        </span><span class=n>cspPolicies</span><span class=p>.</span><span class=na>add</span><span class=p>(</span><span class=s>&#34;connect-src &#34;</span><span class=w> </span><span class=o>+</span><span class=w> </span><span class=n>originLocationRef</span><span class=p>);</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>        </span><span class=c1>// --Define loading policies for Plugins Types</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>        </span><span class=c1>// cspPolicies.add(&#34;plugin-types application/pdf application/x-shockwave-flash&#34;);</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>        </span><span class=c1>// --Define browser XSS filtering feature running mode</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>        </span><span class=c1>// cspPolicies.add(&#34;reflected-xss block&#34;);</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>        </span><span class=c1>// Target formating</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>        </span><span class=k>this</span><span class=p>.</span><span class=na>policies</span><span class=w> </span><span class=o>=</span><span class=w> </span><span class=n>cspPolicies</span><span class=p>.</span><span class=na>toString</span><span class=p>().</span><span class=na>replaceAll</span><span class=p>(</span><span class=s>&#34;(\\[|\\])&#34;</span><span class=p>,</span><span class=w> </span><span class=s>&#34;&#34;</span><span class=p>).</span><span class=na>replaceAll</span><span class=p>(</span><span class=s>&#34;,&#34;</span><span class=p>,</span><span class=w> </span><span class=s>&#34;;&#34;</span><span class=p>)</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>                </span><span class=p>.</span><span class=na>trim</span><span class=p>();</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>    </span><span class=p>}</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>    </span><span class=cm>/**
+</span></span></span><span class=line><span class=cl><span class=cm>     * Add CSP policies on each HTTP response.
+</span></span></span><span class=line><span class=cl><span class=cm>     *
+</span></span></span><span class=line><span class=cl><span class=cm>     * @see javax.servlet.Filter#doFilter(javax.servlet.ServletRequest,
+</span></span></span><span class=line><span class=cl><span class=cm>     *      javax.servlet.ServletResponse, javax.servlet.FilterChain)
+</span></span></span><span class=line><span class=cl><span class=cm>     */</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>    </span><span class=nd>@Override</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>    </span><span class=kd>public</span><span class=w> </span><span class=kt>void</span><span class=w> </span><span class=nf>doFilter</span><span class=p>(</span><span class=n>ServletRequest</span><span class=w> </span><span class=n>request</span><span class=p>,</span><span class=w> </span><span class=n>ServletResponse</span><span class=w> </span><span class=n>response</span><span class=p>,</span><span class=w> </span><span class=n>FilterChain</span><span class=w> </span><span class=n>fchain</span><span class=p>)</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>            </span><span class=kd>throws</span><span class=w> </span><span class=n>IOException</span><span class=p>,</span><span class=w> </span><span class=n>ServletException</span><span class=w> </span><span class=p>{</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>        </span><span class=n>HttpServletRequest</span><span class=w> </span><span class=n>httpRequest</span><span class=w> </span><span class=o>=</span><span class=w> </span><span class=p>((</span><span class=n>HttpServletRequest</span><span class=p>)</span><span class=w> </span><span class=n>request</span><span class=p>);</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>        </span><span class=n>HttpServletResponse</span><span class=w> </span><span class=n>httpResponse</span><span class=w> </span><span class=o>=</span><span class=w> </span><span class=p>((</span><span class=n>HttpServletResponse</span><span class=p>)</span><span class=w> </span><span class=n>response</span><span class=p>);</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>        </span><span class=cm>/* Step 1 : Detect if target resource is a Frame */</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>        </span><span class=c1>// Customize here according to your context...</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>        </span><span class=kt>boolean</span><span class=w> </span><span class=n>isFrame</span><span class=w> </span><span class=o>=</span><span class=w> </span><span class=kc>false</span><span class=p>;</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>        </span><span class=cm>/* Step 2 : Add CSP policies to HTTP response */</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>        </span><span class=n>StringBuilder</span><span class=w> </span><span class=n>policiesBuffer</span><span class=w> </span><span class=o>=</span><span class=w> </span><span class=k>new</span><span class=w> </span><span class=n>StringBuilder</span><span class=p>(</span><span class=k>this</span><span class=p>.</span><span class=na>policies</span><span class=p>);</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>        </span><span class=c1>// If resource is a frame add Frame/Sandbox CSP policy</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>        </span><span class=k>if</span><span class=w> </span><span class=p>(</span><span class=n>isFrame</span><span class=p>)</span><span class=w> </span><span class=p>{</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>            </span><span class=c1>// Frame + Sandbox : Here sandbox allow nothing, customize sandbox options depending on</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>            </span><span class=c1>// your app....</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>            </span><span class=n>policiesBuffer</span><span class=p>.</span><span class=na>append</span><span class=p>(</span><span class=s>&#34;;&#34;</span><span class=p>).</span><span class=na>append</span><span class=p>(</span><span class=s>&#34;frame-src &#39;self&#39;;sandbox&#34;</span><span class=p>);</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>            </span><span class=k>if</span><span class=w> </span><span class=p>(</span><span class=n>INCLUDE_MOZILLA_CSP_DIRECTIVES</span><span class=p>)</span><span class=w> </span><span class=p>{</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>                </span><span class=n>policiesBuffer</span><span class=p>.</span><span class=na>append</span><span class=p>(</span><span class=s>&#34;;&#34;</span><span class=p>).</span><span class=na>append</span><span class=p>(</span><span class=s>&#34;frame-ancestors &#39;self&#39;&#34;</span><span class=p>);</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>            </span><span class=p>}</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>        </span><span class=p>}</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>        </span><span class=cm>/*
+</span></span></span><span class=line><span class=cl><span class=cm>        // Add Script Nonce CSP Policy
+</span></span></span><span class=line><span class=cl><span class=cm>        // --Generate a random number
+</span></span></span><span class=line><span class=cl><span class=cm>        String randomNum = new Integer(this.prng.nextInt()).toString();
+</span></span></span><span class=line><span class=cl><span class=cm>        // --Get its digest
+</span></span></span><span class=line><span class=cl><span class=cm>        MessageDigest sha;
+</span></span></span><span class=line><span class=cl><span class=cm>        try {
+</span></span></span><span class=line><span class=cl><span class=cm>            sha = MessageDigest.getInstance(&#34;SHA-1&#34;);
+</span></span></span><span class=line><span class=cl><span class=cm>        } catch (NoSuchAlgorithmException e) {
+</span></span></span><span class=line><span class=cl><span class=cm>            throw new ServletException(e);
+</span></span></span><span class=line><span class=cl><span class=cm>        }
+</span></span></span><span class=line><span class=cl><span class=cm>        
+</span></span></span><span class=line><span class=cl><span class=cm>        byte[] digest = sha.digest(randomNum.getBytes());
+</span></span></span><span class=line><span class=cl><span class=cm>        // --Encode it into HEXA
+</span></span></span><span class=line><span class=cl><span class=cm>        String scriptNonce = Hex.encodeHexString(digest);
+</span></span></span><span class=line><span class=cl><span class=cm>        policiesBuffer.append(&#34;;&#34;).append(&#34;script-nonce &#34;).append(scriptNonce);
+</span></span></span><span class=line><span class=cl><span class=cm>        // --Made available script nonce in view app layer
+</span></span></span><span class=line><span class=cl><span class=cm>        httpRequest.setAttribute(&#34;CSP_SCRIPT_NONCE&#34;, scriptNonce);
+</span></span></span><span class=line><span class=cl><span class=cm>        */</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>        </span><span class=c1>// Add policies to all HTTP headers</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>        </span><span class=k>for</span><span class=w> </span><span class=p>(</span><span class=n>String</span><span class=w> </span><span class=n>header</span><span class=w> </span><span class=p>:</span><span class=w> </span><span class=k>this</span><span class=p>.</span><span class=na>cspHeaders</span><span class=p>)</span><span class=w> </span><span class=p>{</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>            </span><span class=n>httpResponse</span><span class=p>.</span><span class=na>setHeader</span><span class=p>(</span><span class=n>header</span><span class=p>,</span><span class=w> </span><span class=n>policiesBuffer</span><span class=p>.</span><span class=na>toString</span><span class=p>());</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>        </span><span class=p>}</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>        </span><span class=cm>/* Step 3 : Let request continue chain filter */</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>        </span><span class=n>fchain</span><span class=p>.</span><span class=na>doFilter</span><span class=p>(</span><span class=n>request</span><span class=p>,</span><span class=w> </span><span class=n>response</span><span class=p>);</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>    </span><span class=p>}</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>    </span><span class=cm>/**
+</span></span></span><span class=line><span class=cl><span class=cm>     * {@inheritDoc}
+</span></span></span><span class=line><span class=cl><span class=cm>     *
+</span></span></span><span class=line><span class=cl><span class=cm>     * @see javax.servlet.Filter#destroy()
+</span></span></span><span class=line><span class=cl><span class=cm>     */</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>    </span><span class=nd>@Override</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>    </span><span class=kd>public</span><span class=w> </span><span class=kt>void</span><span class=w> </span><span class=nf>destroy</span><span class=p>()</span><span class=w> </span><span class=p>{</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>        </span><span class=c1>// Not used</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>    </span><span class=p>}</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=p>}</span><span class=w>
+</span></span></span></code></pre></td></tr></table></div></div><ol start=2><li>To compile,</li></ol><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt>1
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-bash data-lang=bash><span class=line><span class=cl>javac -cp <span class=s2>&#34;</span><span class=nv>$TOMCAT_HOME</span><span class=s2>/lib/servlet-api.jar:</span><span class=nv>$TOMCAT_HOME</span><span class=s2>/lib/commons-codec.jar&#34;</span> webapps/&lt;web-app-name&gt;/WEB-INF/classes/CSPPoliciesApplier.java
+</span></span></code></pre></td></tr></table></div></div><ol start=3><li>Restart the server</li><li>To confirm,</li></ol><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt>1
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-fallback data-lang=fallback><span class=line><span class=cl>curl -I http://localhost:8080/&lt;web-app-name&gt;/test1/
+</span></span></code></pre></td></tr></table></div></div><p>Output:</p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt> 1
+</span><span class=lnt> 2
+</span><span class=lnt> 3
+</span><span class=lnt> 4
+</span><span class=lnt> 5
+</span><span class=lnt> 6
+</span><span class=lnt> 7
+</span><span class=lnt> 8
+</span><span class=lnt> 9
+</span><span class=lnt>10
+</span><span class=lnt>11
+</span><span class=lnt>12
+</span><span class=lnt>13
+</span><span class=lnt>14
+</span><span class=lnt>15
+</span><span class=lnt>16
+</span><span class=lnt>17
+</span><span class=lnt>18
+</span><span class=lnt>19
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-http data-lang=http><span class=line><span class=cl><span class=kr>HTTP</span><span class=o>/</span><span class=m>1.1</span> <span class=m>200</span> 
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=g>Content-Security-Policy: default-src &#39;none&#39;; script-src &#39;self&#39;; object-src &#39;self&#39;; style-src &#39;unsafe-inline&#39;; img-src &#39;self&#39;; form-action &#39;self&#39;; connect-src &#39;self&#39;
+</span></span></span><span class=line><span class=cl><span class=g>
+</span></span></span><span class=line><span class=cl><span class=g>Accept-Ranges: bytes
+</span></span></span><span class=line><span class=cl><span class=g>
+</span></span></span><span class=line><span class=cl><span class=g>ETag: W/&#34;299-1762001380542&#34;
+</span></span></span><span class=line><span class=cl><span class=g>
+</span></span></span><span class=line><span class=cl><span class=g>Last-Modified: Sat, 01 Nov 2025 12:49:40 GMT
+</span></span></span><span class=line><span class=cl><span class=g>
+</span></span></span><span class=line><span class=cl><span class=g>Content-Type: text/html
+</span></span></span><span class=line><span class=cl><span class=g>
+</span></span></span><span class=line><span class=cl><span class=g>Content-Length: 299
+</span></span></span><span class=line><span class=cl><span class=g>
+</span></span></span><span class=line><span class=cl><span class=g>Date: Sat, 01 Nov 2025 12:50:17 GMT
+</span></span></span><span class=line><span class=cl><span class=g>
+</span></span></span><span class=line><span class=cl><span class=g>Keep-Alive: timeout=20
+</span></span></span><span class=line><span class=cl><span class=g>
+</span></span></span><span class=line><span class=cl><span class=g>Connection: keep-alive
+</span></span></span></code></pre></td></tr></table></div></div></section><footer class=article-footer><section class=article-tags><a href=/tags/web/>Web</a></section><section class=article-copyright><svg class="icon icon-tabler icon-tabler-copyright" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z"/><circle cx="12" cy="12" r="9"/><path d="M14.5 9a3.5 4 0 100 6"/></svg>
+<span>Licensed under CC BY-NC-SA 4.0</span></section></footer></article><aside class=related-content--wrapper><h2 class=section-title>Related content</h2><div class=related-content><div class="flex article-list--tile"><article><a href=/p/electron-xss-to-rce/><div class=article-details><h2 class=article-title>Electron XSS to RCE</h2></div></a></article><article><a href=/p/xs-leaks-leveraging-cve-2024-11110/><div class=article-details><h2 class=article-title>XS Leaks Leveraging CVE 2024 11110</h2></div></a></article><article><a href=/p/becoming-a-super-soldier-common-/etc/sudoers-misconfigurations/><div class=article-details><h2 class=article-title>Becoming a Super Soldier (Common /etc/sudoers misconfigurations)</h2></div></a></article><article><a href=/p/github-actions-primer-workflows-for-continuous-integration/><div class=article-details><h2 class=article-title>GitHub Actions Primer - Workflows for Continuous Integration</h2></div></a></article></div></div></aside><footer class=site-footer><section class=copyright>&copy;
+2025 -
+2026 Froginacup's site</section><section class=powerby>Built with <a href=https://gohugo.io/ target=_blank rel=noopener>Hugo</a><br>Theme <b><a href=https://github.com/CaiJimmy/hugo-theme-stack target=_blank rel=noopener data-version=3.33.0>Stack</a></b> designed by <a href=https://jimmycai.com target=_blank rel=noopener>Jimmy</a></section></footer><div class=pswp tabindex=-1 role=dialog aria-hidden=true><div class=pswp__bg></div><div class=pswp__scroll-wrap><div class=pswp__container><div class=pswp__item></div><div class=pswp__item></div><div class=pswp__item></div></div><div class="pswp__ui pswp__ui--hidden"><div class=pswp__top-bar><div class=pswp__counter></div><button class="pswp__button pswp__button--close" title="Close (Esc)"></button>
+<button class="pswp__button pswp__button--share" title=Share></button>
+<button class="pswp__button pswp__button--fs" title="Toggle fullscreen"></button>
+<button class="pswp__button pswp__button--zoom" title="Zoom in/out"></button><div class=pswp__preloader><div class=pswp__preloader__icn><div class=pswp__preloader__cut><div class=pswp__preloader__donut></div></div></div></div></div><div class="pswp__share-modal pswp__share-modal--hidden pswp__single-tap"><div class=pswp__share-tooltip></div></div><button class="pswp__button pswp__button--arrow--left" title="Previous (arrow left)">
+</button>
+<button class="pswp__button pswp__button--arrow--right" title="Next (arrow right)"></button><div class=pswp__caption><div class=pswp__caption__center></div></div></div></div></div><script src=https://cdn.jsdelivr.net/npm/photoswipe@4.1.3/dist/photoswipe.min.js integrity="sha256-ePwmChbbvXbsO02lbM3HoHbSHTHFAeChekF1xKJdleo=" crossorigin=anonymous defer></script><script src=https://cdn.jsdelivr.net/npm/photoswipe@4.1.3/dist/photoswipe-ui-default.min.js integrity="sha256-UKkzOn/w1mBxRmLLGrSeyB4e1xbrp4xylgAWb3M42pU=" crossorigin=anonymous defer></script><link rel=stylesheet href=https://cdn.jsdelivr.net/npm/photoswipe@4.1.3/dist/default-skin/default-skin.min.css crossorigin=anonymous><link rel=stylesheet href=https://cdn.jsdelivr.net/npm/photoswipe@4.1.3/dist/photoswipe.min.css crossorigin=anonymous></main></div><script src=https://cdn.jsdelivr.net/npm/node-vibrant@3.1.6/dist/vibrant.min.js integrity="sha256-awcR2jno4kI5X0zL8ex0vi2z+KMkF24hUW8WePSA9HM=" crossorigin=anonymous></script><script type=text/javascript src=/ts/main.c922af694cc257bf1ecc41c0dd7b0430f9114ec280ccf67cd2c6ad55f5316c4e.js defer></script><script>(function(){const e=document.createElement("link");e.href="https://fonts.googleapis.com/css2?family=Lato:wght@300;400;700&display=swap",e.type="text/css",e.rel="stylesheet",document.head.appendChild(e)})()</script></body></html>

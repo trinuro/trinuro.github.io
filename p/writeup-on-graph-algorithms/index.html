@@ -1,0 +1,197 @@
+<!doctype html><html lang=en-us dir=ltr><head><meta charset=utf-8><meta name=viewport content='width=device-width,initial-scale=1'><meta name=description content="WIA2005"><title>Writeup on Graph Algorithms</title><link rel=canonical href=https://trinuro.github.io/p/writeup-on-graph-algorithms/><link rel=stylesheet href=/scss/style.min.833d6eed45de56f48306bf57268d5b8cdfc8a60e8e7bdc99810464fcd033f7c6.css><meta property='og:title' content="Writeup on Graph Algorithms"><meta property='og:description' content="WIA2005"><meta property='og:url' content='https://trinuro.github.io/p/writeup-on-graph-algorithms/'><meta property='og:site_name' content="Froginacup's site"><meta property='og:type' content='article'><meta property='article:section' content='Post'><meta property='article:tag' content='Algorithm'><meta property='article:published_time' content='2025-07-15T23:37:48+00:00'><meta property='article:modified_time' content='2025-07-15T23:37:48+00:00'><meta name=twitter:title content="Writeup on Graph Algorithms"><meta name=twitter:description content="WIA2005"><link rel="shortcut icon" href=/favicon.png></head><body class=article-page><script>(function(){const e="StackColorScheme";localStorage.getItem(e)||localStorage.setItem(e,"auto")})()</script><script>(function(){const t="StackColorScheme",e=localStorage.getItem(t),n=window.matchMedia("(prefers-color-scheme: dark)").matches===!0;e=="dark"||e==="auto"&&n?document.documentElement.dataset.scheme="dark":document.documentElement.dataset.scheme="light"})()</script><div class="container main-container flex on-phone--column extended"><aside class="sidebar left-sidebar sticky"><button class="hamburger hamburger--spin" type=button id=toggle-menu aria-label="Toggle Menu">
+<span class=hamburger-box><span class=hamburger-inner></span></span></button><header><figure class=site-avatar><a href=/><img src=/img/avatar_hu_aff73beef7294c1a.jpg width=300 height=299 class=site-logo loading=lazy alt=Avatar>
+</a><span class=emoji>💡</span></figure><div class=site-meta><h1 class=site-name><a href=/>Froginacup's site</a></h1><h2 class=site-description>A place where Froginacup writes his adventures</h2></div></header><ol class=menu-social><li><a href=https://github.com/trinuro target=_blank title=GitHub rel=me><svg class="icon icon-tabler icon-tabler-brand-github" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M9 19c-4.3 1.4-4.3-2.5-6-3m12 5v-3.5c0-1 .1-1.4-.5-2 2.8-.3 5.5-1.4 5.5-6a4.6 4.6.0 00-1.3-3.2 4.2 4.2.0 00-.1-3.2s-1.1-.3-3.5 1.3a12.3 12.3.0 00-6.2.0C6.5 2.8 5.4 3.1 5.4 3.1a4.2 4.2.0 00-.1 3.2A4.6 4.6.0 004 9.5c0 4.6 2.7 5.7 5.5 6-.6.6-.6 1.2-.5 2V21"/></svg></a></li></ol><ol class=menu id=main-menu><li><a href=/><svg class="icon icon-tabler icon-tabler-home" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z"/><polyline points="5 12 3 12 12 3 21 12 19 12"/><path d="M5 12v7a2 2 0 002 2h10a2 2 0 002-2v-7"/><path d="M9 21v-6a2 2 0 012-2h2a2 2 0 012 2v6"/></svg>
+<span>Home</span></a></li><li><a href=/archives/><svg class="icon icon-tabler icon-tabler-archive" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z"/><rect x="3" y="4" width="18" height="4" rx="2"/><path d="M5 8v10a2 2 0 002 2h10a2 2 0 002-2V8"/><line x1="10" y1="12" x2="14" y2="12"/></svg>
+<span>Archives</span></a></li><li><a href=/search/><svg class="icon icon-tabler icon-tabler-search" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z"/><circle cx="10" cy="10" r="7"/><line x1="21" y1="21" x2="15" y2="15"/></svg>
+<span>Search</span></a></li><li><a href=/projects-and-certificates/><svg class="icon icon-tabler icon-tabler-link" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z"/><path d="M10 14a3.5 3.5.0 005 0l4-4a3.5 3.5.0 00-5-5l-.5.5"/><path d="M14 10a3.5 3.5.0 00-5 0l-4 4a3.5 3.5.0 005 5l.5-.5"/></svg>
+<span>Projects and Certificates</span></a></li><li class=menu-bottom-section><ol class=menu><li id=dark-mode-toggle><svg class="icon icon-tabler icon-tabler-toggle-left" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z"/><circle cx="8" cy="12" r="2"/><rect x="2" y="6" width="20" height="12" rx="6"/></svg>
+<svg class="icon icon-tabler icon-tabler-toggle-right" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z"/><circle cx="16" cy="12" r="2"/><rect x="2" y="6" width="20" height="12" rx="6"/></svg>
+<span>Dark Mode</span></li></ol></li></ol></aside><aside class="sidebar right-sidebar sticky"><section class="widget archives"><div class=widget-icon><svg class="icon icon-tabler icon-tabler-hash" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z"/><line x1="5" y1="9" x2="19" y2="9"/><line x1="5" y1="15" x2="19" y2="15"/><line x1="11" y1="4" x2="7" y2="20"/><line x1="17" y1="4" x2="13" y2="20"/></svg></div><h2 class="widget-title section-title">Table of contents</h2><div class=widget--toc><nav id=TableOfContents><ol><li><a href=#searching-algorithms>Searching algorithms</a></li><li><a href=#minimum-spanning-tree>Minimum spanning tree</a></li><li><a href=#single-source-shortest-path>Single source shortest Path</a></li><li><a href=#all-pairs-shortest-path>All Pairs Shortest Path</a></li></ol></nav></div></section></aside><main class="main full-width"><article class=main-article><header class=article-header><div class=article-details><header class=article-category><a href=/categories/school/ style=background-color:#6495ed;color:#fff>School</a></header><div class=article-title-wrapper><h2 class=article-title><a href=/p/writeup-on-graph-algorithms/>Writeup on Graph Algorithms</a></h2><h3 class=article-subtitle>WIA2005</h3></div><footer class=article-time><div><svg class="icon icon-tabler icon-tabler-calendar-time" width="56" height="56" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z"/><path d="M11.795 21H5a2 2 0 01-2-2V7a2 2 0 012-2h12a2 2 0 012 2v4"/><circle cx="18" cy="18" r="4"/><path d="M15 3v4"/><path d="M7 3v4"/><path d="M3 11h16"/><path d="M18 16.496V18l1 1"/></svg>
+<time class=article-time--published datetime=2025-07-15T23:37:48Z>Jul 15, 2025</time></div><div><svg class="icon icon-tabler icon-tabler-clock" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z"/><circle cx="12" cy="12" r="9"/><polyline points="12 7 12 12 15 15"/></svg>
+<time class=article-time--reading>5 minute read</time></div></footer></div></header><section class=article-content><ol><li>In graph theory, there are four major types of problems:<ol><li>Searching: We want to find a node, n in the tree</li><li>Minimum spanning tree: We want to find a way to connect all nodes in the cheapest way possible.</li><li>Single source shortest path: We want to find the shortest path from a source node, u to every other node, v in the graph.</li><li>All pairs shortest path: We want to find the shortest path from all nodes to every other nodes in the graph</li></ol></li></ol><h2 id=searching-algorithms>Searching algorithms</h2><ol><li>There are two important search algorithms:<ol><li>Depth-first search (DFS)</li><li>Breadth-first search (BFS)</li></ol></li><li>General differences:<ol><li>DFS uses stack while BFS uses queue</li><li>DFS results in a &ldquo;taller&rdquo; tree while BFS results in a tree with more branches</li></ol></li><li>DFS Pseudocode</li></ol><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt> 1
+</span><span class=lnt> 2
+</span><span class=lnt> 3
+</span><span class=lnt> 4
+</span><span class=lnt> 5
+</span><span class=lnt> 6
+</span><span class=lnt> 7
+</span><span class=lnt> 8
+</span><span class=lnt> 9
+</span><span class=lnt>10
+</span><span class=lnt>11
+</span><span class=lnt>12
+</span><span class=lnt>13
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-fallback data-lang=fallback><span class=line><span class=cl>DFS(G,s)
+</span></span><span class=line><span class=cl>V = {}
+</span></span><span class=line><span class=cl>DFS-AUX(G,s,V)
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>DFS-AUX(G,u,V)
+</span></span><span class=line><span class=cl>if u is in V
+</span></span><span class=line><span class=cl>	return
+</span></span><span class=line><span class=cl>	
+</span></span><span class=line><span class=cl>process(u) // print it, add it to a sum etc
+</span></span><span class=line><span class=cl>V = V U {u}
+</span></span><span class=line><span class=cl>for each vertex v that is neighbour of u
+</span></span><span class=line><span class=cl>	if v is not in V
+</span></span><span class=line><span class=cl>		DFS-AUX(G,v,V)
+</span></span></code></pre></td></tr></table></div></div><ol start=4><li>BFS Pseudocode</li></ol><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt> 1
+</span><span class=lnt> 2
+</span><span class=lnt> 3
+</span><span class=lnt> 4
+</span><span class=lnt> 5
+</span><span class=lnt> 6
+</span><span class=lnt> 7
+</span><span class=lnt> 8
+</span><span class=lnt> 9
+</span><span class=lnt>10
+</span><span class=lnt>11
+</span><span class=lnt>12
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-fallback data-lang=fallback><span class=line><span class=cl>BFS(G,s)
+</span></span><span class=line><span class=cl>V = {s}
+</span></span><span class=line><span class=cl>Create queue Q
+</span></span><span class=line><span class=cl>ENQUEUE(Q,s)
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>while Q is not empty
+</span></span><span class=line><span class=cl>	u = DEQUEUE(Q)
+</span></span><span class=line><span class=cl>	process(u)  // print it, add it to a sum etc
+</span></span><span class=line><span class=cl>	for each vertex v that is a neighbour of u
+</span></span><span class=line><span class=cl>		if v is not in V
+</span></span><span class=line><span class=cl>			V = V U {v}
+</span></span><span class=line><span class=cl>			ENQUEUE(Q,v)
+</span></span></code></pre></td></tr></table></div></div><h2 id=minimum-spanning-tree>Minimum spanning tree</h2><ol><li>Minimum spanning tree: Connected and acyclic graph in which the total weight of edges is the smallest</li><li>Two ways to create MST:<ol><li>Prim&rsquo;s algorithm<ol><li>Choose vertex</li><li>Maintain one MST during building process</li></ol></li><li>Kruskal&rsquo;s algorithm<ol><li>Choose edge</li><li>Maintain one or more MST during building process</li></ol></li></ol></li><li>Prim&rsquo;s Algorithm Pseudocode</li></ol><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt> 1
+</span><span class=lnt> 2
+</span><span class=lnt> 3
+</span><span class=lnt> 4
+</span><span class=lnt> 5
+</span><span class=lnt> 6
+</span><span class=lnt> 7
+</span><span class=lnt> 8
+</span><span class=lnt> 9
+</span><span class=lnt>10
+</span><span class=lnt>11
+</span><span class=lnt>12
+</span><span class=lnt>13
+</span><span class=lnt>14
+</span><span class=lnt>15
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-fallback data-lang=fallback><span class=line><span class=cl>PRIM(G,s)
+</span></span><span class=line><span class=cl>// initialise key and previous node
+</span></span><span class=line><span class=cl>for each vertex v in G.V:
+</span></span><span class=line><span class=cl>	v.key = INF
+</span></span><span class=line><span class=cl>	v.previous = NIL
+</span></span><span class=line><span class=cl>s.key=0
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>V = G.V
+</span></span><span class=line><span class=cl>while V is not empty:
+</span></span><span class=line><span class=cl>	u = EXTRACT-MIN(V) // get node with lowest weight
+</span></span><span class=line><span class=cl>	for each vertex v that is neighbour of u
+</span></span><span class=line><span class=cl>		// adjust the key of all nodes
+</span></span><span class=line><span class=cl>		if v is in V and v.key &gt; w(u,v):
+</span></span><span class=line><span class=cl>				v.key = w(u,v)
+</span></span><span class=line><span class=cl>				v.previous = u
+</span></span></code></pre></td></tr></table></div></div><ol start=4><li>Kruskal&rsquo;s Algorithm Pseudocode</li></ol><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt> 1
+</span><span class=lnt> 2
+</span><span class=lnt> 3
+</span><span class=lnt> 4
+</span><span class=lnt> 5
+</span><span class=lnt> 6
+</span><span class=lnt> 7
+</span><span class=lnt> 8
+</span><span class=lnt> 9
+</span><span class=lnt>10
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-fallback data-lang=fallback><span class=line><span class=cl>KRUSKAL(G)
+</span></span><span class=line><span class=cl>for each vertex v in G.V:
+</span></span><span class=line><span class=cl>	MAKE-SET(v) // each vertex is its own tree
+</span></span><span class=line><span class=cl>Sort G.E in ascending order of weight // get edge with lowest weight each time
+</span></span><span class=line><span class=cl>S = {}
+</span></span><span class=line><span class=cl>for each edge (u,v) in G.E: 
+</span></span><span class=line><span class=cl>	if GET-SET(u) != GET-SET(v): // prevents merge of nodes from same tree
+</span></span><span class=line><span class=cl>		UNION(u,v) // merge two trees
+</span></span><span class=line><span class=cl>		S = S U {(u,v)} // add edge to output
+</span></span><span class=line><span class=cl>return S
+</span></span></code></pre></td></tr></table></div></div><ol start=5><li>Both Prim and Kruskal have time complexity of <code>O(ElogV)</code></li></ol><h2 id=single-source-shortest-path>Single source shortest Path</h2><ol><li>Objective is to find shortest path from current node, s to all other nodes</li><li>Two algorithms are available:<ol><li>Dijkstra&rsquo;s<ol><li>Cannot handle negative weights</li><li>Better time complexity for positive weights than Bellman-Ford</li></ol></li><li>Bellman-Ford<ol><li>Can handle negative weights</li></ol></li></ol></li><li>Both do not work if there exists a negative cycle</li><li>Dijkstra&rsquo;s algorithm pseudocode</li></ol><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt>1
+</span><span class=lnt>2
+</span><span class=lnt>3
+</span><span class=lnt>4
+</span><span class=lnt>5
+</span><span class=lnt>6
+</span><span class=lnt>7
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-fallback data-lang=fallback><span class=line><span class=cl>DIJKSTRA(G,s,w)
+</span></span><span class=line><span class=cl>INITIALISE-SINGLE-SOURCE(G,s)
+</span></span><span class=line><span class=cl>V = G.V
+</span></span><span class=line><span class=cl>while V is not empty:
+</span></span><span class=line><span class=cl>	u = EXTRACT-MIN(V) // Get the vertex with smallest weight every time
+</span></span><span class=line><span class=cl>	for each vertex v that is neighbour of u:
+</span></span><span class=line><span class=cl>		RELAX(u,v,w)
+</span></span></code></pre></td></tr></table></div></div><ol start=5><li>Bellman-Ford algorithm Pseudocode</li></ol><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt> 1
+</span><span class=lnt> 2
+</span><span class=lnt> 3
+</span><span class=lnt> 4
+</span><span class=lnt> 5
+</span><span class=lnt> 6
+</span><span class=lnt> 7
+</span><span class=lnt> 8
+</span><span class=lnt> 9
+</span><span class=lnt>10
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-fallback data-lang=fallback><span class=line><span class=cl>BELLMAN-FORD(G,s,w)
+</span></span><span class=line><span class=cl>INTIALISE-SINGLE-SOURCE(G,s)
+</span></span><span class=line><span class=cl>n = |G.V|
+</span></span><span class=line><span class=cl>for i in 1 to n-1
+</span></span><span class=line><span class=cl>	for each edge(u,v) in G.E
+</span></span><span class=line><span class=cl>		RELAX(u,v,w)
+</span></span><span class=line><span class=cl>for each edge(u,v) in G.E
+</span></span><span class=line><span class=cl>	if v.key &gt; u.key+w(u,v)
+</span></span><span class=line><span class=cl>		return FALSE // If negative cycle exist, the result is wrong
+</span></span><span class=line><span class=cl>return TRUE
+</span></span></code></pre></td></tr></table></div></div><ol start=6><li>Helper algorithms</li></ol><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt> 1
+</span><span class=lnt> 2
+</span><span class=lnt> 3
+</span><span class=lnt> 4
+</span><span class=lnt> 5
+</span><span class=lnt> 6
+</span><span class=lnt> 7
+</span><span class=lnt> 8
+</span><span class=lnt> 9
+</span><span class=lnt>10
+</span><span class=lnt>11
+</span><span class=lnt>12
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-fallback data-lang=fallback><span class=line><span class=cl>// Initialize all vertex to have nodes with impossible distance and no parent node, except source node 
+</span></span><span class=line><span class=cl>INTIIALISE-SINGLE-SOURCE(G,s)
+</span></span><span class=line><span class=cl>for each vertex u in G.V
+</span></span><span class=line><span class=cl>	u.key = INF
+</span></span><span class=line><span class=cl>	u.previous = NIL
+</span></span><span class=line><span class=cl>s.key = 0
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>// Adjust the key of each node IF there is a better path to the node
+</span></span><span class=line><span class=cl>RELAX(u,v,w)
+</span></span><span class=line><span class=cl>if v.key &gt; u.key+w(u,v)
+</span></span><span class=line><span class=cl>	v.key = u.key+w(u,v)
+</span></span><span class=line><span class=cl>	v.previous = u
+</span></span></code></pre></td></tr></table></div></div><ol start=7><li>Time complexity of Dijkstra<ol><li>Without max-heap: <code>O(V^2)</code></li><li>With max-heap: <code>O(ElogV)</code></li></ol></li><li>Time complexity of Bellman-Ford is <code>O(VE)</code></li></ol><h2 id=all-pairs-shortest-path>All Pairs Shortest Path</h2><ol><li>Objective is for each pair of vertex, u and v, of the graph, find the shortest path between these two nodes</li><li>Two algorithms:<ol><li>Johnson&rsquo;s:<ol><li>Complex as heck, but better time complexity</li></ol></li><li>Floyd-Warshall<ol><li>Simple, uses matrices</li></ol></li></ol></li><li>Johnson&rsquo;s algorithm high level overview<ol><li>Add a new vertex to the graph and add edge to each existing vertex on the graph</li><li>Apply Bellman-Ford algorithm and normalize the graph to remove all negative-weighted edges</li><li>Remove the extra vertex in step 1 and apply Dijkstra&rsquo;s on all original vertices.</li></ol></li><li>Floyd-Warshall algorithm pseudocode</li></ol><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt> 1
+</span><span class=lnt> 2
+</span><span class=lnt> 3
+</span><span class=lnt> 4
+</span><span class=lnt> 5
+</span><span class=lnt> 6
+</span><span class=lnt> 7
+</span><span class=lnt> 8
+</span><span class=lnt> 9
+</span><span class=lnt>10
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-fallback data-lang=fallback><span class=line><span class=cl>FLOYD-WARSHALL(G,w)
+</span></span><span class=line><span class=cl>n = |G.V| 
+</span></span><span class=line><span class=cl>Create a matrix nxn, D(0)
+</span></span><span class=line><span class=cl>D = G
+</span></span><span class=line><span class=cl>for i in 1 to n
+</span></span><span class=line><span class=cl>	for j in 1 to n
+</span></span><span class=line><span class=cl>		for k in 1 to n
+</span></span><span class=line><span class=cl>			Create a new nxn matrix, D(i)
+</span></span><span class=line><span class=cl>			D(i)[j][k] = MIN(D(i-1)[j][k], D(i-1)[j][i]+D(i-1)[i][k])
+</span></span><span class=line><span class=cl>return D(n)
+</span></span></code></pre></td></tr></table></div></div><ol start=5><li>Floyd-Warshall time complexity is <code>O(V^3)</code></li><li>Johnson&rsquo;s algorithm time complexity is <code>O(V^2 log V + VE)</code></li></ol></section><footer class=article-footer><section class=article-tags><a href=/tags/algorithm/>Algorithm</a></section><section class=article-copyright><svg class="icon icon-tabler icon-tabler-copyright" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z"/><circle cx="12" cy="12" r="9"/><path d="M14.5 9a3.5 4 0 100 6"/></svg>
+<span>Licensed under CC BY-NC-SA 4.0</span></section></footer></article><aside class=related-content--wrapper><h2 class=section-title>Related content</h2><div class=related-content><div class="flex article-list--tile"><article><a href=/p/writeups-on-sorting-algorithms/><div class=article-details><h2 class=article-title>Writeups on Sorting Algorithms</h2></div></a></article><article><a href=/p/writeup-on-hashing-algorithms/><div class=article-details><h2 class=article-title>Writeup on Hashing Algorithms</h2></div></a></article><article><a href=/p/writeup-on-dynamic-programming-algorithms/><div class=article-details><h2 class=article-title>Writeup on Dynamic Programming Algorithms</h2></div></a></article></div></div></aside><footer class=site-footer><section class=copyright>&copy;
+2025 -
+2026 Froginacup's site</section><section class=powerby>Built with <a href=https://gohugo.io/ target=_blank rel=noopener>Hugo</a><br>Theme <b><a href=https://github.com/CaiJimmy/hugo-theme-stack target=_blank rel=noopener data-version=3.33.0>Stack</a></b> designed by <a href=https://jimmycai.com target=_blank rel=noopener>Jimmy</a></section></footer><div class=pswp tabindex=-1 role=dialog aria-hidden=true><div class=pswp__bg></div><div class=pswp__scroll-wrap><div class=pswp__container><div class=pswp__item></div><div class=pswp__item></div><div class=pswp__item></div></div><div class="pswp__ui pswp__ui--hidden"><div class=pswp__top-bar><div class=pswp__counter></div><button class="pswp__button pswp__button--close" title="Close (Esc)"></button>
+<button class="pswp__button pswp__button--share" title=Share></button>
+<button class="pswp__button pswp__button--fs" title="Toggle fullscreen"></button>
+<button class="pswp__button pswp__button--zoom" title="Zoom in/out"></button><div class=pswp__preloader><div class=pswp__preloader__icn><div class=pswp__preloader__cut><div class=pswp__preloader__donut></div></div></div></div></div><div class="pswp__share-modal pswp__share-modal--hidden pswp__single-tap"><div class=pswp__share-tooltip></div></div><button class="pswp__button pswp__button--arrow--left" title="Previous (arrow left)">
+</button>
+<button class="pswp__button pswp__button--arrow--right" title="Next (arrow right)"></button><div class=pswp__caption><div class=pswp__caption__center></div></div></div></div></div><script src=https://cdn.jsdelivr.net/npm/photoswipe@4.1.3/dist/photoswipe.min.js integrity="sha256-ePwmChbbvXbsO02lbM3HoHbSHTHFAeChekF1xKJdleo=" crossorigin=anonymous defer></script><script src=https://cdn.jsdelivr.net/npm/photoswipe@4.1.3/dist/photoswipe-ui-default.min.js integrity="sha256-UKkzOn/w1mBxRmLLGrSeyB4e1xbrp4xylgAWb3M42pU=" crossorigin=anonymous defer></script><link rel=stylesheet href=https://cdn.jsdelivr.net/npm/photoswipe@4.1.3/dist/default-skin/default-skin.min.css crossorigin=anonymous><link rel=stylesheet href=https://cdn.jsdelivr.net/npm/photoswipe@4.1.3/dist/photoswipe.min.css crossorigin=anonymous></main></div><script src=https://cdn.jsdelivr.net/npm/node-vibrant@3.1.6/dist/vibrant.min.js integrity="sha256-awcR2jno4kI5X0zL8ex0vi2z+KMkF24hUW8WePSA9HM=" crossorigin=anonymous></script><script type=text/javascript src=/ts/main.c922af694cc257bf1ecc41c0dd7b0430f9114ec280ccf67cd2c6ad55f5316c4e.js defer></script><script>(function(){const e=document.createElement("link");e.href="https://fonts.googleapis.com/css2?family=Lato:wght@300;400;700&display=swap",e.type="text/css",e.rel="stylesheet",document.head.appendChild(e)})()</script></body></html>

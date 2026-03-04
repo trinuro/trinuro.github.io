@@ -1,0 +1,171 @@
+<!doctype html><html lang=en-us dir=ltr><head><meta charset=utf-8><meta name=viewport content='width=device-width,initial-scale=1'><meta name=description content="WIA2005"><title>Writeup on Dynamic Programming Algorithms</title><link rel=canonical href=https://trinuro.github.io/p/writeup-on-dynamic-programming-algorithms/><link rel=stylesheet href=/scss/style.min.833d6eed45de56f48306bf57268d5b8cdfc8a60e8e7bdc99810464fcd033f7c6.css><meta property='og:title' content="Writeup on Dynamic Programming Algorithms"><meta property='og:description' content="WIA2005"><meta property='og:url' content='https://trinuro.github.io/p/writeup-on-dynamic-programming-algorithms/'><meta property='og:site_name' content="Froginacup's site"><meta property='og:type' content='article'><meta property='article:section' content='Post'><meta property='article:tag' content='Algorithm'><meta property='article:published_time' content='2025-07-15T23:46:39+00:00'><meta property='article:modified_time' content='2025-07-15T23:46:39+00:00'><meta name=twitter:title content="Writeup on Dynamic Programming Algorithms"><meta name=twitter:description content="WIA2005"><link rel="shortcut icon" href=/favicon.png></head><body class=article-page><script>(function(){const e="StackColorScheme";localStorage.getItem(e)||localStorage.setItem(e,"auto")})()</script><script>(function(){const t="StackColorScheme",e=localStorage.getItem(t),n=window.matchMedia("(prefers-color-scheme: dark)").matches===!0;e=="dark"||e==="auto"&&n?document.documentElement.dataset.scheme="dark":document.documentElement.dataset.scheme="light"})()</script><div class="container main-container flex on-phone--column extended"><aside class="sidebar left-sidebar sticky"><button class="hamburger hamburger--spin" type=button id=toggle-menu aria-label="Toggle Menu">
+<span class=hamburger-box><span class=hamburger-inner></span></span></button><header><figure class=site-avatar><a href=/><img src=/img/avatar_hu_aff73beef7294c1a.jpg width=300 height=299 class=site-logo loading=lazy alt=Avatar>
+</a><span class=emoji>💡</span></figure><div class=site-meta><h1 class=site-name><a href=/>Froginacup's site</a></h1><h2 class=site-description>A place where Froginacup writes his adventures</h2></div></header><ol class=menu-social><li><a href=https://github.com/trinuro target=_blank title=GitHub rel=me><svg class="icon icon-tabler icon-tabler-brand-github" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M9 19c-4.3 1.4-4.3-2.5-6-3m12 5v-3.5c0-1 .1-1.4-.5-2 2.8-.3 5.5-1.4 5.5-6a4.6 4.6.0 00-1.3-3.2 4.2 4.2.0 00-.1-3.2s-1.1-.3-3.5 1.3a12.3 12.3.0 00-6.2.0C6.5 2.8 5.4 3.1 5.4 3.1a4.2 4.2.0 00-.1 3.2A4.6 4.6.0 004 9.5c0 4.6 2.7 5.7 5.5 6-.6.6-.6 1.2-.5 2V21"/></svg></a></li></ol><ol class=menu id=main-menu><li><a href=/><svg class="icon icon-tabler icon-tabler-home" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z"/><polyline points="5 12 3 12 12 3 21 12 19 12"/><path d="M5 12v7a2 2 0 002 2h10a2 2 0 002-2v-7"/><path d="M9 21v-6a2 2 0 012-2h2a2 2 0 012 2v6"/></svg>
+<span>Home</span></a></li><li><a href=/archives/><svg class="icon icon-tabler icon-tabler-archive" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z"/><rect x="3" y="4" width="18" height="4" rx="2"/><path d="M5 8v10a2 2 0 002 2h10a2 2 0 002-2V8"/><line x1="10" y1="12" x2="14" y2="12"/></svg>
+<span>Archives</span></a></li><li><a href=/search/><svg class="icon icon-tabler icon-tabler-search" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z"/><circle cx="10" cy="10" r="7"/><line x1="21" y1="21" x2="15" y2="15"/></svg>
+<span>Search</span></a></li><li><a href=/projects-and-certificates/><svg class="icon icon-tabler icon-tabler-link" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z"/><path d="M10 14a3.5 3.5.0 005 0l4-4a3.5 3.5.0 00-5-5l-.5.5"/><path d="M14 10a3.5 3.5.0 00-5 0l-4 4a3.5 3.5.0 005 5l.5-.5"/></svg>
+<span>Projects and Certificates</span></a></li><li class=menu-bottom-section><ol class=menu><li id=dark-mode-toggle><svg class="icon icon-tabler icon-tabler-toggle-left" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z"/><circle cx="8" cy="12" r="2"/><rect x="2" y="6" width="20" height="12" rx="6"/></svg>
+<svg class="icon icon-tabler icon-tabler-toggle-right" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z"/><circle cx="16" cy="12" r="2"/><rect x="2" y="6" width="20" height="12" rx="6"/></svg>
+<span>Dark Mode</span></li></ol></li></ol></aside><aside class="sidebar right-sidebar sticky"><section class="widget archives"><div class=widget-icon><svg class="icon icon-tabler icon-tabler-hash" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z"/><line x1="5" y1="9" x2="19" y2="9"/><line x1="5" y1="15" x2="19" y2="15"/><line x1="11" y1="4" x2="7" y2="20"/><line x1="17" y1="4" x2="13" y2="20"/></svg></div><h2 class="widget-title section-title">Table of contents</h2><div class=widget--toc><nav id=TableOfContents><ol><li><a href=#fibonacci-series>Fibonacci Series</a></li><li><a href=#rod-cutting-problem>Rod-Cutting Problem</a></li><li><a href=#0-1-knapsack-problem>0-1 Knapsack Problem</a></li></ol></nav></div></section></aside><main class="main full-width"><article class=main-article><header class=article-header><div class=article-details><header class=article-category><a href=/categories/school/ style=background-color:#6495ed;color:#fff>School</a></header><div class=article-title-wrapper><h2 class=article-title><a href=/p/writeup-on-dynamic-programming-algorithms/>Writeup on Dynamic Programming Algorithms</a></h2><h3 class=article-subtitle>WIA2005</h3></div><footer class=article-time><div><svg class="icon icon-tabler icon-tabler-calendar-time" width="56" height="56" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z"/><path d="M11.795 21H5a2 2 0 01-2-2V7a2 2 0 012-2h12a2 2 0 012 2v4"/><circle cx="18" cy="18" r="4"/><path d="M15 3v4"/><path d="M7 3v4"/><path d="M3 11h16"/><path d="M18 16.496V18l1 1"/></svg>
+<time class=article-time--published datetime=2025-07-15T23:46:39Z>Jul 15, 2025</time></div><div><svg class="icon icon-tabler icon-tabler-clock" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z"/><circle cx="12" cy="12" r="9"/><polyline points="12 7 12 12 15 15"/></svg>
+<time class=article-time--reading>5 minute read</time></div></footer></div></header><section class=article-content><ol><li>Dynamic programming is programming paradigm that takes advantage of overlapping subprograms. It increases efficiency by answering the subproblems once and keeping the answers to overlapping subprograms.</li><li>There are two approaches of dynamic programming<ol><li>Memoization: We store the answers of overlapping subprograms as we solve them.</li><li>Tabulation: We calculates the answers of the overlapping subprograms first.</li></ol></li><li>There are a few problems that can be solved with DP:<ol><li>0-1 Knapsack Problem</li><li>Rod-cutting Problem</li><li>Fibonacci Series</li></ol></li></ol><h2 id=fibonacci-series>Fibonacci Series</h2><ol><li>This is a good problem to showcase the efficiency of dynamic programming</li><li>To solve this series naively, we use this</li></ol><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt>1
+</span><span class=lnt>2
+</span><span class=lnt>3
+</span><span class=lnt>4
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-fallback data-lang=fallback><span class=line><span class=cl>FIB(n)
+</span></span><span class=line><span class=cl>if n&lt;=1
+</span></span><span class=line><span class=cl>	return n
+</span></span><span class=line><span class=cl>return FIB(n-1)+FIB(n-2)
+</span></span></code></pre></td></tr></table></div></div><ol start=3><li>Recursive tree of naive algorithm: ![[Pasted image 20250709205728.png]]<ol><li>As you can see many calculations are repeated. This is the so called &ldquo;overlapping subproblem&rdquo;</li><li>For example, <code>FIB(2)</code> is repeated 3 times</li></ol></li><li>We can improve efficiency by storing the results of <code>FIB(X)</code> ![[Pasted image 20250709205942.png]]</li><li>This method is called the memoization method in dynamic programming</li></ol><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt> 1
+</span><span class=lnt> 2
+</span><span class=lnt> 3
+</span><span class=lnt> 4
+</span><span class=lnt> 5
+</span><span class=lnt> 6
+</span><span class=lnt> 7
+</span><span class=lnt> 8
+</span><span class=lnt> 9
+</span><span class=lnt>10
+</span><span class=lnt>11
+</span><span class=lnt>12
+</span><span class=lnt>13
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-fallback data-lang=fallback><span class=line><span class=cl>FIB-MEMO(n)
+</span></span><span class=line><span class=cl>Create an array S[0..n]
+</span></span><span class=line><span class=cl>for i in 1 to n
+</span></span><span class=line><span class=cl>	S[i] = -1
+</span></span><span class=line><span class=cl>return FIB-AUX(n,S)
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>FIB-AUX(n,S)
+</span></span><span class=line><span class=cl>if S[n] != -1:
+</span></span><span class=line><span class=cl>	return S[n] // if S[n] is memorized
+</span></span><span class=line><span class=cl>if n&lt;=1
+</span></span><span class=line><span class=cl>	return n
+</span></span><span class=line><span class=cl>S[n] = FIB-AUX(n-1,S) + FIB-AUX(n-2,S) // memorize the output of FIB(n)
+</span></span><span class=line><span class=cl>return S[n]
+</span></span></code></pre></td></tr></table></div></div><ol start=6><li>The tabulation approach is slightly different. In this approach, we will precompute all the answers to subproblems</li></ol><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt>1
+</span><span class=lnt>2
+</span><span class=lnt>3
+</span><span class=lnt>4
+</span><span class=lnt>5
+</span><span class=lnt>6
+</span><span class=lnt>7
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-fallback data-lang=fallback><span class=line><span class=cl>FIB(n)
+</span></span><span class=line><span class=cl>Create an array A[0..n]
+</span></span><span class=line><span class=cl>A[0] = 0
+</span></span><span class=line><span class=cl>A[1] = 1
+</span></span><span class=line><span class=cl>for i in 2 to n
+</span></span><span class=line><span class=cl>	A[i] = A[i-1] + A[i-2]
+</span></span><span class=line><span class=cl>return A[n]
+</span></span></code></pre></td></tr></table></div></div><p>Visualization</p><div class=table-wrapper><table><thead><tr><th>i</th><th>0</th><th>1</th><th>2</th><th>3</th><th>4</th><th>5</th><th>6</th><th>&mldr;</th><th>n</th></tr></thead><tbody><tr><td>FIB(i)</td><td>0</td><td>1</td><td>1</td><td>2</td><td>3</td><td>5</td><td>8</td><td>….</td><td></td></tr><tr><td>7. The naive approach to Fibonacci numbers has a time complexity of <code>O(2^n)</code> while the dynamic programming approach to Fibonacci numbers has a time complexity of <code>O(n)</code></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td></tr></tbody></table></div><h2 id=rod-cutting-problem>Rod-Cutting Problem</h2><ol><li>In this problem, we want to maximise the profit from a given length of rod. This is because the length of the rod is not proportional to the profit of the rod.</li><li>Example: Say we have a Profit array of <code>P = [3,5,1,9]</code>, where the profit of 1 unit length of rod is <code>P[1] = 3</code> and so on. The length of the rod right now is 4 units. What is the best way to chop and sell this rod?</li><li>The trick to solve this is to recursively find the maximum profit for rod length 1,2,3 and 4.</li></ol><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt>1
+</span><span class=lnt>2
+</span><span class=lnt>3
+</span><span class=lnt>4
+</span><span class=lnt>5
+</span><span class=lnt>6
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-fallback data-lang=fallback><span class=line><span class=cl>M[4] = MAX(
+</span></span><span class=line><span class=cl>	P[4]+M[0], // no cut
+</span></span><span class=line><span class=cl>	P[3]+M[1], // 3 unit + best cut for 1 unit
+</span></span><span class=line><span class=cl>	P[2]+M[2], // 2 unit + best cut for 2 unit
+</span></span><span class=line><span class=cl>	P[1]+M[3] // 1 unit + best cut for 3 unit
+</span></span><span class=line><span class=cl>	)
+</span></span></code></pre></td></tr></table></div></div><p>To find the best cut of length 3,</p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt>1
+</span><span class=lnt>2
+</span><span class=lnt>3
+</span><span class=lnt>4
+</span><span class=lnt>5
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-fallback data-lang=fallback><span class=line><span class=cl>M[3] = MAX(
+</span></span><span class=line><span class=cl>	P[3]+M[0], // no cut
+</span></span><span class=line><span class=cl>	P[2]+M[1], // 3 unit + best cut for 1 unit
+</span></span><span class=line><span class=cl>	P[1]+M[2], // 2 unit + best cut for 2 unit
+</span></span><span class=line><span class=cl>	)
+</span></span></code></pre></td></tr></table></div></div><p>And so on.
+4. The tabulation algorithm (n is the length of rod while P is the profit for each length of rod)</p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt>1
+</span><span class=lnt>2
+</span><span class=lnt>3
+</span><span class=lnt>4
+</span><span class=lnt>5
+</span><span class=lnt>6
+</span><span class=lnt>7
+</span><span class=lnt>8
+</span><span class=lnt>9
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-fallback data-lang=fallback><span class=line><span class=cl>ROD(n,P)
+</span></span><span class=line><span class=cl>Create an array M[0..n]
+</span></span><span class=line><span class=cl>M[0] = 0
+</span></span><span class=line><span class=cl>for i in 1 to n
+</span></span><span class=line><span class=cl>	q = - INF
+</span></span><span class=line><span class=cl>	for j in 1 to i
+</span></span><span class=line><span class=cl>		q = MAX(q, P[j]+ M[i-j])
+</span></span><span class=line><span class=cl>	M[i] = q
+</span></span><span class=line><span class=cl>return M[n]
+</span></span></code></pre></td></tr></table></div></div><ol start=5><li>The memoization algorithm</li></ol><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt> 1
+</span><span class=lnt> 2
+</span><span class=lnt> 3
+</span><span class=lnt> 4
+</span><span class=lnt> 5
+</span><span class=lnt> 6
+</span><span class=lnt> 7
+</span><span class=lnt> 8
+</span><span class=lnt> 9
+</span><span class=lnt>10
+</span><span class=lnt>11
+</span><span class=lnt>12
+</span><span class=lnt>13
+</span><span class=lnt>14
+</span><span class=lnt>15
+</span><span class=lnt>16
+</span><span class=lnt>17
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-fallback data-lang=fallback><span class=line><span class=cl>ROD(n,P)
+</span></span><span class=line><span class=cl>Create an array M[0..n]
+</span></span><span class=line><span class=cl>for i in 0 to n
+</span></span><span class=line><span class=cl>	M[i] = -INF
+</span></span><span class=line><span class=cl>ROD-AUX(n,P,M)
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>ROD-AUX(i,P,M)
+</span></span><span class=line><span class=cl>if M[i] != -INF
+</span></span><span class=line><span class=cl>	return M[i]
+</span></span><span class=line><span class=cl>if i == 0
+</span></span><span class=line><span class=cl>	M[i] = 0
+</span></span><span class=line><span class=cl>	return M[i]
+</span></span><span class=line><span class=cl>q = -INF
+</span></span><span class=line><span class=cl>for j in 1 to i
+</span></span><span class=line><span class=cl>	q = MAX(q, P[j]+ROD-AUX(i-j,P,M))
+</span></span><span class=line><span class=cl>M[i] = q
+</span></span><span class=line><span class=cl>return M[i]
+</span></span></code></pre></td></tr></table></div></div><h2 id=0-1-knapsack-problem>0-1 Knapsack Problem</h2><ol><li>In this problem, we have n indivisible objects. We can only choose m objects out of n into our knapsack. We can only carry a max weight, w. Each object has a certain profit, <code>P[i]</code>. How do we pick these objects such that our profit is maximized?</li><li>The naive approach is to test all possibilities.<ol><li>An object can be either in or outside the knapsack. (0 or 1)</li><li>Thus, there is 2^n ways to choose objects.</li><li>Find the profit of all the permutations. Reject the permutation that cause the knapsack to become overweight.</li></ol></li><li>The dynamic programming approach will stop the search at the maximum weight and avoid recalculating what is the highest profit at a certain weight value. (Kinda bad explanation, lul)</li><li>The DP algorithm (Tabulation approach)</li></ol><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt> 1
+</span><span class=lnt> 2
+</span><span class=lnt> 3
+</span><span class=lnt> 4
+</span><span class=lnt> 5
+</span><span class=lnt> 6
+</span><span class=lnt> 7
+</span><span class=lnt> 8
+</span><span class=lnt> 9
+</span><span class=lnt>10
+</span><span class=lnt>11
+</span><span class=lnt>12
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-fallback data-lang=fallback><span class=line><span class=cl>KNAPSACK(P,W,max)
+</span></span><span class=line><span class=cl>n = W.length
+</span></span><span class=line><span class=cl>Create a 2d array, M[0..n][0..max]
+</span></span><span class=line><span class=cl>for i in 0 to max
+</span></span><span class=line><span class=cl>	M[0][i] = 0 // nothing has a profit of zero
+</span></span><span class=line><span class=cl>for i in 1 to n 
+</span></span><span class=line><span class=cl>	for j in 0 to max
+</span></span><span class=line><span class=cl>		if j &gt;= W[i]
+</span></span><span class=line><span class=cl>			M[i][j] = MIN(M[i-1][j], M[i-1][j-W[i]]+P[i]) // ok, basically check if the previous set of objects or previous set of objects and the profit of current object is higher
+</span></span><span class=line><span class=cl>		else
+</span></span><span class=line><span class=cl>			M[i][j] = M[i-1][j]
+</span></span><span class=line><span class=cl>return M[n][max]
+</span></span></code></pre></td></tr></table></div></div><ol start=5><li>Example
+P = {1,2,5,6}<br>W = {2,3,4,5}<br>Max weight = 8</li></ol><div class=table-wrapper><table><thead><tr><th style=text-align:right><strong>P</strong></th><th style=text-align:right><strong>W</strong></th><th style=text-align:right><strong>i</strong></th><th style=text-align:right><strong>0</strong></th><th style=text-align:right><strong>1</strong></th><th style=text-align:right><strong>2</strong></th><th style=text-align:right><strong>3</strong></th><th style=text-align:right><strong>4</strong></th><th style=text-align:right><strong>5</strong></th><th style=text-align:right><strong>6</strong></th><th style=text-align:right><strong>7</strong></th><th style=text-align:right>8</th></tr></thead><tbody><tr><td style=text-align:right>0</td><td style=text-align:right>0</td><td style=text-align:right>i = 0</td><td style=text-align:right>0</td><td style=text-align:right>0</td><td style=text-align:right>0</td><td style=text-align:right>0</td><td style=text-align:right>0</td><td style=text-align:right>0</td><td style=text-align:right>0</td><td style=text-align:right>0</td><td style=text-align:right>0</td></tr><tr><td style=text-align:right>1</td><td style=text-align:right>2</td><td style=text-align:right>i = 1</td><td style=text-align:right>0</td><td style=text-align:right>0</td><td style=text-align:right>1</td><td style=text-align:right>1</td><td style=text-align:right>1</td><td style=text-align:right>1</td><td style=text-align:right>1</td><td style=text-align:right>1</td><td style=text-align:right>1</td></tr><tr><td style=text-align:right>2</td><td style=text-align:right>3</td><td style=text-align:right>i = 2</td><td style=text-align:right>0</td><td style=text-align:right>0</td><td style=text-align:right>1</td><td style=text-align:right>==2==</td><td style=text-align:right>2</td><td style=text-align:right>3</td><td style=text-align:right>3</td><td style=text-align:right>3</td><td style=text-align:right>3</td></tr><tr><td style=text-align:right>5</td><td style=text-align:right>4</td><td style=text-align:right>i = 3</td><td style=text-align:right>0</td><td style=text-align:right>0</td><td style=text-align:right>1</td><td style=text-align:right>==2==</td><td style=text-align:right>5</td><td style=text-align:right>5</td><td style=text-align:right>6</td><td style=text-align:right>7</td><td style=text-align:right>7</td></tr><tr><td style=text-align:right>6</td><td style=text-align:right>5</td><td style=text-align:right>i = 4</td><td style=text-align:right>0</td><td style=text-align:right>0</td><td style=text-align:right>1</td><td style=text-align:right>==2==</td><td style=text-align:right>5</td><td style=text-align:right>6</td><td style=text-align:right>6</td><td style=text-align:right>7</td><td style=text-align:right>==8==</td></tr><tr><td style=text-align:right>Max-profit = 8</td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td></tr></tbody></table></div><p>To backtrack which object is in the set,
+Notice that <code>M[3][8]</code> is 7 != 8. Thus, Item 4 must be in this set.
+Subtract <code>P[4]</code> from 8. We get <code>8-6=2</code>.
+Follow the column with value in 2
+Notice that <code>M[1][3]</code> is 1 != 2. Thus, Item 2 must be in this set.</p><p>Set of item with maximum profit = {2,4}</p></section><footer class=article-footer><section class=article-tags><a href=/tags/algorithm/>Algorithm</a></section><section class=article-copyright><svg class="icon icon-tabler icon-tabler-copyright" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z"/><circle cx="12" cy="12" r="9"/><path d="M14.5 9a3.5 4 0 100 6"/></svg>
+<span>Licensed under CC BY-NC-SA 4.0</span></section></footer></article><aside class=related-content--wrapper><h2 class=section-title>Related content</h2><div class=related-content><div class="flex article-list--tile"><article><a href=/p/writeups-on-sorting-algorithms/><div class=article-details><h2 class=article-title>Writeups on Sorting Algorithms</h2></div></a></article><article><a href=/p/writeup-on-hashing-algorithms/><div class=article-details><h2 class=article-title>Writeup on Hashing Algorithms</h2></div></a></article><article><a href=/p/writeup-on-graph-algorithms/><div class=article-details><h2 class=article-title>Writeup on Graph Algorithms</h2></div></a></article></div></div></aside><footer class=site-footer><section class=copyright>&copy;
+2025 -
+2026 Froginacup's site</section><section class=powerby>Built with <a href=https://gohugo.io/ target=_blank rel=noopener>Hugo</a><br>Theme <b><a href=https://github.com/CaiJimmy/hugo-theme-stack target=_blank rel=noopener data-version=3.33.0>Stack</a></b> designed by <a href=https://jimmycai.com target=_blank rel=noopener>Jimmy</a></section></footer><div class=pswp tabindex=-1 role=dialog aria-hidden=true><div class=pswp__bg></div><div class=pswp__scroll-wrap><div class=pswp__container><div class=pswp__item></div><div class=pswp__item></div><div class=pswp__item></div></div><div class="pswp__ui pswp__ui--hidden"><div class=pswp__top-bar><div class=pswp__counter></div><button class="pswp__button pswp__button--close" title="Close (Esc)"></button>
+<button class="pswp__button pswp__button--share" title=Share></button>
+<button class="pswp__button pswp__button--fs" title="Toggle fullscreen"></button>
+<button class="pswp__button pswp__button--zoom" title="Zoom in/out"></button><div class=pswp__preloader><div class=pswp__preloader__icn><div class=pswp__preloader__cut><div class=pswp__preloader__donut></div></div></div></div></div><div class="pswp__share-modal pswp__share-modal--hidden pswp__single-tap"><div class=pswp__share-tooltip></div></div><button class="pswp__button pswp__button--arrow--left" title="Previous (arrow left)">
+</button>
+<button class="pswp__button pswp__button--arrow--right" title="Next (arrow right)"></button><div class=pswp__caption><div class=pswp__caption__center></div></div></div></div></div><script src=https://cdn.jsdelivr.net/npm/photoswipe@4.1.3/dist/photoswipe.min.js integrity="sha256-ePwmChbbvXbsO02lbM3HoHbSHTHFAeChekF1xKJdleo=" crossorigin=anonymous defer></script><script src=https://cdn.jsdelivr.net/npm/photoswipe@4.1.3/dist/photoswipe-ui-default.min.js integrity="sha256-UKkzOn/w1mBxRmLLGrSeyB4e1xbrp4xylgAWb3M42pU=" crossorigin=anonymous defer></script><link rel=stylesheet href=https://cdn.jsdelivr.net/npm/photoswipe@4.1.3/dist/default-skin/default-skin.min.css crossorigin=anonymous><link rel=stylesheet href=https://cdn.jsdelivr.net/npm/photoswipe@4.1.3/dist/photoswipe.min.css crossorigin=anonymous></main></div><script src=https://cdn.jsdelivr.net/npm/node-vibrant@3.1.6/dist/vibrant.min.js integrity="sha256-awcR2jno4kI5X0zL8ex0vi2z+KMkF24hUW8WePSA9HM=" crossorigin=anonymous></script><script type=text/javascript src=/ts/main.c922af694cc257bf1ecc41c0dd7b0430f9114ec280ccf67cd2c6ad55f5316c4e.js defer></script><script>(function(){const e=document.createElement("link");e.href="https://fonts.googleapis.com/css2?family=Lato:wght@300;400;700&display=swap",e.type="text/css",e.rel="stylesheet",document.head.appendChild(e)})()</script></body></html>

