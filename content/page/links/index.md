@@ -30,6 +30,11 @@ links:
       This certification was a refresher of most things I learnt in the CCNA. It was interesting to see how concepts are the same across vendors. Moreover, I learnt a lot about PPP, PPPOE and WLAN, which are not emphasized in CCNA.
     website: https://drive.google.com/file/d/1n2W2kmDvC-w64R4-z18rHQss-1E6PI52/view
     image: ./HCIA-Datacom.png
+  - title: AI Solutions on Cisco Infrastructure Essentials
+    description: |
+      Learnt about the hardware and network architecture in a data center to support AI workloads. Learnt a ton about GPUs.
+    website: https://www.credly.com/badges/5e8e6c09-a2ab-400f-b095-ef1055b45078/public_url
+    image: ./DCAIE-1.png
 menu:
     main: 
         weight: 4
