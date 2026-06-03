@@ -1,6 +1,10 @@
 ---
 title: Projects and Certificates
 links:
+  - title: HackTheBox
+    description: I love red team and offensive security. This is my main long term cybersecurity project. I absolutely learnt a lot from this site in terms of Linux, Windows and Active Directory enumeration and exploits.
+    website: https://app.hackthebox.com/public/users/1409389
+    image: ./htb-logo.svg
   - title: GitHub
     description: GitHub is where I upload the projects I am working on.
     website: https://github.com/trinuro
@@ -35,6 +39,16 @@ links:
       Learnt about the hardware and network architecture in a data center to support AI workloads. Learnt a ton about GPUs.
     website: https://www.credly.com/badges/5e8e6c09-a2ab-400f-b095-ef1055b45078/public_url
     image: ./DCAIE-1.png
+  - title: HackTheBox ProLabs Dante
+    description: |
+      A complex network with Linux and Windows machines. Learnt to leave no stones unturned as a lot of machines require credential hunting and pillaging to advance
+    website: https://app.hackthebox.com/public/users/1409389
+    image: ./ic-dante-overview.svg
+  - title: HackTheBox ProLabs Zephyr
+    description: |
+      An medium Active Directory network containing 17 machines. It honestly uncovered many weak points in my pentest methodology, especially inter-forest exploitation. In addition, I learnt basic ways to bypass Defender.
+    website: https://app.hackthebox.com/public/users/1409389
+    image: ./ic-zephyr-overview.svg
 menu:
     main: 
         weight: 4

@@ -15,6 +15,14 @@ url = "https://github.com/trinuro"
 [social.params]
 icon = "brand-github"
 
+[[social]]
+identifier = "hackthebox"
+name = "HacktheBox"
+url = "https://app.hackthebox.com/public/users/1409389"
+
+[social.params]
+icon = "hackthebox"
+
 # [[social]]
 # identifier = "twitter"
 # name = "Twitter"
