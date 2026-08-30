@@ -4,9 +4,8 @@ description: My thoughts on security architecture after following Cisco's SDSI c
 date: 2026-07-30T10:12:35-04:00
 image: 
 tags:
-    - HTB
 categories:
-    - htb-writeups
+    - Personal Research
 comments: false
 ---
 
