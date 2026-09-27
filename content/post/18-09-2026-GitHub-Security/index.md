@@ -11,8 +11,7 @@ categories:
 comments: false
 ---
 ## Introduction
-1. GitHub is a well known remote Git repository solution and naturally there are many security tools in it.
-2. I felt to compelled to write this as I know I haven't wrote anything for my GitHub Advanced Security certification (shameless plug lol).
+1. GitHub is a well known remote Git repository solution and naturally there are many security tools in it. I felt compelled to write this as I know I haven't wrote anything for my GitHub Advanced Security certification (shameless plug lol).
 ## Secrets
 ### Secrets Protection
 1. One of the most common mistakes made by developers is committing secrets in Git history. Notice how I said Git history? This is because even if you deleted the secret and committed the delete, attackers can use tools such as [TruffleHog](https://github.com/trufflesecurity/trufflehog) to retrieve the secret!
@@ -54,7 +53,7 @@ Output:
 Configure the branch to only accept pull request and reject any direct commits.
 ![GHS-blog-5.png](GHS-blog-5.png)
 3. To take this one step further, we can require any pull requests to only be merged after it has been reviewed by one or more senior developers or testers. Refer to the above diagram
-4. To take this another step further, a [`CODEOWNERS`](https://docs.github.com/en/repositories/managing-your-repositorys-settings-and-features/customizing-your-repository/about-code-owners) file can be defined to specify the user that must approve the pull request for the particular section of the code repo. This ensures that the subject matter expert has approved the matter.
+4. To take this another step further, a [`CODEOWNERS`](https://docs.github.com/en/repositories/managing-your-repositorys-settings-and-features/customizing-your-repository/about-code-owners) file can be defined to specify the user that must approve the pull request for the particular section of the code repo. This ensures that the subject matter expert has approved the code change.
 ```SH
 # CODEOWNERS defines which user is required to approve certain PR
 # Syntax: path @username
