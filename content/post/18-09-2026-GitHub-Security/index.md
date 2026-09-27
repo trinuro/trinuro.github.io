@@ -38,7 +38,7 @@ Successfully created database at /home/kali/Work/SecurityScan/myDumbApp-db.
 ```
 Then, scan the database. Here I chose `python-code-scanning.qls` to scan.
 ```
-codeql database analyze HivisionIDPhotos-db --format=csv --output=myDumbApp-output.csv python-code-scanning.qls
+codeql database analyze myDumbApp-db --format=csv --output=myDumbApp-output.csv python-code-scanning.qls
 ```
 Output:
 ```
